@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>稳定币 ⇄ 法币 · 演示版</title>
+<style>
+:root{--bg:#f6f7f4;--card:#fff;--ink:#14212b;--mute:#5e6b73;--line:#dde2df;--brand:#0b4a6f;--brand-ink:#fff;--best:#b8730a;--best-bg:#fbf1dc;--ok:#1b7a57;--warn:#a23b2a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#10181e;--card:#18232b;--ink:#e8eef1;--mute:#98a7b0;--line:#2b3a44;--brand:#5fb3e0;--brand-ink:#08202e;--best:#f0b44c;--best-bg:#3a2d12;--ok:#5ccb9b;--warn:#ff9b87}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#10181e;--card:#18232b;--ink:#e8eef1;--mute:#98a7b0;--line:#2b3a44;--brand:#5fb3e0;--brand-ink:#08202e;--best:#f0b44c;--best-bg:#3a2d12;--ok:#5ccb9b;--warn:#ff9b87}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:480px;margin:0 auto;padding:16px 16px 40px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+h1{font-size:20px;margin:0}
+.tag{font-size:12px;color:var(--best);background:var(--best-bg);padding:3px 9px;border-radius:999px}
+.note{font-size:13px;color:var(--mute);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:none}
+.card.on{display:block}
+label{display:block;font-size:14px;color:var(--mute);margin:14px 0 6px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;font:inherit;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.seg button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn{width:100%;margin-top:18px;font:inherit;font-weight:600;padding:13px;border:0;border-radius:10px;background:var(--brand);color:var(--brand-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand);margin-top:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.err{color:var(--warn);font-size:13px;min-height:18px;margin:8px 0 0}
+.big{font-size:36px;font-weight:700;line-height:1.15;margin:4px 0 2px;color:var(--brand)}
+.sub{font-size:13px;color:var(--mute)}
+.bar{height:5px;background:var(--line);border-radius:4px;margin:14px 0 4px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--brand);transition:width 1s linear}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.row:last-child{border-bottom:0}
+.row span:first-child{color:var(--mute);flex:none}
+.row span:last-child,.row b{text-align:right;word-break:break-all}
+h2{font-size:15px;margin:20px 0 6px}
+.lp{display:flex;justify-content:space-between;padding:9px 10px;border-radius:8px;font-size:15px}
+.lp.best{background:var(--best-bg);color:var(--best);font-weight:600}
+.addr{word-break:break-all;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:13px;margin:8px 0}
+ol.steps{list-style:none;margin:8px 0 0;padding:0}
+ol.steps li{display:flex;gap:10px;padding:9px 0;color:var(--mute);border-bottom:1px solid var(--line)}
+ol.steps li:last-child{border-bottom:0}
+ol.steps li .d{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none;margin-top:3px}
+ol.steps li.done{color:var(--ink)}
+ol.steps li.done .d{background:var(--ok);border-color:var(--ok)}
+ol.steps li.now .d{border-color:var(--brand)}
+ol.steps li time{margin-left:auto;font-size:13px;color:var(--mute)}
+.final{margin-top:14px;padding:14px;border-radius:10px;background:var(--best-bg);display:none}
+.final.on{display:block}
+.foot{font-size:12px;color:var(--mute);margin-top:18px;text-align:center}
+.wrap.wide{max-width:960px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
+.tabs button{flex:none;font:inherit;font-size:14px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.tabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.view .card{margin-bottom:12px}
+.tw{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--mute);font-weight:500}
+.mini{font:inherit;font-size:12px;padding:4px 9px;border-radius:6px;border:1px solid var(--brand);background:transparent;color:var(--brand);cursor:pointer}
+.hl{color:var(--best);font-weight:700}
+.bad{color:var(--warn);font-weight:600}
+.inv{display:flex;gap:8px;flex-wrap:wrap}
+.inv div{flex:1 1 90px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--mute)}
+.inv b{display:block;font-size:16px;color:var(--ink)}
+.two{display:flex;gap:8px}
+.two>*{flex:1}
+.chk{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:15px}
+.chk input{width:auto}
+.roles{display:grid;gap:10px}
+.rc{font:inherit;text-align:left;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer}
+.rc b{display:block;font-size:16px}
+.rc span{font-size:13px;color:var(--mute)}
+#ubar{display:none;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;color:var(--mute)}
+progress{width:70px;height:8px;vertical-align:middle}
+.view table input{width:auto}
+.ap{display:none}
+textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;resize:vertical}
+textarea:focus{outline:2px solid var(--brand);outline-offset:1px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>稳定币 ⇄ 法币</h1><span class="tag">演示版 · 模拟数据</span></header>
+<p class="note">价格、汇率、地址和到账过程均为模拟，不涉及真实资金。</p>
+<div id="home">
+ <h2 style="margin:8px 0 12px">登录</h2>
+ <div class="roles">
+  <div class="rc" style="cursor:default"><b>客户登录</b><span>选择演示客户（不同客户的档位和佣金比例不同）</span><select id="lcs" style="margin-top:10px"></select><button class="btn" id="lc" style="margin-top:8px">客户登录</button></div>
+  <div class="rc" style="cursor:default"><b>客户开户</b><span>填写推荐人，系统自动对应该推荐人的客户经理；没有推荐人可留空</span><input id="onm" placeholder="客户姓名" style="margin-top:10px"><select id="ore" style="margin-top:8px"></select><p class="err" id="omsg"></p><button class="btn" id="oadd" style="margin-top:6px">开户</button></div>
+  <div class="rc" style="cursor:default"><b>员工登录</b><span>输入管理员分配的角色代码（字母 + 数字）</span>
+   <input id="scode" placeholder="例如 T01" autocapitalize="characters" style="margin-top:10px">
+   <p class="err" id="serr"></p>
+   <button class="btn" id="slog" style="margin-top:6px">员工登录</button>
+   <p class="sub" id="shint" style="margin-bottom:0"></p></div>
+ </div>
+</div>
+<div id="ubar"><span id="who2"></span><button class="mini" id="out2">退出登录</button></div>
+<div id="v-cust" style="display:none">
+
+<section class="card on" id="s1">
+  <div class="seg" id="dir"><button class="on" data-d="sell">卖出稳定币，收法币</button><button data-d="buy">用法币买入稳定币</button></div>
+  <label for="fiat">法币币种</label>
+  <select id="fiat"><option>USD</option><option>HKD</option><option>EUR</option><option>GBP</option><option>SGD</option><option>AED</option></select>
+  <label>稳定币</label>
+  <div class="seg" id="coin"><button class="on" data-c="USDC">USDC</button><button data-c="USDT">USDT</button></div>
+  <label for="net">转账网络</label><select id="net"></select>
+  <label for="amt" id="amtL"></label><input id="amt" type="number" inputmode="decimal" value="50000">
+  <label for="rail" id="railL"></label><select id="rail"></select>
+  <label for="who" id="whoL"></label><input id="who" value="示例姓名 SAMPLE NAME">
+  <div id="wbox"><label for="wallet">收款钱包地址</label><input id="wallet" value="DEMO-wallet-address"></div>
+  <p class="err" id="err"></p>
+  <button class="btn" id="go">获取报价</button>
+  <button class="btn ghost" id="tk">咨询或投诉</button>
+</section>
+
+<section class="card" id="s2">
+  <div class="sub">你将收到</div>
+  <div class="big" id="out">–</div>
+  <div class="sub" id="left"></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div id="rows"></div>
+  <div id="lpbox" style="display:none"><h2>已比价的流动性渠道（最优价自动选中）</h2>
+  <div id="lps"></div></div>
+  <button class="btn ghost" id="auth">授权人员查看渠道比价</button>
+  <div id="authbox" style="display:none"><label for="code">授权码（演示：8888）</label><input id="code" type="password"><p class="err" id="err2"></p><button class="btn" id="codeok">确认</button></div>
+  <button class="btn" id="accept">接受报价</button>
+  <button class="btn ghost" id="req">重新询价</button>
+</section>
+
+<section class="card" id="s3">
+  <h2 style="margin-top:0" id="s3t"></h2>
+  <div id="s3rows"></div>
+  <label id="addrL"></label>
+  <div class="addr" id="addr"></div>
+  <p class="sub" id="s3n"></p>
+  <button class="btn" id="sim"></button>
+</section>
+
+<section class="card" id="s4">
+  <h2 style="margin-top:0">订单进度</h2>
+  <ol class="steps" id="steps"></ol>
+  <div class="final" id="final"></div>
+  <button class="btn ghost" id="again" style="display:none">再做一笔</button>
+</section>
+
+<section class="card" id="s5">
+  <h2 style="margin-top:0">咨询与投诉</h2>
+  <label for="tt">类型</label><select id="tt"><option>咨询</option><option>投诉</option></select>
+  <label for="tx">内容</label><textarea id="tx" rows="3"></textarea>
+  <p class="err" id="te5"></p><button class="btn" id="tsend">提交</button>
+  <h2>我的记录</h2><div id="tl"></div>
+  <button class="btn ghost" id="tback">返回</button>
+</section>
+</div>
+<div id="v-trader" class="view" style="display:none">
+ <div class="card on"><h2 style="margin-top:0">智能订单</h2><p class="sub" id="tmode"></p>
+  <div class="two"><select id="ts"><option value="sell">卖出</option><option value="buy">买入</option></select><select id="tc"><option>USDC</option><option>USDT</option></select></div>
+  <label for="tz">数量</label><input id="tz" type="number" value="100000">
+  <label for="tg">执行策略</label>
+  <select id="tg"><option value="sor">智能路由 SOR</option><option value="twap">TWAP 时间加权</option><option value="ice">冰山单 Iceberg</option><option value="lim">限价单</option></select>
+  <p class="sub" id="tgd"></p>
+  <div id="tpb"><label for="tp">限价（美元）</label><input id="tp" type="number" step="0.0001" value="0.9995"></div>
+  <div id="tdb"><label for="td">TWAP 时长（分钟，演示中快进）</label><input id="td" type="number" value="3"></div>
+  <p class="err" id="te"></p><button class="btn" id="tgo">提交订单</button></div>
+ <div class="card on"><h2 style="margin-top:0">智能路由实时详情：报价、深度与分配</h2><div id="rt"></div></div>
+ <div class="card on"><h2 style="margin-top:0">成本分析（TCA）</h2><div id="tca"></div></div>
+ <div class="card on"><h2 style="margin-top:0">待对冲的客户订单</h2><div class="tw" id="hq"></div></div>
+ <div class="card on"><h2 style="margin-top:0">我的订单（实时）</h2><div class="tw" id="tb"></div></div>
+ <div class="card on"><h2 style="margin-top:0">渠道行情</h2><div class="tw" id="liq"></div></div>
+ <div class="card on"><h2 style="margin-top:0">头寸</h2><div class="inv" id="inv"></div></div>
+</div>
+<div id="v-admin" class="view" style="display:none">
+ <nav class="tabs" id="atabs"><button class="on" data-t="live">实时交易</button><button data-t="hist">历史记录</button><button data-t="role">角色权限</button><button data-t="aud">审计日志</button><button data-t="brk">对账差异</button><button data-t="staff">员工与角色代码</button><button data-t="cfg">系统配置</button></nav>
+ <p class="bad" id="nop" style="display:none">当前角色没有此页面的权限。</p>
+ <div class="card on ap" id="a-live"><div class="inv" id="kp"></div><div class="tw" id="ll"></div></div>
+ <div class="card on ap" id="a-hist"><div class="two"><select id="hs"><option>全部</option><option>已完成</option><option>已撤销</option><option>已拒绝</option></select><select id="hr"><option>全部</option><option>客户</option><option>交易员</option></select></div><div class="tw" id="hl"></div><button class="btn ghost" id="hx">导出历史记录（演示）</button><p class="sub" id="hxm"></p></div>
+ <div class="card on ap" id="a-role"><div class="tw" id="rm"></div><p class="sub">勾选即授权，修改立即生效并写入审计日志。下单权限分两种、二选一：“手动确认后执行”需交易员核对路由方案后确认；“自动执行”提交即执行，交易员默认为自动执行。管理员默认不含下单和出款权限，以实现职责分离；管理角色权限本身不可取消，避免锁死。</p></div>
+ <div class="card on ap" id="a-aud"><div class="tw" id="al"></div></div>
+ <div class="card on ap" id="a-brk"><div class="tw" id="ab"></div></div>
+ <div class="card on ap" id="a-staff"><div class="tw" id="sl"></div>
+  <h2>分配新的角色代码</h2><div class="two"><select id="sr"></select><input id="sn" placeholder="员工姓名"></div>
+  <button class="btn" id="sadd">生成并启用角色代码</button><p class="sub" id="sm"></p>
+  <p class="sub">规则：同一岗位用同一个字母，数字是该岗位的员工编号。T=交易员，F=财务主管，R=风控主管，C=客户关系部经理，B=后台管理员，A=管理员。</p></div>
+ <div class="card on ap" id="a-cfg"><label for="cc">默认佣金率（%，仅在客户没有分档时使用）</label><input id="cc" type="number" step="0.01" value="0.15"><label for="pdev">订单价格保护：偏离阈值（bp）</label><input id="pdev" type="number" value="30"><label for="pmax">订单价格保护：单笔数量上限</label><input id="pmax" type="number" value="5000000"><button class="btn" id="csave">保存配置</button></div>
+</div>
+<div id="v-ops" class="view" style="display:none">
+ <div class="card on"><h2 style="margin-top:0">出款确认（后台管理员）</h2><div class="tw" id="ord"></div></div>
+ <div class="card on"><h2 style="margin-top:0">三方对账</h2><div class="tw" id="rec"></div></div>
+</div>
+<div id="v-fin" class="view" style="display:none">
+ <p class="bad" id="g-fin" style="display:none">当前角色没有此页面的权限。</p>
+ <div id="b-fin">
+  <div class="card on"><h2 style="margin-top:0">资金账户</h2><div class="inv" id="fa"></div></div>
+  <div class="card on"><h2 style="margin-top:0">资金流水（实时）</h2><div class="tw" id="ff"></div></div>
+  <div class="card on"><h2 style="margin-top:0">账本</h2><button class="btn" id="fgen" style="margin-top:0">生成账本</button><div class="tw" id="fl"></div></div>
+  <div class="card on"><h2 style="margin-top:0">日终对账</h2><button class="btn" id="frec" style="margin-top:0">执行日终对账</button><button class="btn ghost" id="fsim">模拟一笔大额差异（演示）</button><div class="tw" id="fr"></div><p class="sub">对账规则：账本与外部余额差异 ≤ 10 美元自动通过；10–1,000 美元需财务主管说明并登记调整凭证；超过 1,000 美元升级给风控主管和管理员。客户资金覆盖率不得低于 100%。</p></div>
+  <div class="card on"><h2 style="margin-top:0">对账差异处理</h2><input id="fnote" placeholder="填写差异原因说明（提交说明时使用）"><p class="err" id="fm"></p><div class="tw" id="fb"></div><p class="sub">流程：10–1,000 美元由财务主管说明后关闭；超过 1,000 美元依次经财务主管说明、风控主管确认、管理员批准后关闭，任一环节可退回。</p></div>
+  <div class="card on"><h2 style="margin-top:0">订单成本与利润</h2><div id="fp"></div></div>
+  <div class="card on"><h2 style="margin-top:0">科目表</h2><div class="tw" id="coa"></div></div>
+ </div>
+</div>
+<div id="v-risk" class="view" style="display:none">
+ <p class="bad" id="g-risk" style="display:none">当前角色没有此页面的权限。</p>
+ <div id="b-risk">
+  <div class="card on"><h2 style="margin-top:0">自动风控系统</h2><div class="inv" id="rk"></div><div class="tw" id="rr"></div></div>
+  <div class="card on"><h2 style="margin-top:0">风险事件</h2><div class="tw" id="re"></div></div>
+  <div class="card on"><h2 style="margin-top:0">对账差异升级</h2><div class="tw" id="rb"></div></div>
+ </div>
+</div>
+<div id="v-crm" class="view" style="display:none">
+ <nav class="tabs" id="ctabs"><button class="on" data-t="cu">客户与交易</button><button data-t="tier">分级规则</button><button data-t="map">对应关系与比例</button><button data-t="stm">佣金表</button><button data-t="grp">分组明细</button><button data-t="tk">投诉与咨询</button></nav>
+ <p class="bad" id="g-crm" style="display:none">当前角色没有此页面的权限。</p>
+ <div class="ap" id="c-cu">
+  <div class="card on"><div class="inv" id="cu0"></div></div>
+  <div class="card on"><h2 style="margin-top:0">客户一览</h2><div class="tw" id="cu1"></div></div>
+  <div class="card on"><h2 style="margin-top:0">实时交易执行</h2><div class="tw" id="cu2"></div></div>
+  <div class="card on"><h2 style="margin-top:0">交易历史</h2><select id="chc"></select><div class="tw" id="cu3"></div></div>
+ </div>
+ <div class="ap" id="c-tier">
+  <div class="card on"><h2 style="margin-top:0">客户分级规则</h2>
+   <p class="sub">按客户前 30 日（不含当天）已完成交易量自动分档，并自动把对应佣金比例加入该客户的报价。</p>
+   <div class="tw"><table><tr><th>档位</th><th>前30日交易量门槛（美元等值）</th><th>佣金比例（%）</th></tr>
+    <tr><td>普通</td><td><input id="th0" type="number" disabled></td><td><input id="tr0" type="number" step="0.01"></td></tr>
+    <tr><td>银卡</td><td><input id="th1" type="number"></td><td><input id="tr1" type="number" step="0.01"></td></tr>
+    <tr><td>金卡</td><td><input id="th2" type="number"></td><td><input id="tr2" type="number" step="0.01"></td></tr>
+    <tr><td>钻石</td><td><input id="th3" type="number"></td><td><input id="tr3" type="number" step="0.01"></td></tr></table></div>
+   <p class="err" id="tm"></p><button class="btn" id="tsave">保存分级规则</button></div>
+  <div class="card on"><h2 style="margin-top:0">客户当前档位</h2><div class="tw" id="tl2"></div></div>
+ </div>
+ <div class="ap" id="c-map">
+  <div class="card on"><h2 style="margin-top:0">推荐人与客户经理对应关系及佣金比例</h2>
+   <p class="sub">客户开户时填写推荐人，系统自动把客户对应到该推荐人的客户经理。佣金比例均为占我方佣金收入的百分比。</p>
+   <div class="tw" id="mp1"></div>
+   <h2>客户经理佣金比例</h2><div class="tw" id="mp2"></div>
+   <p class="err" id="mpm"></p><button class="btn" id="mpsave">保存对应关系与佣金比例</button></div>
+  <div class="card on"><h2 style="margin-top:0">新增推荐人</h2>
+   <input id="nrn" placeholder="推荐人姓名"><div class="two" style="margin-top:8px"><select id="nrm"></select><input id="nrs" type="number" placeholder="佣金比例（%）"></div><button class="btn" id="nradd">新增推荐人</button></div>
+  <div class="card on"><h2 style="margin-top:0">无推荐人客户的分配</h2>
+   <p class="sub" id="mp4"></p>
+   <select id="asel"></select><div class="tw" id="mp3"></div><button class="btn ghost" id="asall">一键分配所有待分配客户给最新入职的客户经理</button></div>
+ </div>
+ <div class="ap" id="c-stm">
+  <div class="card on"><h2 style="margin-top:0">生成佣金明细与汇总表</h2>
+   <div class="two"><select id="st1"><option>按客户经理</option><option>按推荐人</option></select><select id="st3"><option>近30日</option><option>本月</option><option>全部</option></select></div>
+   <label for="st2">对象</label><select id="st2"></select>
+   <button class="btn" id="stgo">生成佣金表</button><p class="sub" id="sscope"></p></div>
+  <div class="card on"><div id="so"><p class="sub">选择类型、对象和期间后点“生成佣金表”，会得到汇总表和明细表。</p></div><button class="btn ghost" id="sx" style="display:none">下载为 CSV（GitHub / Netlify 版可用）</button></div>
+  <div class="card on"><h2 style="margin-top:0">生成记录</h2><div class="tw" id="sh"></div></div>
+ </div>
+ <div class="ap" id="c-grp">
+  <div class="card on"><div class="two"><select id="gg"><option>按推荐人</option><option>按客户等级</option><option>推荐人+等级</option><option>不分组</option></select><select id="gp"><option>近30日</option><option>全部</option></select></div>
+   <div class="two" style="margin-top:8px"><select id="gr"></select><select id="gt"><option value="全部">等级：全部</option><option>普通</option><option>银卡</option><option>金卡</option><option>钻石</option></select></div>
+   <div class="inv" id="gk" style="margin-top:12px"></div><div class="tw" id="gl"></div>
+   <p class="sub">客户等级按当前档位显示；佣金比例是下单当时报价使用的比例；应付推荐人金额 = 佣金金额 × 推荐人佣金比例。成交量按稳定币 1:1 折算美元。</p></div>
+ </div>
+ <div class="ap" id="c-tk">
+  <div class="card on"><h2 style="margin-top:0">客户咨询与投诉</h2><div class="tw" id="ct"></div></div>
+  <div class="card on" id="cbox" style="display:none"><h2 style="margin-top:0" id="cth"></h2><p class="sub" id="ctx" style="white-space:pre-wrap"></p><textarea id="crp" rows="3"></textarea><button class="btn" id="csend">发送回复</button></div>
+ </div>
+</div>
+<p class="foot">演示版仅展示界面和流程，非投资或金融服务。交易员、管理员和后台界面借鉴机构交易平台的通用功能布局，数据均为模拟；真实系统需要账号认证、双因素验证和操作审批。</p>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var FX={USD:1,HKD:7.8,EUR:0.92,GBP:0.79,SGD:1.34,AED:3.6725};
+var BID={USDC:0.9998,USDT:0.9991}, ASK={USDC:1.0004,USDT:1.0009};
+var NET={USDC:["Ethereum","Solana","Base"],USDT:["Tron (TRC20)","Ethereum","Solana"]};
+var FEE={"Ethereum":3,"Solana":0.1,"Base":0.05,"Tron (TRC20)":1};
+var LPS=["Fuze Finance","Binance OTC","OKX OTC"];
+var COMM=0.0015, dir="sell", coin="USDC", q=null, tm=null, left=30;
+var S1="美元";
+var RAILS={
+ USD:[["同行内部转账","秒级"],["CHATS 美元清算","几分钟（营业时段内）"],["SWIFT 电汇","1–2 个工作日"]],
+ HKD:[["FPS 转数快","秒级"],["CHATS 港币","当天"]],
+ EUR:[["SEPA Instant","秒级"],["SEPA 转账","当天至 1 个工作日"],["SWIFT 电汇","1–2 个工作日"]],
+ GBP:[["Faster Payments","秒级"],["SWIFT 电汇","1–2 个工作日"]],
+ SGD:[["FAST / PayNow","秒级"],["SWIFT 电汇","1–2 个工作日"]],
+ AED:[["本地转账","当天"],["SWIFT 电汇","1–2 个工作日"]]
+};
+var SELL=[["检测到链上转账","T+8秒"],["地址风险筛查通过","T+20秒"],["确认数达标，订单确认","T+45秒"],["市场对冲成交","T+52秒"],["法币出款已发起","T+70秒"],["法币到账",""]];
+var BUY=[["收到法币入账",""],["付款人姓名核对一致","T+10秒"],["风险筛查通过","T+20秒"],["订单确认","T+30秒"],["市场买入稳定币","T+45秒"],["稳定币已转出到你的钱包","T+70秒"]];
+function fmt(n,d){d=d===undefined?2:d;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function show(n){for(var i=1;i<=5;i++)$("s"+i).classList.toggle("on",i===n);window.scrollTo(0,0)}
+function opts(sel,arr){sel.innerHTML="";arr.forEach(function(t){var o=document.createElement("option");o.textContent=t;sel.appendChild(o)})}
+function fiat(){return $("fiat").value}
+function eta(){var r=RAILS[fiat()],v=$("rail").value;for(var i=0;i<r.length;i++)if(r[i][0]===v)return r[i][1];return ""}
+function labels(){
+  var s=dir==="sell",f=fiat();
+  $("amtL").textContent=s?"卖出数量（"+coin+"）":"付款金额（"+f+"）";
+  $("railL").textContent=s?"法币出款方式":"法币付款方式";
+  $("whoL").textContent=s?"收款人姓名":"付款人姓名（须与实名一致）";
+  $("wbox").style.display=s?"none":"block";
+}
+function rails(){opts($("rail"),RAILS[fiat()].map(function(r){return r[0]}))}
+function nets(){opts($("net"),NET[coin])}
+document.querySelectorAll("#dir button").forEach(function(b){b.onclick=function(){dir=b.dataset.d;document.querySelectorAll("#dir button").forEach(function(x){x.classList.toggle("on",x===b)});labels()}});
+document.querySelectorAll("#coin button").forEach(function(b){b.onclick=function(){coin=b.dataset.c;document.querySelectorAll("#coin button").forEach(function(x){x.classList.toggle("on",x===b)});nets();labels()}});
+$("fiat").onchange=function(){rails();labels()};
+function row(k,v){var d=document.createElement("div");d.className="row";var a=document.createElement("span");a.textContent=k;var b=document.createElement("span");b.textContent=v;d.appendChild(a);d.appendChild(b);return d}
+function quote(){COMM=custRate();
+  var s=dir==="sell",f=fiat(),fx=FX[f],amt=parseFloat($("amt").value),net=$("net").value;
+  if(!(amt>=(s?1000:1000*fx))){$("err").textContent="最小"+(s?"卖出数量为 1,000 "+coin:"付款金额为 "+fmt(1000*fx,0)+" "+f)+"（演示设定）。";return}
+  if(!s&&!$("wallet").value.trim()){$("err").textContent="请填写收款钱包地址（演示可随意填写）。";return}
+  $("err").textContent="";
+  var lps=LPS.map(function(n){var u=s?BID[coin]+(Math.random()-0.45)*0.001:ASK[coin]+(Math.random()-0.55)*0.001;return{n:n,p:u*fx}});
+  var best=lps.reduce(function(a,b){return(s?b.p>a.p:b.p<a.p)?b:a});
+  var r=$("rows");r.innerHTML="";
+  var out,comm;
+  if(s){var g=amt*best.p;comm=g*COMM;var fee=FEE[net]*fx;out=fmt(g-comm-fee)+" "+f;
+    r.appendChild(row("卖出",fmt(amt)+" "+coin));
+    r.appendChild(row("最优市场价","1 "+coin+" = "+best.p.toFixed(4)+" "+f));
+    r.appendChild(row("平台佣金（"+cTier()+(COMM*100).toFixed(2)+"%）","− "+fmt(comm)+" "+f));
+    r.appendChild(row("链上手续费","− "+fmt(fee)+" "+f));
+    r.appendChild(row("法币出款",$("rail").value+"，预计"+eta()));
+  }else{comm=amt*COMM;var c=(amt-comm)/best.p-FEE[net];out=fmt(c)+" "+coin;
+    r.appendChild(row("付款",fmt(amt)+" "+f));
+    r.appendChild(row("最优市场价","1 "+coin+" = "+best.p.toFixed(4)+" "+f));
+    r.appendChild(row("平台佣金（"+cTier()+(COMM*100).toFixed(2)+"%）","− "+fmt(comm)+" "+f));
+    r.appendChild(row("链上手续费","− "+FEE[net]+" "+coin));
+    r.appendChild(row("法币付款",$("rail").value+"，预计"+eta()+"入账"));
+    r.appendChild(row("收款钱包（"+net+"）",$("wallet").value.trim()));
+  }
+  q={s:s,f:f,amt:amt,net:net,out:out,rail:$("rail").value,eta:eta(),coin:coin,who:$("who").value};
+  $("out").textContent=out;
+  var l=$("lps");l.innerHTML="";
+  lps.forEach(function(x){var d=document.createElement("div");d.className="lp"+(x===best?" best":"");var a=document.createElement("span");a.textContent=x.n+(x===best?"（最优）":"");var b=document.createElement("span");b.textContent=x.p.toFixed(4)+" "+f;d.appendChild(a);d.appendChild(b);l.appendChild(d)});
+  lpVis();$("accept").disabled=false;left=30;clearInterval(tm);tick();tm=setInterval(tick,1000);show(2);
+}
+function tick(){
+  $("bar").style.width=(left/30*100)+"%";
+  if(left<=0){clearInterval(tm);$("left").textContent="报价已过期，请重新询价";$("accept").disabled=true;return}
+  $("left").textContent="报价还剩 "+left+" 秒";left--;
+}
+function hex(n){var h="";for(var i=0;i<n;i++)h+="0123456789abcdef"[Math.floor(Math.random()*16)];return h}
+$("go").onclick=quote;$("req").onclick=quote;
+$("accept").onclick=function(){
+  clearInterval(tm);var r=$("s3rows");r.innerHTML="";
+  if(q.s){
+    $("s3t").textContent="请转入稳定币";
+    r.appendChild(row("转账金额",fmt(q.amt)+" "+q.coin));r.appendChild(row("网络",q.net));
+    $("addrL").textContent="本订单专用充值地址（演示）";
+    $("addr").textContent="DEMO-"+hex(34)+"（仅演示，请勿转账）";
+    $("s3n").textContent="真实系统会为每个订单生成唯一地址，并在入账前做链上风险筛查。";
+    $("sim").textContent="模拟我已转账";
+  }else{
+    $("s3t").textContent="请汇入法币";
+    r.appendChild(row("汇款金额",fmt(q.amt)+" "+q.f));r.appendChild(row("付款方式",q.rail));
+    $("addrL").textContent="收款账户与附言（演示）";
+    $("addr").textContent="户名：DEMO PLATFORM LTD（演示）\n账号：DEMO-"+hex(10)+"\n附言：REF-"+hex(6);
+    $("addr").style.whiteSpace="pre-wrap";
+    $("s3n").textContent="真实系统要求付款人姓名与实名一致，不接受第三方付款。";
+    $("sim").textContent="模拟我已付款";
+  }
+  show(3);
+};
+$("sim").onclick=function(){
+  show(4);var ol=$("steps");ol.innerHTML="";$("final").className="final";$("again").style.display="none";
+  var st=q.s?SELL:BUY;
+  var items=st.map(function(s){var li=document.createElement("li");var d=document.createElement("span");d.className="d";var t=document.createElement("span");t.textContent=s[0];var tt=document.createElement("time");tt.textContent=s[1];li.appendChild(d);li.appendChild(t);li.appendChild(tt);ol.appendChild(li);return li});
+  var i=0;
+  (function next(){
+    if(i>0)items[i-1].className="done";
+    if(i>=items.length){
+      var f=$("final");
+      f.textContent=q.s?"演示完成："+q.out+" 已通过「"+q.rail+"」汇至 "+q.who+" 的"+q.f+"账户。真实到账时间取决于出款通道："+q.eta+"。":"演示完成："+q.out+" 已转入你的钱包（"+q.net+"）。";
+      f.className="final on";$("again").style.display="block";return;
+    }
+    items[i].className="now";i++;setTimeout(next,1100);
+  })();
+};
+$("again").onclick=function(){show(1)};
+var USER=null,UCODE="",LINK=null,DET=null,SEL=null,AT="live",authed=false,LOG=[],SEQ=1051,ESEQ=301,TSEQ=101,LEDGER=null,LV=0,INV={USDC:500000,USDT:300000,USD:800000};
+var ROLES=["客户","交易员","财务主管","风控主管","客户关系部经理","客户经理","后台管理员","管理员"];
+var P=[["lp","查看渠道比价"],["trade","下单：手动确认后执行"],["auto","下单：自动执行"],["cancel","撤销订单"],["cost","查看成本分析"],["fin","查看资金流水"],["ledger","生成与查看账本"],["brk","确认与批准对账差异"],["riskmon","监控自动风控"],["riskhandle","处理风险事件"],["crm","回复客户咨询与投诉"],["cust","查看客户与交易（客户经理仅限本人客户）"],["tier","定义客户分级规则"],["map","定义推荐人与客户经理对应及佣金比例"],["stm","查询、生成佣金明细与汇总表（客户经理仅限本人）"],["rpt","分组明细查询"],["approve","出款确认与对账"],["live","查看实时交易"],["hist","查看历史记录"],["export","导出报表"],["staff","管理员工角色代码"],["rbac","管理角色权限"],["cfg","修改佣金与保护参数"],["audit","查看审计日志"]];
+var PM={"客户":{},"交易员":{lp:1,auto:1,cancel:1,cost:1,live:1},"财务主管":{fin:1,ledger:1,cost:1,live:1,hist:1,export:1},"风控主管":{lp:1,riskmon:1,riskhandle:1,brk:1,live:1,hist:1,audit:1},"客户关系部经理":{crm:1,cust:1,tier:1,map:1,stm:1,rpt:1,hist:1},"客户经理":{cust:1,stm:1},"后台管理员":{approve:1,live:1,hist:1},"管理员":{lp:1,live:1,hist:1,export:1,brk:1,staff:1,rbac:1,cfg:1,audit:1}};
+var VIEW={"客户":"cust","交易员":"trader","财务主管":"fin","风控主管":"risk","客户关系部经理":"crm","客户经理":"crm","管理员":"admin","后台管理员":"ops"};
+var LPD=["Fuze Finance","Binance OTC","OKX OTC","Circle Mint（USDC 赎回）"],DONE=["已完成","已撤销","已拒绝"];
+var GN={sor:"智能路由 SOR",twap:"TWAP",ice:"冰山单",lim:"限价单","":"客户订单"};
+var GD={sor:"同时询价多个渠道，按最优价拆单成交，适合急单。",twap:"把订单按时间均匀切片，减小对价格的冲击。",ice:"只露出一小部分数量，成交后再补量，隐藏真实规模。",lim:"只在价格不劣于限价时成交，否则等待。"};
+function mk(id,src,side,coin,size,g,fill,avg,st,t,v){return{id:id,src:src,side:side,coin:coin,size:size,g:g,fill:fill,avg:avg,st:st,t:t,v:v||{},dur:3,px:0,link:null,plan:null,d:0,cid:null,cr:undefined}}
+var ORDERS=[
+ mk("T-1051","客户","买入","USDT",20000,"",0,0,"待出款","10-15 09:52"),
+ mk("T-1050","客户","卖出","USDC",50000,"",0,0,"待风险审核","10-15 09:40"),
+ mk("S-1049","交易员","卖出","USDC",200000,"sor",200000,0.99981,"已完成","10-14 16:20",{"Fuze Finance":120000,"OKX OTC":80000}),
+ mk("S-1048","交易员","买入","USDT",150000,"twap",150000,1.00072,"已完成","10-14 11:05",{"Binance OTC":90000,"Fuze Finance":60000}),
+ mk("T-1047","客户","卖出","USDT",50000,"",50000,0.99902,"已完成","10-14 10:31",{"OKX OTC":50000}),
+ mk("S-1046","交易员","卖出","USDC",80000,"lim",30000,0.99974,"已撤销","10-13 15:44",{"Binance OTC":30000}),
+ mk("T-1045","客户","卖出","USDC",12000,"",0,0,"已拒绝","10-13 09:12")
+];
+function can(p){return !!(USER&&PM[USER][p])}
+function tbl(h,rows){return "<table><tr>"+h.map(function(x){return "<th>"+x+"</th>"}).join("")+"</tr>"+rows.map(function(r){return "<tr>"+r.map(function(c){return "<td>"+c+"</td>"}).join("")+"</tr>"}).join("")+"</table>"}
+function btn(i,a,t){return '<button class="mini" data-i="'+i+'" data-a="'+a+'">'+t+'</button>'}
+function hm(){return new Date().toLocaleTimeString("en-GB")}
+function log(m){LOG.unshift(hm()+" "+(USER?USER+(UCODE?" "+UCODE:""):"系统")+"："+m);if(LOG.length>20)LOG.pop()}
+function logS(m){LOG.unshift(hm()+" 系统："+m);if(LOG.length>20)LOG.pop()}
+function find(id){return ORDERS.filter(function(o){return o.id===id})[0]}
+function rnd(c,s){return s?BID[c]+(Math.random()-0.45)*0.001:ASK[c]+(Math.random()-0.55)*0.001}
+function isM(n){return n.indexOf("Circle")===0}
+function lpList(c){return LPD.filter(function(n){return c==="USDC"||!isM(n)})}
+function prog(o){return '<progress value="'+o.fill+'" max="'+o.size+'"></progress> '+(o.size?Math.round(o.fill/o.size*100):0)+"%"}
+function lpVis(){var v=can("lp")||authed;$("lpbox").style.display=v?"block":"none";$("auth").style.display=v?"none":"block"}
+var ROLEL={"交易员":"T","财务主管":"F","风控主管":"R","客户关系部经理":"C","客户经理":"M","后台管理员":"B","管理员":"A"};
+var STAFF=[{code:"T01",name:"李明",role:"交易员",on:true,hire:"2022-05-10"},{code:"T02",name:"陈晨",role:"交易员",on:true,hire:"2024-02-01"},{code:"F01",name:"周婷",role:"财务主管",on:true,hire:"2021-09-01"},{code:"R01",name:"赵刚",role:"风控主管",on:true,hire:"2022-01-15"},{code:"C01",name:"孙倩",role:"客户关系部经理",on:true,hire:"2020-03-01"},{code:"M01",name:"刘洋",role:"客户经理",on:true,hire:"2023-03-01"},{code:"M02",name:"黄磊",role:"客户经理",on:true,hire:"2024-06-15"},{code:"M03",name:"杨帆",role:"客户经理",on:true,hire:"2025-09-01"},{code:"B01",name:"吴凡",role:"后台管理员",on:true,hire:"2023-07-01"},{code:"A01",name:"张伟",role:"管理员",on:true,hire:"2019-01-01"}];
+var VIEWS=["cust","trader","fin","risk","crm","admin","ops"];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function gate(v,p){var ok=can(p);$("g-"+v).style.display=ok?"none":"block";$("b-"+v).style.display=ok?"block":"none";return ok}
+function login(r,code,name){
+  USER=r;UCODE=code||"";$("home").style.display="none";$("ubar").style.display="flex";
+  $("who2").textContent="当前："+r+(code?" · "+code:"")+" · "+name;
+  VIEWS.forEach(function(x){$("v-"+x).style.display=x===VIEW[r]?"block":"none"});
+  document.querySelector(".wrap").classList.toggle("wide",r!=="客户");
+  log("登录");render(true);lpVis();if(r==="客户")show(1);window.scrollTo(0,0);
+}
+$("out2").onclick=function(){
+  log("退出登录");USER=null;UCODE="";authed=false;
+  VIEWS.forEach(function(x){$("v-"+x).style.display="none"});
+  $("home").style.display="block";$("ubar").style.display="none";document.querySelector(".wrap").classList.remove("wide");
+};
+$("lc").onclick=function(){var c=custById($("lcs").value),t=tierOf(vol30(c.id));CURC=c.id;COMM=t.r/100;login("客户","",c.name+" · "+t.n+"（佣金 "+t.r.toFixed(2)+"%）")};
+$("slog").onclick=function(){
+  var c=$("scode").value.trim().toUpperCase();
+  if(!/^[A-Z]\d{2}$/.test(c)){$("serr").textContent="角色代码是一个字母加两位数字，例如 T01。";return}
+  var s=STAFF.filter(function(x){return x.code===c})[0];
+  if(!s){$("serr").textContent="角色代码不存在，请联系管理员分配。";logS("员工登录失败：代码 "+c+" 不存在");return}
+  if(!s.on){$("serr").textContent="该角色代码已停用，请联系管理员。";logS("员工登录失败：代码 "+c+" 已停用");return}
+  $("serr").textContent="";$("scode").value="";login(s.role,s.code,s.name);
+};
+function book(c,s){
+  return lpList(c).map(function(n){
+    var m=isM(n),p0=m?1:rnd(c,s),lv=[];
+    if(m){lv.push({p:1,q:1000000})}
+    else for(var i=0;i<3;i++)lv.push({p:p0+(s?-1:1)*i*0.0001,q:(2+Math.floor(Math.random()*18))*100000});
+    return{n:n,lv:lv,ms:8+Math.floor(Math.random()*12)};
+  });
+}
+function plan(c,s,z){
+  var all=[];
+  book(c,s).forEach(function(b){b.lv.forEach(function(l){all.push({n:b.n,p:l.p,q:l.q})})});
+  all.sort(function(a,b){return s?b.p-a.p:a.p-b.p});
+  var rem=z,alloc={},val={},best=all[0].p;
+  all.forEach(function(l){if(rem<=0)return;var t=Math.min(rem,l.q);alloc[l.n]=(alloc[l.n]||0)+t;val[l.n]=(val[l.n]||0)+t*l.p;rem-=t});
+  if(rem>0){var k=all[0].n;alloc[k]=(alloc[k]||0)+rem;val[k]=(val[k]||0)+rem*all[0].p}
+  var px={},tot=0;
+  Object.keys(alloc).forEach(function(n){px[n]=val[n]/alloc[n];tot+=val[n]});
+  return{alloc:alloc,px:px,vwap:tot/z,best:best};
+}
+function step(){
+  ORDERS.forEach(function(o){
+    if(o.st!=="运行中"||!o.plan)return;
+    var c=o.coin,s=o.side==="卖出",q2;
+    if(o.g==="sor")q2=o.size*0.35;else if(o.g==="twap")q2=o.size/(o.dur*6);else if(o.g==="ice")q2=o.size*0.1;
+    else{var m=rnd(c,s);if(s?m<o.px:m>o.px)return;q2=o.size*0.25}
+    q2=Math.min(q2,o.size-o.fill);
+    var f=q2/o.size,tv=0,tq=0;
+    Object.keys(o.plan.alloc).forEach(function(v){
+      var qv=Math.min(o.plan.alloc[v]*f,o.plan.alloc[v]-(o.v[v]||0));if(qv<=0)return;
+      var p=o.plan.px[v]+(Math.random()-0.5)*0.00006;
+      o.v[v]=(o.v[v]||0)+qv;tv+=qv*p;tq+=qv;
+    });
+    if(tq>0){o.avg=(o.avg*o.fill+tv)/(o.fill+tq);o.fill+=tq;INV[c]+=s?-tq:tq;INV.USD+=s?tv:-tv}
+    if(o.size-o.fill<0.01){
+      o.fill=o.size;o.st="已完成";
+      var k=o.link?find(o.link):null;if(k&&k.st==="待对冲")k.st="待出款";
+      log("订单 "+o.id+" 执行完成"+(k?"，客户订单 "+k.id+" 转为待出款":""));
+    }
+  });
+}
+function render(full){
+  if(!USER)return;var v=VIEW[USER];
+  if(v==="trader")rTrader();else if(v==="admin")rAdmin(full);else if(v==="ops")rOps();
+  else if(v==="fin")rFin(full);else if(v==="risk")rRisk();else if(v==="crm")rCrm(full);
+}
+setInterval(function(){step();render(false)},1000);
+function tgUI(){var g=$("tg").value;$("tgd").textContent=GD[g];$("tpb").style.display=g==="lim"?"block":"none";$("tdb").style.display=g==="twap"?"block":"none"}
+$("tg").onchange=tgUI;
+$("tgo").onclick=function(){
+  var mode=can("auto")?"auto":can("trade")?"manual":null;
+  if(!mode){$("te").textContent="当前角色没有下达智能订单的权限。";return}
+  var z=parseFloat($("tz").value),g=$("tg").value,px=parseFloat($("tp").value),du=parseFloat($("td").value);
+  if(!(z>0)){$("te").textContent="请输入数量。";return}
+  if(g==="lim"&&!(px>0)){$("te").textContent="请输入限价。";return}
+  if(g==="twap"&&!(du>0)){$("te").textContent="请输入 TWAP 时长。";return}
+  $("te").textContent="";
+  var s=$("ts").value==="sell",c=$("tc").value;
+  var pr=protect(c,s,z,g,px);if(pr){$("te").textContent="订单价格保护拦截："+pr;return}
+  var o=mk("S-"+(++SEQ),"交易员",s?"卖出":"买入",c,z,g,0,0,mode==="auto"?"运行中":"待确认","10-15 "+hm());
+  o.px=px;o.dur=du||3;o.link=LINK;LINK=null;o.plan=plan(c,s,z);o.arr=o.plan.best;
+  ORDERS.unshift(o);DET=o.id;
+  log("提交"+GN[g]+" "+o.id+"："+o.side+" "+fmt(z,0)+" "+c+(mode==="auto"?"（自动执行）":"（待手动确认）"));
+  rTrader();
+};
+function rRoute(){
+  var d=find(DET);
+  if(!d){$("rt").innerHTML='<p class="sub">提交订单后，这里会实时显示所有渠道的报价、深度、路由分配和成交。</p>';return}
+  if(!d.plan){
+    $("rt").innerHTML='<p class="sub">'+d.id+" 是历史订单，没有路由快照，仅显示各渠道成交。</p>"+tbl(["渠道","成交量"],Object.keys(d.v).map(function(k){return[k,fmt(d.v[k],0)]}));
+    return;
+  }
+  var s=d.side==="卖出",B=book(d.coin,s),slip=Math.abs(d.plan.best-d.plan.vwap)/d.plan.best*10000;
+  var rows=B.map(function(b){
+    var a=d.plan.alloc[b.n]||0,f=d.v[b.n]||0;
+    var depth=b.lv.map(function(l){return l.p.toFixed(4)+"×"+(l.q>=1e6?(l.q/1e6)+"M":Math.round(l.q/1000)+"K")}).join(" / ");
+    var stt=!a?"未分配":d.st==="待确认"?"待确认":d.st==="已撤销"?"已撤销":f>=a-0.01?"已完成":"执行中";
+    return[b.n,'<span class="hl">'+b.lv[0].p.toFixed(4)+"</span>",depth,fmt(a,0),fmt(f,0),stt,b.ms+" ms"];
+  });
+  var ask=d.st==="待确认"?'<p class="bad">待确认：请核对下面的路由方案，确认后才会执行。</p><div>'+btn(d.id,"confirm","确认执行")+" "+btn(d.id,"cancel","取消订单")+"</div>":"";
+  $("rt").innerHTML='<div class="inv"><div>'+d.id+" · "+d.side+" "+d.coin+"<b>"+fmt(d.size,0)+"</b></div><div>状态<b>"+d.st+"</b></div><div>进度<b>"+prog(d)+"</b></div><div>预计均价<b>"+d.plan.vwap.toFixed(4)+"</b></div><div>已成交均价<b>"+(d.avg?d.avg.toFixed(4):"—")+"</b></div><div>预计滑点<b>"+slip.toFixed(1)+" bp</b></div></div>"+ask+'<div class="tw">'+tbl(["渠道","实时最优价","实时三档深度（价×量）","路由分配","已成交","状态","延迟"],rows)+'</div><p class="sub">深度和报价每秒刷新；分配按价格从优到劣、逐档吃单计算，超出各档深度的部分追加到最优渠道（演示规则）。</p>';
+}
+function rTrader(){
+  var c=$("tc").value;
+  $("tmode").textContent="当前执行权限："+(can("auto")?"自动执行":can("trade")?"手动确认后执行":"无下单权限");
+  var L=lpList(c).map(function(n){var m=isM(n);return{n:n,b:m?1:rnd(c,true),a:m?1:rnd(c,false)}});
+  var bb=Math.max.apply(null,L.map(function(l){return l.b})),ba=Math.min.apply(null,L.map(function(l){return l.a}));
+  $("liq").innerHTML=tbl(["渠道","买价 Bid","卖价 Ask","延迟"],L.map(function(l){return[l.n,'<span class="'+(l.b===bb?"hl":"")+'">'+l.b.toFixed(4)+"</span>",'<span class="'+(l.a===ba?"hl":"")+'">'+l.a.toFixed(4)+"</span>",(8+Math.floor(Math.random()*12))+" ms"]}));
+  var H=ORDERS.filter(function(o){return o.src==="客户"&&o.st==="待对冲"});
+  $("hq").innerHTML=H.length?tbl(["订单","方向","数量","操作"],H.map(function(o){return[o.id,o.side+" "+o.coin,fmt(o.size,0),btn(o.id,"hedge","载入对冲")]})):'<p class="sub">暂无。客户下单并通过风控审核后会出现在这里。</p>';
+  var M=ORDERS.filter(function(o){return o.src==="交易员"});
+  $("tb").innerHTML=M.length?tbl(["订单","方向","策略","进度","均价","状态","操作"],M.map(function(o){
+    var a="";
+    if(o.st==="待确认")a=btn(o.id,"confirm","确认执行")+" "+btn(o.id,"cancel","取消")+" ";
+    else if(o.st==="运行中"&&can("cancel"))a=btn(o.id,"cancel","撤单")+" ";
+    return[o.id,o.side+" "+o.coin,GN[o.g],prog(o),o.avg?o.avg.toFixed(4):"—",o.st,a+btn(o.id,"det","路由详情")]})):'<p class="sub">暂无订单。</p>';
+  rRoute();rTca();
+  $("inv").innerHTML=Object.keys(INV).map(function(k){return "<div>"+k+"<b>"+fmt(INV[k],0)+"</b></div>"}).join("");
+}
+function act(a,id){
+  var o=find(id);if(!o)return;
+  if(a==="confirm"&&o.st==="待确认"){o.plan=plan(o.coin,o.side==="卖出",o.size);o.st="运行中";log("手动确认执行 "+o.id)}
+  else if(a==="cancel"&&(o.st==="运行中"||o.st==="待确认")&&(can("cancel")||o.st==="待确认")){o.st="已撤销";log("撤销订单 "+o.id)}
+  else if(a==="det"){DET=o.id}
+  rTrader();
+}
+$("tb").onclick=function(e){var b=e.target;if(b.dataset.a)act(b.dataset.a,b.dataset.i)};
+$("rt").onclick=function(e){var b=e.target;if(b.dataset.a)act(b.dataset.a,b.dataset.i)};
+$("hq").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="hedge")return;var o=find(b.dataset.i);
+  $("ts").value=o.side==="卖出"?"sell":"buy";$("tc").value=o.coin;$("tz").value=o.size;$("tg").value="sor";tgUI();
+  LINK=o.id;$("te").textContent="已载入客户订单 "+o.id+"，确认后点“提交订单”对冲。";window.scrollTo(0,0);
+};
+function rOps(){
+  var Q=ORDERS.filter(function(o){return o.src==="客户"&&(o.st==="待风险审核"||o.st==="待对冲"||o.st==="待出款")});
+  $("ord").innerHTML=Q.length?tbl(["订单","内容","状态","操作"],Q.map(function(o){var a="—";if(can("approve")&&o.st==="待出款")a=btn(o.id,"pay","确认出款");return[o.id,o.side+" "+o.coin+" "+fmt(o.size,0),o.st,a]})):'<p class="sub">暂无处理中的客户订单。</p>';
+  $("rec").innerHTML=tbl(["项目","我方账本","外部余额","差异"],[["Circle Mint · USDC","512,300.00","512,300.00","0.00"],["Fireblocks · USDT","301,850.00","301,850.00","0.00"],["香港银行 · USD","798,420.50","798,408.00",'<span class="bad">12.50</span>']]);
+}
+$("ord").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="pay"||!can("approve"))return;
+  var o=find(b.dataset.i);o.st="已完成";o.fill=o.size;log("确认出款 "+o.id);rOps();
+};
+document.querySelectorAll("#atabs button").forEach(function(b){b.onclick=function(){AT=b.dataset.t;rAdmin(true)}});
+function rAdmin(full){
+  document.querySelectorAll("#atabs button").forEach(function(b){b.classList.toggle("on",b.dataset.t===AT)});
+  var need={live:"live",hist:"hist",brk:"brk",staff:"staff",role:"rbac",aud:"audit",cfg:"cfg"}[AT],ok=can(need);
+  ["live","hist","brk","staff","role","aud","cfg"].forEach(function(t){$("a-"+t).style.display=(ok&&t===AT)?"block":"none"});
+  $("nop").style.display=ok?"none":"block";
+  if(!ok)return;
+  if(AT==="live"){
+    var A=ORDERS.filter(function(o){return DONE.indexOf(o.st)<0}),vol=0;
+    ORDERS.forEach(function(o){if(o.g)vol+=o.fill*o.avg});
+    $("kp").innerHTML="<div>进行中订单<b>"+A.length+"</b></div><div>运行中智能订单<b>"+ORDERS.filter(function(o){return o.st==="运行中"}).length+"</b></div><div>待风控审核<b>"+ORDERS.filter(function(o){return o.st==="待风险审核"}).length+"</b></div><div>智能订单成交额（美元）<b>"+fmt(vol,0)+"</b></div>";
+    $("ll").innerHTML=tbl(["订单","来源","内容","进度","状态","时间"],A.map(function(o){return[o.id,o.src,o.side+" "+o.coin+" "+fmt(o.size,0),o.g?prog(o):"—",o.st,o.t]}));
+  }
+  if(AT==="hist"){
+    var H=ORDERS.filter(function(o){return DONE.indexOf(o.st)>=0&&($("hs").value==="全部"||o.st===$("hs").value)&&($("hr").value==="全部"||o.src===$("hr").value)});
+    $("hl").innerHTML=tbl(["订单","来源","内容","策略","成交/数量","均价","状态","时间"],H.map(function(o){return[o.id,o.src,o.side+" "+o.coin,GN[o.g],fmt(o.fill,0)+" / "+fmt(o.size,0),o.avg?o.avg.toFixed(4):"—",o.st,o.t]}));
+  }
+  if(AT==="brk")$("ab").innerHTML=brkTable();if(full&&AT==="staff")rStaff();
+  if(full&&AT==="role"){
+    $("rm").innerHTML=tbl(["权限"].concat(ROLES),P.map(function(p){return[p[1]].concat(ROLES.map(function(r){return '<input type="checkbox" data-r="'+r+'" data-p="'+p[0]+'"'+(PM[r][p[0]]?" checked":"")+((r==="管理员"&&(p[0]==="rbac"||p[0]==="staff"))?" disabled":"")+'>'}))}));
+  }
+  if(AT==="aud")$("al").innerHTML=tbl(["审计日志"],LOG.map(function(x){return[esc(x)]}));
+}
+function staffUI(){
+  $("shint").textContent="演示代码："+STAFF.filter(function(s){return s.on}).map(function(s){return s.code}).join("、");
+}
+function rStaff(){
+  $("sl").innerHTML=tbl(["角色代码","姓名","岗位","入职日期","状态","操作"],STAFF.map(function(s){return[s.code,esc(s.name),s.role,s.hire,s.on?"启用":'<span class="bad">停用</span>',btn(s.code,"tog",s.on?"停用":"启用")]}));
+  staffUI();
+}
+$("sl").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="tog"||!can("staff"))return;
+  var s=STAFF.filter(function(x){return x.code===b.dataset.i})[0];
+  if(s.code===UCODE){$("sm").textContent="不能停用自己正在使用的代码。";return}
+  s.on=!s.on;$("sm").textContent="";log((s.on?"启用":"停用")+"员工代码 "+s.code);rStaff();
+};
+$("sadd").onclick=function(){
+  if(!can("staff"))return;
+  var r=$("sr").value,n=$("sn").value.trim();
+  if(!n){$("sm").textContent="请输入员工姓名。";return}
+  var L=ROLEL[r],mx=0;
+  STAFF.forEach(function(x){if(x.code.charAt(0)===L)mx=Math.max(mx,parseInt(x.code.slice(1),10))});
+  var code=L+(mx+1<10?"0":"")+(mx+1);
+  STAFF.push({code:code,name:n,role:r,on:true,hire:"2026-10-15"});
+  $("sn").value="";$("sm").textContent="已分配角色代码 "+code+"（"+r+"）。";
+  log("新增员工代码 "+code+"（"+r+"，"+n+"）");rStaff();
+};
+$("rm").onchange=function(e){
+  var c=e.target,r=c.dataset.r,p=c.dataset.p;if(!r||!can("rbac"))return;
+  PM[r][p]=c.checked?1:0;
+  if(c.checked&&p==="auto")PM[r].trade=0;
+  if(c.checked&&p==="trade")PM[r].auto=0;
+  log("修改权限："+r+(c.checked?" 获得「":" 取消「")+P.filter(function(x){return x[0]===p})[0][1]+"」");
+  rAdmin(true);
+};
+$("hx").onclick=function(){
+  if(can("export")){log("导出历史记录（演示，不生成文件）");$("hxm").textContent="已记录导出请求（演示，不生成文件）。"}
+  else $("hxm").textContent="当前角色没有“导出报表”权限。";
+};
+$("csave").onclick=function(){
+  var v=parseFloat($("cc").value),d=parseFloat($("pdev").value),m=parseFloat($("pmax").value);
+  if(!(v>=0&&v<=2)||!(d>0)||!(m>0))return;
+  COMM=v/100;PCFG.dev=d;PCFG.max=m;
+  log("修改配置：佣金率 "+v+"%，价格保护偏离阈值 "+d+" bp，单笔上限 "+fmt(m,0));
+};
+$("hs").onchange=function(){rAdmin(false)};$("hr").onchange=function(){rAdmin(false)};
+var RULES=[{n:"单笔大额复核（≥100,000）",ev:12,hit:3},{n:"链上地址风险筛查",ev:12,hit:2},{n:"客户居住地准入",ev:12,hit:1},{n:"价格偏离保护",ev:12,hit:0}];
+var EVT=[{id:"E-301",oid:"T-1050",sev:"中",rule:"链上地址风险筛查",desc:"充值地址与高风险标签存在间接关联（模拟）",st:"待处理",t:"10-15 09:41"},{id:"E-300",oid:"T-1045",sev:"高",rule:"客户居住地准入",desc:"居住地疑似受限地区（模拟）",st:"已拒绝",t:"10-13 09:13"}];
+var TICKETS=[{id:"Q-101",type:"咨询",from:"王先生",text:"USDT 转账大概多久能确认？",st:"待回复",reply:"",t:"10-15 08:30"},{id:"Q-100",type:"投诉",from:"王先生",text:"昨天的出款比预计晚了两个小时。",st:"待回复",reply:"",t:"10-14 17:05"},{id:"Q-099",type:"咨询",from:"王先生",text:"最小卖出金额是多少？",st:"已回复",reply:"演示设定为 1,000 稳定币起。",t:"10-13 14:10"}];
+function autoRisk(o){
+  var hits=[];
+  RULES.forEach(function(r){r.ev++});
+  if(o.size>=100000){RULES[0].hit++;hits.push([0,"中","单笔 "+fmt(o.size,0)+" "+o.coin+" 超过复核线"])}
+  if(Math.random()<0.25){RULES[1].hit++;hits.push([1,"高","充值地址与高风险标签存在间接关联（模拟）"])}
+  if(hits.length){
+    var h=hits[hits.length-1];
+    EVT.unshift({id:"E-"+(++ESEQ),oid:o.id,sev:h[1],rule:RULES[h[0]].n,desc:h[2],st:"待处理",t:"10-15 "+hm()});
+    o.st="待风险审核";logS("自动风控拦截订单 "+o.id+"，等待风控主管处理");
+  }else{o.st="待对冲";logS("自动风控放行订单 "+o.id)}
+}
+var _sim=$("sim").onclick;
+$("sim").onclick=function(){
+  _sim();
+  var sz=q.s?q.amt:parseFloat(q.out.replace(/,/g,""));
+  var o=mk("T-"+(++SEQ),"客户",q.s?"卖出":"买入",q.coin,sz,"",0,0,"待风险审核","10-15 "+hm());
+  o.railc=RAILC[q.rail]||0;o.cid=CURC;o.cr=COMM;ORDERS.unshift(o);autoRisk(o);
+};
+function rRisk(){
+  if(!gate("risk","riskmon"))return;
+  var ev=0,ht=0;RULES.forEach(function(r){ev+=r.ev;ht+=r.hit});
+  var pend=EVT.filter(function(e){return e.st==="待处理"||e.st==="已升级"}).length;
+  $("rk").innerHTML="<div>自动风控<b>运行中</b></div><div>累计检查<b>"+ev+"</b></div><div>规则触发<b>"+ht+"</b></div><div>待处理事件<b>"+pend+"</b></div>";
+  $("rb").innerHTML=brkTable();$("rr").innerHTML=tbl(["规则","状态","检查次数","触发次数"],RULES.map(function(r){return[r.n,"运行中",r.ev,r.hit]}).concat([["订单价格保护（交易员订单）","运行中",PROT.ev,PROT.hit]]));
+  $("re").innerHTML=EVT.length?tbl(["事件","订单","等级","规则","说明","状态","操作"],EVT.map(function(e){
+    var a="";
+    if(can("riskhandle")&&(e.st==="待处理"||e.st==="已升级"))a=btn(e.id,"ok","放行")+" "+btn(e.id,"no","拒绝")+(e.st==="待处理"?" "+btn(e.id,"up","升级"):"");
+    return[e.id,e.oid,e.sev==="高"?'<span class="bad">高</span>':e.sev,e.rule,e.desc,e.st,a||"—"]})):'<p class="sub">暂无风险事件。</p>';
+}
+$("re").onclick=function(e){
+  var b=e.target,a=b.dataset.a;if(!a||!can("riskhandle"))return;
+  var ev=EVT.filter(function(x){return x.id===b.dataset.i})[0],o=find(ev.oid);
+  if(a==="ok"){ev.st="已放行";if(o&&o.st==="待风险审核")o.st="待对冲"}
+  else if(a==="no"){ev.st="已拒绝";if(o)o.st="已拒绝"}
+  else ev.st="已升级";
+  log("风险事件 "+ev.id+"（订单 "+ev.oid+"）→ "+ev.st);rRisk();
+};
+var CT="cu",NEED={cu:"cust",tier:"tier",map:"map",stm:"stm",grp:"rpt",tk:"crm"};
+document.querySelectorAll("#ctabs button").forEach(function(b){b.onclick=function(){CT=b.dataset.t;rCrm(true)}});
+function rCrm(full){
+  if(!can(NEED[CT])){var f=Object.keys(NEED).filter(function(k){return can(NEED[k])})[0];if(f)CT=f}
+  document.querySelectorAll("#ctabs button").forEach(function(b){b.classList.toggle("on",b.dataset.t===CT);b.style.display=can(NEED[b.dataset.t])?"":"none"});
+  var ok=can(NEED[CT]);
+  ["cu","tier","map","stm","grp","tk"].forEach(function(t){$("c-"+t).style.display=(ok&&t===CT)?"block":"none"});
+  $("g-crm").style.display=ok?"none":"block";
+  if(!ok)return;
+  if(CT==="cu"){if(full)fillChc();rCu()}
+  else if(CT==="tier"){if(full)fillTier();rTier()}
+  else if(CT==="map"){if(full)rMap()}
+  else if(CT==="stm"){if(full){fillSt();rStm()}}
+  else if(CT==="grp"){if(full)fillGr();rGrp()}
+  else rTk();
+}
+function rTk(){
+  $("ct").innerHTML=tbl(["编号","类型","客户","内容","状态","时间","操作"],TICKETS.map(function(t){return[t.id,t.type==="投诉"?'<span class="bad">投诉</span>':"咨询",esc(t.from),esc(t.text),t.st,t.t,btn(t.id,"open",t.st==="待回复"?"回复":"查看")]}));
+}
+$("ct").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="open"||!can("crm"))return;
+  var t=TICKETS.filter(function(x){return x.id===b.dataset.i})[0];SEL=t.id;
+  $("cth").textContent=t.id+" · "+t.type;
+  $("ctx").textContent="客户："+t.text+(t.reply?"\n上次回复："+t.reply:"");
+  $("crp").value=t.reply;$("cbox").style.display="block";
+};
+$("csend").onclick=function(){
+  var t=TICKETS.filter(function(x){return x.id===SEL})[0],x=$("crp").value.trim();
+  if(!t||!x||!can("crm"))return;
+  t.reply=x;t.st="已回复";log("回复客户 "+t.id);$("cbox").style.display="none";SEL=null;rCrm();
+};
+$("tsend").onclick=function(){
+  var x=$("tx").value.trim();
+  if(!x){$("te5").textContent="请输入内容。";return}
+  $("te5").textContent="";
+  TICKETS.unshift({id:"Q-"+(++TSEQ),type:$("tt").value,from:custName(),text:x,st:"待回复",reply:"",t:"10-15 "+hm()});
+  $("tx").value="";logS("客户提交"+TICKETS[0].type+" "+TICKETS[0].id);rTickets();
+};
+function rTickets(){
+  var l=$("tl");l.innerHTML="";
+  TICKETS.forEach(function(t){l.appendChild(row(t.id+" · "+t.type+" · "+t.st,t.text));if(t.reply)l.appendChild(row("客服回复",t.reply))});
+}
+$("tk").onclick=function(){rTickets();show(5)};
+$("tback").onclick=function(){show(1)};
+var COA=[["1001","银行-USD（客户资金）","资产","客户资金","借"],["1002","银行-USD（交易）","资产","交易","借"],["1003","银行-USD（运营）","资产","运营","借"],["1101","托管账户-USDC（客户资金）","资产","客户资金","借"],["1102","托管账户-USDT（客户资金）","资产","客户资金","借"],["1103","托管账户-USDC（交易）","资产","交易","借"],["1104","托管账户-USDT（交易）","资产","交易","借"],["2001","客户应付款","负债","客户资金","贷"],["3001","所有者权益","权益","运营","贷"],["4001","手续费收入（运营）","收入","运营","贷"],["5001","银行手续费","费用","运营","借"]];
+var ADJ=[],RECON=null,ADJDONE=false;
+function ac(n){var r=COA.filter(function(a){return a[1]===n})[0];return r?r[0]+" "+n:n}
+function flows(){
+  var F=[];
+  ORDERS.forEach(function(o){
+    if(o.src==="客户"&&o.st!=="已拒绝"&&o.st!=="待风险审核"&&!o.d){
+      var sell=o.side==="卖出",cw="托管账户-"+o.coin+"（客户资金）";
+      F.push({t:o.t,oid:o.id,ty:sell?"稳定币入账（客户转入）":"法币入金（客户汇入）",ac:"客户资金账户",cu:sell?o.coin:"USD",amt:o.size,st:"已确认",dr:sell?cw:"银行-USD（客户资金）",cr:"客户应付款"});
+      if(o.st==="已完成")F.push({t:o.t,oid:o.id,ty:sell?"美元出款（客户收款）":"稳定币转出（客户钱包）",ac:"客户资金账户",cu:sell?"USD":o.coin,amt:-o.size,st:"已完成",dr:"客户应付款",cr:sell?"银行-USD（客户资金）":cw});
+    }
+    if(o.src==="交易员"&&o.fill>0){
+      var s=o.side==="卖出",v=o.fill*o.avg,tw="托管账户-"+o.coin+"（交易）";
+      F.push({t:o.t,oid:o.id,ty:"对冲成交（"+GN[o.g]+"）",ac:"交易账户",cu:"USD",amt:s?v:-v,st:o.st==="运行中"?"成交中":o.st,dr:s?"银行-USD（交易）":tw,cr:s?tw:"银行-USD（交易）"});
+    }
+  });
+  return F;
+}
+function rFin(full){
+  if(!gate("fin","fin"))return;
+  var F=flows(),cust=0,com=0;
+  F.forEach(function(f){if(f.ac==="客户资金账户")cust+=f.amt});
+  ORDERS.forEach(function(o){if(o.src==="客户"&&o.st==="已完成"&&!o.d)com+=cm(o)});
+  $("fa").innerHTML="<div>客户资金账户（美元等值）<b>"+fmt(1250000+cust,0)+"</b></div><div>交易账户 USD<b>"+fmt(INV.USD,0)+"</b></div><div>稳定币库存 USDC<b>"+fmt(INV.USDC,0)+"</b></div><div>稳定币库存 USDT<b>"+fmt(INV.USDT,0)+"</b></div><div>运营账户（含佣金）<b>"+fmt(42380+com,0)+"</b></div>";
+  $("ff").innerHTML=tbl(["时间","订单","类型","账户","币种","金额","状态"],F.map(function(f){return[f.t,f.oid,f.ty,f.ac,f.cu,(f.amt>0?"+":"")+fmt(f.amt),f.st]}));
+  $("fb").innerHTML=brkTable();$("fp").innerHTML=can("cost")?profitHtml():'<p class="bad">当前角色没有成本分析权限。</p>';
+  var ok=can("ledger");
+  $("fgen").style.display=ok?"block":"none";$("frec").style.display=ok?"block":"none";$("fsim").style.display=ok?"block":"none";
+  if(!ok){var msg='<p class="bad">当前角色没有账本权限。</p>';$("fl").innerHTML=msg;$("fr").innerHTML=msg;$("coa").innerHTML=msg}
+  else if(full){
+    $("coa").innerHTML=tbl(["科目编码","科目名称","类别","资金账户","余额方向"],COA);
+    rLedger();rRecon();
+  }
+}
+function opening(){return[
+  ["J-0001","期初余额：客户资金账户","银行-USD（客户资金）","客户应付款",1250000],
+  ["J-0002","期初余额：交易账户 USD","银行-USD（交易）","所有者权益",800000],
+  ["J-0003","期初余额：交易账户 USDC","托管账户-USDC（交易）","所有者权益",500000],
+  ["J-0004","期初余额：交易账户 USDT","托管账户-USDT（交易）","所有者权益",300000],
+  ["J-0005","期初余额：运营账户","银行-USD（运营）","所有者权益",42380]]}
+function bals(){
+  var m={};COA.forEach(function(a){m[a[1]]={d:0,c:0,a:a,b:0}});
+  LEDGER.E.forEach(function(e){m[e[2]].d+=e[4];m[e[3]].c+=e[4]});
+  COA.forEach(function(a){var x=m[a[1]];x.b=a[4]==="借"?x.d-x.c:x.c-x.d});
+  return m;
+}
+function coverage(m){
+  var a=m["银行-USD（客户资金）"].b+m["托管账户-USDC（客户资金）"].b+m["托管账户-USDT（客户资金）"].b,l=m["客户应付款"].b;
+  return{a:a,l:l,r:l?a/l:1};
+}
+$("fgen").onclick=function(){
+  if(!can("ledger"))return;
+  var n=1000,E=opening();
+  flows().forEach(function(f){E.push(["J-"+(++n),f.oid+" "+f.ty,f.dr,f.cr,Math.abs(f.amt)])});
+  ORDERS.forEach(function(o){
+    if(o.src==="客户"&&o.st==="已完成"&&!o.d){
+      var c=cm(o);
+      E.push(["J-"+(++n),o.id+" 佣金收入","客户应付款","手续费收入（运营）",c]);
+      E.push(["J-"+(++n),o.id+" 佣金划转运营账户（客户资金隔离）","银行-USD（运营）","银行-USD（客户资金）",c]);
+    }
+  });
+  ADJ.forEach(function(a){E.push(a)});
+  LEDGER={ver:++LV,time:hm(),E:E};RECON=null;
+  log("生成账本 v"+LV+"（"+E.length+" 笔凭证）");rLedger();rRecon();
+};
+function rLedger(){
+  if(!LEDGER){$("fl").innerHTML='<p class="sub">尚未生成账本。点击“生成账本”，按当前资金流水生成带科目编码的复式记账凭证和试算平衡表（稳定币按 1:1 折算美元，演示设定）。</p>';return}
+  var m=bals(),td=0,cv=coverage(m);
+  LEDGER.E.forEach(function(e){td+=e[4]});
+  $("fl").innerHTML='<p class="sub">账本 v'+LEDGER.ver+"，生成于 "+LEDGER.time+"，共 "+LEDGER.E.length+" 笔凭证；借方合计 "+fmt(td)+"，贷方合计 "+fmt(td)+"，试算平衡 ✓</p>"
+   +'<p class="'+(cv.r>=1-1e-9?"sub":"bad")+'">客户资金覆盖率 '+(cv.r*100).toFixed(1)+"%（客户资金账户资产 "+fmt(cv.a)+" ÷ 客户应付款 "+fmt(cv.l)+"），规则：不得低于 100%</p>"
+   +tbl(["凭证","摘要","借方科目","贷方科目","金额"],LEDGER.E.map(function(e){return[e[0],e[1],ac(e[2]),ac(e[3]),fmt(e[4])]}))
+   +"<h2>试算平衡表</h2>"+tbl(["科目","借方发生额","贷方发生额","余额"],COA.map(function(a){var x=m[a[1]];return[a[0]+" "+a[1],fmt(x.d),fmt(x.c),fmt(x.b)+" "+a[4]]}));
+}
+function rRecon(){
+  var el=$("fr");
+  if(!LEDGER){el.innerHTML='<p class="sub">请先生成账本，再执行日终对账。</p>';return}
+  if(!RECON){el.innerHTML='<p class="sub">账本 v'+LEDGER.ver+" 已生成。点击“执行日终对账”，把账本余额与托管方和银行的外部余额逐项核对。</p>";return}
+  var open=0;
+  var rows=RECON.rows.map(function(r){
+    var res=r.rule==="自动通过"?(Math.abs(r.d)<0.005?"✓ 一致":"✓ 容差内"):'<span class="bad">'+r.rule+"</span>";
+    if(r.rule!=="自动通过")open++;
+    var a=(r.adj&&!ADJDONE&&r.rule!=="自动通过")?btn("x","adj","登记调整凭证"):"—";
+    return[r.n,fmt(r.l),fmt(r.e),fmt(r.d),res,r.note||"—",a];
+  });
+  el.innerHTML='<p class="'+(open?"bad":"sub")+'">日终对账 '+RECON.time+"：共 "+RECON.rows.length+" 项，"+(RECON.rows.length-open)+" 项通过，"+open+" 项需处理；客户资金覆盖率 "+(RECON.cov.r*100).toFixed(1)+"%</p>"+tbl(["项目","我方账本","外部余额","差异","结果","说明","操作"],rows);
+}
+$("frec").onclick=function(){
+  if(!can("ledger")||!LEDGER)return;
+  var m=bals(),rows=[];
+  function add(n,l,e,note,adj){var d=l-e,ad=Math.abs(d);rows.push({n:n,l:l,e:e,d:d,rule:ad<=10?"自动通过":ad<=1000?"主管说明":"升级处理",note:note,adj:adj})}
+  add("Circle Mint · USDC 余额",m["托管账户-USDC（客户资金）"].b+m["托管账户-USDC（交易）"].b,m["托管账户-USDC（客户资金）"].b+m["托管账户-USDC（交易）"].b,"");
+  add("Fireblocks · USDT 余额",m["托管账户-USDT（客户资金）"].b+m["托管账户-USDT（交易）"].b,m["托管账户-USDT（客户资金）"].b+m["托管账户-USDT（交易）"].b-(SIMBIG?2500:0),SIMBIG?"链上到账与账本不一致，疑似转入尚未确认":"");
+  var bc=m["银行-USD（客户资金）"].b;
+  add("香港银行 · USD（客户资金）",bc,bc-(ADJDONE?0:12.5),ADJDONE?"已按调整凭证入账":"银行扣收的在途手续费 12.50",true);
+  add("香港银行 · USD（交易）",m["银行-USD（交易）"].b,m["银行-USD（交易）"].b,"");
+  syncCases(rows);RECON={time:hm(),rows:rows,cov:coverage(m)};
+  log("执行日终对账（账本 v"+LEDGER.ver+"）");rRecon();
+};
+$("fr").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="adj"||!can("ledger")||ADJDONE)return;
+  ADJ.push(["J-ADJ1","对账差异调整：银行扣收手续费","银行手续费","银行-USD（客户资金）",12.5]);ADJ.push(["J-ADJ2","运营账户补足客户资金账户（保持 100% 覆盖）","银行-USD（客户资金）","银行-USD（运营）",12.5]);
+  ADJDONE=true;log("登记对账调整凭证 J-ADJ1、J-ADJ2（12.50 美元）");BREAKS.forEach(function(c){if(c.item.indexOf("客户资金")>=0&&c.st!=="已关闭"){c.st="已关闭";c.note="已登记调整凭证 J-ADJ1、J-ADJ2"}});
+  $("fr").innerHTML='<p class="sub">已登记调整凭证（银行手续费入账，并由运营账户补足客户资金账户）。请重新生成账本，并再次执行日终对账。</p>';
+};
+var PROT={ev:0,hit:0},PCFG={dev:30,max:5000000},LASTO=null,SIMBIG=false,BREAKS=[],BSEQ=0;
+var RAILC={"同行内部转账":0,"CHATS 美元清算":5,"SWIFT 电汇":25,"FPS 转数快":0,"CHATS 港币":4,"SEPA Instant":0.5,"SEPA 转账":0.3,"Faster Payments":0.5,"FAST / PayNow":0.5,"本地转账":2};
+find("S-1049").arr=0.9999;find("S-1048").arr=1.0006;find("S-1046").arr=0.99985;
+(function(){var t=find("T-1047");t.hc=18.4;t.railc=25})();
+function protect(c,s,z,g,px){
+  PROT.ev++;
+  var fair=(BID[c]+ASK[c])/2,r="",key=(s?"卖":"买")+"|"+c+"|"+z+"|"+g;
+  if(z>PCFG.max)r="数量 "+fmt(z,0)+" 超过单笔上限 "+fmt(PCFG.max,0);
+  else if(g==="lim"&&Math.abs(px-fair)/fair*1e4>PCFG.dev)r="限价偏离公允价 "+(Math.abs(px-fair)/fair*1e4).toFixed(0)+" bp，超过阈值 "+PCFG.dev+" bp";
+  else{
+    var pl=plan(c,s,z),sl=Math.abs(pl.best-pl.vwap)/pl.best*1e4;
+    if(sl>PCFG.dev)r="预计滑点 "+sl.toFixed(0)+" bp，超过阈值 "+PCFG.dev+" bp";
+    else if(LASTO&&LASTO.k===key&&Date.now()-LASTO.t<10000)r="疑似重复订单（10 秒内相同订单）";
+  }
+  if(r){PROT.hit++;EVT.unshift({id:"E-"+(++ESEQ),oid:"—",sev:"中",rule:"订单价格保护",desc:r+"（"+UCODE+"）",st:"已拦截",t:"10-15 "+hm()});log("订单价格保护拦截："+r)}
+  else LASTO={k:key,t:Date.now()};
+  return r;
+}
+function slipBp(o){return(o.fill&&o.arr)?(o.side==="卖出"?(o.arr-o.avg):(o.avg-o.arr))/o.arr*1e4:0}
+function slipCost(o){return(o.fill&&o.arr)?(o.side==="卖出"?(o.arr-o.avg):(o.avg-o.arr))*o.fill:0}
+function rTca(){
+  if(!can("cost")){$("tca").innerHTML='<p class="bad">当前角色没有成本分析权限。</p>';return}
+  var S=ORDERS.filter(function(o){return o.src==="交易员"&&o.arr&&o.fill>0});
+  var q=0,wb=0,cost=0,G={},V={};
+  S.forEach(function(o){
+    var b=slipBp(o);q+=o.fill;wb+=b*o.fill;cost+=slipCost(o);
+    var g=G[o.g]||(G[o.g]={n:0,q:0,w:0});g.n++;g.q+=o.fill;g.w+=b*o.fill;
+    Object.keys(o.v).forEach(function(k){var x=V[k]||(V[k]={q:0,w:0});x.q+=o.v[k];x.w+=b*o.v[k]});
+  });
+  var bp=function(x){return(x>2?'<span class="bad">':"")+x.toFixed(2)+(x>2?"</span>":"")};
+  $("tca").innerHTML='<div class="inv"><div>已分析订单<b>'+S.length+"</b></div><div>加权平均滑点（bp）<b>"+(q?(wb/q).toFixed(2):"—")+"</b></div><div>累计滑点成本（美元）<b>"+fmt(cost)+"</b></div><div>价格保护拦截<b>"+PROT.hit+" / "+PROT.ev+"</b></div></div>"
+   +'<div class="tw">'+tbl(["订单","方向","策略","到达价","预计均价","成交均价","滑点 bp","成本（美元）"],S.map(function(o){return[o.id,o.side+" "+o.coin,GN[o.g],o.arr.toFixed(4),o.plan?o.plan.vwap.toFixed(4):"—",o.avg.toFixed(4),bp(slipBp(o)),fmt(slipCost(o))]}))+"</div>"
+   +"<h2>按策略</h2>"+tbl(["策略","订单数","成交量","加权滑点 bp"],Object.keys(G).map(function(k){return[GN[k],G[k].n,fmt(G[k].q,0),bp(G[k].w/G[k].q)]}))
+   +"<h2>按渠道</h2>"+tbl(["渠道","成交量","加权滑点 bp"],Object.keys(V).map(function(k){return[k,fmt(V[k].q,0),bp(V[k].w/V[k].q)]}))
+   +'<p class="sub">到达价 = 提交订单时的最优价；滑点为成交均价相对到达价的不利偏离，正数表示成本。</p>';
+}
+function hedgeCost(o){if(o.hc!==undefined)return o.hc;var h=ORDERS.filter(function(x){return x.link===o.id})[0];return h?slipCost(h):0}
+function profitHtml(){
+  var C=ORDERS.filter(function(o){return o.src==="客户"&&o.st==="已完成"&&(!o.d||o.hc!==undefined)}),tr=0,tc=0;
+  var rows=C.map(function(o){var rev=cm(o),hc=hedgeCost(o),rc=o.railc||0,net=rev-hc-rc;tr+=rev;tc+=hc+rc;return[o.id,o.side+" "+o.coin+" "+fmt(o.size,0),fmt(rev),fmt(hc),fmt(rc),(net<0?'<span class="bad">':"")+fmt(net)+(net<0?"</span>":""),rev?(net/rev*100).toFixed(0)+"%":"—"]});
+  return '<div class="inv"><div>佣金收入<b>'+fmt(tr)+"</b></div><div>对冲与出款成本<b>"+fmt(tc)+"</b></div><div>净利润<b>"+fmt(tr-tc)+"</b></div></div>"+(rows.length?'<div class="tw">'+tbl(["订单","内容","佣金收入","对冲滑点成本","出款通道费","净利润","利润率"],rows)+"</div>":'<p class="sub">暂无已完成的客户订单。</p>')+'<p class="sub">成本 = 对冲滑点成本（相对到达价）+ 出款通道费用；链上手续费由客户承担，未计入；佣金按当前费率估算。</p>';
+}
+function brkTable(){
+  return BREAKS.length?tbl(["编号","项目","差异","级别","状态","说明","操作"],BREAKS.map(function(c){
+    var a="";
+    if(c.st==="待财务说明"&&can("ledger"))a=btn(c.id,"exp","提交说明");
+    else if(c.st==="待风控确认"&&can("brk")&&USER==="风控主管")a=btn(c.id,"rk","确认")+" "+btn(c.id,"bk","退回");
+    else if(c.st==="待管理员批准"&&can("brk")&&USER==="管理员")a=btn(c.id,"ad","批准关闭")+" "+btn(c.id,"bk","退回");
+    return[c.id,c.item,fmt(c.diff),c.lv==="升级"?'<span class="bad">升级</span>':"说明",c.st,esc(c.note)||"—",a||"—"]
+  })):'<p class="sub">暂无对账差异。执行日终对账后，超出容差的项目会在这里生成待办。</p>';
+}
+function syncCases(rows){
+  rows.forEach(function(r){
+    var open=BREAKS.filter(function(c){return c.item===r.n&&c.st!=="已关闭"})[0];
+    if(r.rule==="自动通过"){if(open){open.st="已关闭";open.note=(open.note?open.note+"；":"")+"对账已通过，自动关闭";log("差异 "+open.id+" 对账通过，自动关闭")}return}
+    if(!open){
+      var c={id:"D-"+(++BSEQ),item:r.n,diff:r.d,lv:r.rule==="升级处理"?"升级":"说明",st:"待财务说明",note:"",t:"10-15 "+hm()};
+      BREAKS.unshift(c);log("对账差异 "+c.id+"（"+r.n+" "+fmt(r.d)+"）生成待办，级别："+c.lv+(c.lv==="升级"?"，需财务主管说明、风控主管确认、管理员批准":""));
+    }else if(r.rule==="升级处理")open.lv="升级";
+  });
+}
+function brkAct(a,id){
+  var c=BREAKS.filter(function(x){return x.id===id})[0];if(!c)return;
+  if(a==="exp"&&can("ledger")&&c.st==="待财务说明"){
+    var t=$("fnote").value.trim();
+    if(!t){$("fm").textContent="请先填写差异原因说明。";return}
+    $("fm").textContent="";$("fnote").value="";c.note=t;c.st=c.lv==="升级"?"待风控确认":"已关闭";
+    log("提交差异说明 "+c.id+"："+(c.lv==="升级"?"转风控主管确认":"已关闭"));
+  }else if(a==="rk"&&USER==="风控主管"&&can("brk")&&c.st==="待风控确认"){c.st="待管理员批准";log("风控确认差异 "+c.id+"，转管理员批准")}
+  else if(a==="ad"&&USER==="管理员"&&can("brk")&&c.st==="待管理员批准"){c.st="已关闭";if(c.item.indexOf("Fireblocks")===0)SIMBIG=false;log("管理员批准关闭差异 "+c.id)}
+  else if(a==="bk"&&can("brk")&&(c.st==="待风控确认"||c.st==="待管理员批准")){c.st="待财务说明";log("退回差异 "+c.id+" 至财务主管")}
+  render(false);
+}
+["fb","rb","ab"].forEach(function(i){$(i).onclick=function(e){var b=e.target;if(b.dataset.a)brkAct(b.dataset.a,b.dataset.i)}});
+$("fsim").onclick=function(){
+  if(!can("ledger"))return;
+  SIMBIG=!SIMBIG;
+  $("fr").innerHTML='<p class="sub">已'+(SIMBIG?"模拟":"取消")+"一笔 2,500 美元的 USDT 外部余额差异。请重新执行日终对账。</p>";
+  log((SIMBIG?"模拟":"取消")+"大额对账差异（演示）");
+};
+var CUST=[{id:"C001",name:"王先生",ref:"P01",mgr:"",open:"2025-11-03"},{id:"C002",name:"李女士",ref:"P01",mgr:"",open:"2026-02-18"},{id:"C003",name:"Acme Trading Ltd",ref:"P02",mgr:"",open:"2025-08-21"},{id:"C004",name:"赵先生",ref:"",mgr:"",open:"2026-10-12"},{id:"C005",name:"Orion Capital",ref:"P02",mgr:"",open:"2025-05-09"},{id:"C006",name:"周女士",ref:"",mgr:"M02",open:"2026-01-27"}];
+var REFS=[{id:"P01",name:"陈经纪",share:25,mgr:"M01"},{id:"P02",name:"林顾问",share:30,mgr:"M02"},{id:"P03",name:"黄顾问",share:20,mgr:"M03"}];
+var MS={M01:10,M02:12,M03:8};
+var TIERS=[{n:"普通",th:0,r:0.30},{n:"银卡",th:500000,r:0.25},{n:"金卡",th:2000000,r:0.20},{n:"钻石",th:10000000,r:0.15}];
+var CURC="C001",STMTS=[],SEQS=100,CURS=null;
+function custById(id){return CUST.filter(function(c){return c.id===id})[0]}
+function custName(){var c=custById(CURC);return c?c.name:"客户"}
+function refOf(c){return REFS.filter(function(r){return r.id===c.ref})[0]}
+function staffBy(code){return STAFF.filter(function(s){return s.code===code})[0]}
+function mgrs(){return STAFF.filter(function(s){return s.role==="客户经理"})}
+function mgrOf(c){var r=refOf(c);return r?r.mgr:(c.mgr||"")}
+function mgrLabel(code){var s=staffBy(code);return s?code+" "+s.name:"未分配"}
+function mshare(code){return code?(MS[code]!==undefined?MS[code]:10):0}
+function newestMgr(){var a=mgrs().filter(function(s){return s.on});a.sort(function(x,y){return x.hire<y.hire?1:x.hire>y.hire?-1:(x.code<y.code?1:-1)});return a[0]}
+function scope(){return USER==="客户经理"?UCODE:null}
+function visible(c){var sc=scope();return sc===null||mgrOf(c)===sc}
+function visO(o){var c=custById(o.cid);return !!c&&visible(c)}
+function cm(o){return o.size*(o.cr!==undefined?o.cr:COMM)}
+function vol30(cid){var v=0;ORDERS.forEach(function(o){if(o.src==="客户"&&o.cid===cid&&o.st==="已完成"&&o.d>=1&&o.d<=30)v+=o.size});return v}
+function tierOf(v){var t=TIERS[0];TIERS.forEach(function(x){if(v>=x.th)t=x});return t}
+function custRate(){var c=custById(CURC);return c?tierOf(vol30(c.id)).r/100:COMM}
+function cTier(){var c=custById(CURC);return c?tierOf(vol30(c.id)).n+" ":""}
+function dstr(d){var x=new Date(2026,9,15-d);return("0"+(x.getMonth()+1)).slice(-2)+"-"+("0"+x.getDate()).slice(-2)}
+(function(){
+  find("T-1051").cid="C002";find("T-1050").cid="C001";
+  var a=find("T-1047");a.cid="C003";a.d=1;a.t="10-14 10:31";
+  var b=find("T-1045");b.cid="C004";b.d=2;b.t="10-13 09:12";
+  var x=mk("T-1049","客户","卖出","USDC",800000,"",0,0,"待对冲","10-15 09:58");x.cid="C005";ORDERS.push(x);
+  var y=mk("T-1048","客户","买入","USDT",300000,"",0,0,"待出款","10-15 09:55");y.cid="C003";ORDERS.push(y);
+  var HS={C001:[[3,400000,"卖出","USDC"],[9,350000,"卖出","USDT"],[17,300000,"买入","USDC"],[25,270000,"卖出","USDC"],[41,200000,"卖出","USDC"]],
+   C002:[[5,90000,"卖出","USDC"],[20,60000,"买入","USDT"],[33,50000,"卖出","USDC"]],
+   C003:[[2,1800000,"卖出","USDT"],[8,1500000,"卖出","USDC"],[14,1300000,"买入","USDT"],[22,1100000,"卖出","USDC"],[28,700000,"卖出","USDT"],[38,900000,"卖出","USDC"]],
+   C004:[[6,150000,"卖出","USDC"],[19,120000,"买入","USDC"],[27,80000,"卖出","USDT"]],
+   C005:[[1,3200000,"卖出","USDC"],[4,2800000,"卖出","USDT"],[10,2500000,"买入","USDC"],[16,2300000,"卖出","USDC"],[24,2000000,"卖出","USDT"],[35,1500000,"卖出","USDC"]],
+   C006:[[7,900000,"卖出","USDC"],[13,700000,"卖出","USDT"],[21,450000,"买入","USDC"],[29,300000,"卖出","USDC"]]};
+  var n=2000;
+  Object.keys(HS).forEach(function(cid){HS[cid].forEach(function(h){var o=mk("H-"+(++n),"客户",h[2],h[3],h[1],"",h[1],1,"已完成",dstr(h[0])+" 10:00");o.d=h[0];o.cid=cid;ORDERS.push(o)})});
+  ORDERS.forEach(function(o){if(o.src==="客户"&&o.cid&&o.cr===undefined)o.cr=tierOf(vol30(o.cid)).r/100});
+  CUST.forEach(function(c){var p=document.createElement("option");p.value=c.id;p.textContent=c.name;$("lcs").appendChild(p)});
+  refreshRefs();
+})();
+function refreshRefs(){$("ore").innerHTML='<option value="">推荐人：无（留空）</option>'+REFS.map(function(r){return'<option value="'+r.id+'">'+esc(r.name)+'</option>'}).join("")}
+$("oadd").onclick=function(){
+  var n=$("onm").value.trim();
+  if(!n){$("omsg").textContent="请填写客户姓名。";return}
+  var id="C"+("00"+(CUST.length+1)).slice(-3),c={id:id,name:n,ref:$("ore").value,mgr:"",open:"2026-10-15"};
+  CUST.push(c);
+  var p=document.createElement("option");p.value=id;p.textContent=n;$("lcs").appendChild(p);
+  var r=refOf(c);
+  $("omsg").textContent=r?"开户成功（"+id+"），已自动对应客户经理 "+mgrLabel(r.mgr)+"。":"开户成功（"+id+"）。未填写推荐人，等待客户关系部经理分配客户经理。";
+  $("onm").value="";
+  logS("客户开户 "+id+" "+n+(r?"，推荐人 "+r.name+"，客户经理 "+mgrLabel(r.mgr):"，无推荐人，待分配"));
+};
+function cnm(o){var c=custById(o.cid);return c?esc(c.name):"—"}
+function cmg(o){var c=custById(o.cid);return c?esc(mgrLabel(mgrOf(c))):"—"}
+function fillChc(){
+  var s=$("chc"),cur=s.value||"全部";s.innerHTML="";
+  var a=document.createElement("option");a.value="全部";a.textContent="全部客户";s.appendChild(a);
+  CUST.filter(visible).forEach(function(c){var p=document.createElement("option");p.value=c.id;p.textContent=c.name;s.appendChild(p)});
+  s.value=cur;
+}
+function rCu(){
+  var V=CUST.filter(visible),live=ORDERS.filter(function(o){return o.src==="客户"&&DONE.indexOf(o.st)<0&&visO(o)});
+  var tv=0;V.forEach(function(c){tv+=vol30(c.id)});
+  $("cu0").innerHTML="<div>"+(scope()?"我的客户":"客户数")+"<b>"+V.length+"</b></div><div>进行中订单<b>"+live.length+"</b></div><div>今日客户订单<b>"+ORDERS.filter(function(o){return o.src==="客户"&&!o.d&&visO(o)}).length+"</b></div><div>前30日总成交量<b>"+fmt(tv,0)+"</b></div>";
+  $("cu1").innerHTML=tbl(["客户","推荐人","客户经理","档位","前30日交易量","累计完成订单","进行中"],V.map(function(c){var rf=refOf(c),v=vol30(c.id);return[esc(c.name),rf?esc(rf.name):"—",esc(mgrLabel(mgrOf(c))),tierOf(v).n,fmt(v,0),ORDERS.filter(function(o){return o.cid===c.id&&o.st==="已完成"}).length,ORDERS.filter(function(o){return o.cid===c.id&&DONE.indexOf(o.st)<0}).length]}));
+  $("cu2").innerHTML=live.length?tbl(["订单","客户","客户经理","内容","状态","对冲进度","时间"],live.map(function(o){var h=ORDERS.filter(function(x){return x.link===o.id})[0];return[o.id,cnm(o),cmg(o),o.side+" "+o.coin+" "+fmt(o.size,0),o.st,h?prog(h):"—",o.t]})):'<p class="sub">暂无进行中的客户订单。</p>';
+  var sel=$("chc").value||"全部";
+  var H=ORDERS.filter(function(o){return o.src==="客户"&&o.cid&&DONE.indexOf(o.st)>=0&&visO(o)&&(sel==="全部"||o.cid===sel)}).sort(function(a,b){return a.d-b.d});
+  $("cu3").innerHTML=tbl(["订单","日期","客户","客户经理","内容","佣金比例","佣金金额","状态"],H.map(function(o){return[o.id,o.t,cnm(o),cmg(o),o.side+" "+o.coin+" "+fmt(o.size,0),o.cr!==undefined?(o.cr*100).toFixed(2)+"%":"—",o.st==="已完成"?fmt(cm(o)):"—",o.st]}));
+}
+function fillTier(){TIERS.forEach(function(t,i){$("th"+i).value=t.th;$("tr"+i).value=t.r})}
+function rTier(){
+  $("tl2").innerHTML=tbl(["客户","推荐人","客户经理","前30日交易量","档位","佣金比例","距下一档"],CUST.map(function(c){
+    var rf=refOf(c),v=vol30(c.id),t=tierOf(v),nx=TIERS[TIERS.indexOf(t)+1];
+    return[esc(c.name),rf?esc(rf.name):"—",esc(mgrLabel(mgrOf(c))),fmt(v,0),t.n,t.r.toFixed(2)+"%",nx?"还差 "+fmt(nx.th-v,0)+" 升至"+nx.n:"最高档"];
+  }));
+}
+$("tsave").onclick=function(){
+  if(!can("tier"))return;
+  var th=[0,1,2,3].map(function(i){return i?parseFloat($("th"+i).value):0}),r=[0,1,2,3].map(function(i){return parseFloat($("tr"+i).value)});
+  if(th.some(isNaN)||r.some(isNaN)){$("tm").textContent="请填写完整的数字。";return}
+  for(var i=1;i<4;i++)if(th[i]<=th[i-1]){$("tm").textContent="门槛必须逐档升高。";return}
+  if(r.some(function(x){return x<=0||x>2})){$("tm").textContent="佣金比例需在 0–2% 之间。";return}
+  TIERS.forEach(function(t,i){t.th=th[i];t.r=r[i]});
+  $("tm").textContent="已保存，新的分级规则将用于之后的报价。";
+  log("修改客户分级规则：门槛 "+th.slice(1).map(function(x){return fmt(x,0)}).join("/")+"，佣金 "+r.join("/")+"%");rTier();
+};
+function rMap(){
+  var mo=mgrs().map(function(s){return'<option value="'+s.code+'">'+esc(s.code+" "+s.name)+(s.on?"":"（已停用）")+"</option>"}).join("");
+  var h='<table><tr><th>推荐人</th><th>对应客户经理</th><th>推荐人佣金比例（%）</th><th>客户数</th></tr>';
+  REFS.forEach(function(r){h+="<tr><td>"+esc(r.name)+"（"+r.id+'）</td><td><select id="rm_'+r.id+'">'+mo+'</select></td><td><input id="rs_'+r.id+'" type="number" value="'+r.share+'"></td><td>'+CUST.filter(function(c){return c.ref===r.id}).length+"</td></tr>"});
+  $("mp1").innerHTML=h+"</table>";
+  REFS.forEach(function(r){$("rm_"+r.id).value=r.mgr});
+  var g='<table><tr><th>客户经理</th><th>入职日期</th><th>状态</th><th>佣金比例（%）</th><th>负责客户数</th></tr>';
+  mgrs().forEach(function(s){g+="<tr><td>"+esc(s.code+" "+s.name)+"</td><td>"+s.hire+"</td><td>"+(s.on?"在职":"停用")+'</td><td><input id="ms_'+s.code+'" type="number" value="'+mshare(s.code)+'"></td><td>'+CUST.filter(function(c){return mgrOf(c)===s.code}).length+"</td></tr>"});
+  $("mp2").innerHTML=g+"</table>";
+  $("nrm").innerHTML=mo;
+  var nw=newestMgr(),NR=CUST.filter(function(c){return !c.ref});
+  $("asel").innerHTML=mo;if(nw)$("asel").value=nw.code;
+  $("mp4").textContent=nw?"最新入职的客户经理："+nw.code+" "+nw.name+"（入职 "+nw.hire+"）。下拉框默认选中他，也可以改选其他客户经理。":"当前没有在职的客户经理。";
+  $("mp3").innerHTML=NR.length?tbl(["客户","开户日期","当前客户经理","操作"],NR.map(function(c){return[esc(c.name),c.open,c.mgr?esc(mgrLabel(c.mgr)):'<span class="bad">待分配</span>',btn(c.id,"as","分配给所选客户经理")]})):'<p class="sub">没有无推荐人的客户。</p>';
+}
+$("mpsave").onclick=function(){
+  if(!can("map"))return;
+  var bad="",nr=REFS.map(function(r){return{r:r,m:$("rm_"+r.id).value,s:parseFloat($("rs_"+r.id).value)}}),nm=mgrs().map(function(s){return{s:s,v:parseFloat($("ms_"+s.code).value)}});
+  nr.forEach(function(x){if(isNaN(x.s)||x.s<0||x.s>100)bad="推荐人佣金比例需在 0–100% 之间。"});
+  nm.forEach(function(x){if(isNaN(x.v)||x.v<0||x.v>100)bad="客户经理佣金比例需在 0–100% 之间。"});
+  if(!bad)nr.forEach(function(x){var y=nm.filter(function(z){return z.s.code===x.m})[0];if(y&&x.s+y.v>100)bad="推荐人 "+x.r.name+" 与其对应客户经理的佣金比例合计超过 100%。"});
+  if(bad){$("mpm").textContent=bad;return}
+  nr.forEach(function(x){x.r.share=x.s;x.r.mgr=x.m});nm.forEach(function(x){MS[x.s.code]=x.v});
+  log("修改推荐人与客户经理对应关系及佣金比例");rMap();$("mpm").textContent="已保存。";
+};
+$("nradd").onclick=function(){
+  if(!can("map"))return;
+  var n=$("nrn").value.trim(),m=$("nrm").value,sh=parseFloat($("nrs").value);
+  if(!n||!m||isNaN(sh)||sh<0||sh>100){$("mpm").textContent="请填写推荐人姓名、对应客户经理，以及 0–100 之间的佣金比例。";return}
+  var id="P"+("0"+(REFS.length+1)).slice(-2);
+  REFS.push({id:id,name:n,share:sh,mgr:m});refreshRefs();
+  $("nrn").value="";$("nrs").value="";log("新增推荐人 "+id+" "+n+"，对应客户经理 "+mgrLabel(m)+"，佣金比例 "+sh+"%");rMap();$("mpm").textContent="已新增推荐人 "+id+"。";
+};
+$("mp3").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="as"||!can("map"))return;
+  var c=custById(b.dataset.i),m=$("asel").value;if(!c||!m)return;
+  c.mgr=m;log("分配客户 "+c.name+" 给客户经理 "+mgrLabel(m));rMap();
+};
+$("asall").onclick=function(){
+  if(!can("map"))return;
+  var nw=newestMgr();if(!nw)return;var n=0;
+  CUST.forEach(function(c){if(!c.ref&&!c.mgr){c.mgr=nw.code;n++}});
+  log("一键分配 "+n+" 个待分配客户给最新入职的客户经理 "+mgrLabel(nw.code));rMap();
+};
+function fillSt(){
+  var t=$("st1").value,sc=scope(),h='<option value="全部">全部</option>';
+  if(t==="按客户经理"){(sc?[sc]:mgrs().map(function(x){return x.code}).concat([""])).forEach(function(c){h+='<option value="'+c+'">'+esc(c?mgrLabel(c):"未分配")+"</option>"})}
+  else{var seen={};CUST.filter(visible).forEach(function(c){var k=c.ref||"无推荐人";if(!seen[k]){seen[k]=1;var r=refOf(c);h+='<option value="'+k+'">'+esc(r?r.name:"无推荐人")+"</option>"}})}
+  $("st2").innerHTML=h;
+  $("sscope").textContent=sc?"你只能查看自己管理的客户，以及这些客户对应的推荐人佣金。":"可查看全部客户经理和推荐人。";
+}
+function stmBuild(){
+  var typ=$("st1").value,sub=$("st2").value,per=$("st3").value,L=[];
+  ORDERS.forEach(function(o){
+    if(o.src!=="客户"||o.st!=="已完成"||!o.cid)return;
+    if(per==="近30日"&&!(o.d<=30))return;
+    if(per==="本月"&&!(o.d<=14))return;
+    var c=custById(o.cid);if(!c||!visible(c))return;
+    var rf=refOf(c),mc=mgrOf(c),cv=cm(o),rs=rf?rf.share:0,ms=mshare(mc);
+    var gk=typ==="按客户经理"?mc:(c.ref||"无推荐人");
+    if(sub!=="全部"&&gk!==sub)return;
+    L.push({o:o,c:c,rf:rf,mc:mc,cv:cv,rs:rs,rp:cv*rs/100,ms:ms,mp:cv*ms/100,gk:gk});
+  });
+  L.sort(function(a,b){return a.gk<b.gk?-1:a.gk>b.gk?1:a.o.d-b.o.d});
+  var G={},ord=[],T={n:0,v:0,c:0,rp:0,mp:0};
+  L.forEach(function(x){
+    if(!G[x.gk]){G[x.gk]={n:0,v:0,c:0,rp:0,mp:0,rs:x.rs,ms:x.ms};ord.push(x.gk)}
+    var g=G[x.gk];g.n++;g.v+=x.o.size;g.c+=x.cv;g.rp+=x.rp;g.mp+=x.mp;
+    T.n++;T.v+=x.o.size;T.c+=x.cv;T.rp+=x.rp;T.mp+=x.mp;
+  });
+  var byM=typ==="按客户经理";
+  function lab(k){if(byM)return mgrLabel(k);var r=REFS.filter(function(z){return z.id===k})[0];return r?r.name:"无推荐人"}
+  var sh=byM?["客户经理","笔数","成交量（美元等值）","佣金收入","客户经理比例","客户经理佣金","推荐人佣金","公司净佣金"]:["推荐人","笔数","成交量（美元等值）","佣金收入","推荐人比例","推荐人佣金","客户经理佣金","公司净佣金"];
+  var sr=ord.map(function(k){var g=G[k];return[esc(lab(k)),g.n,fmt(g.v,0),fmt(g.c),byM?(k?g.ms+"%":"—"):(k==="无推荐人"?"—":g.rs+"%"),fmt(byM?g.mp:g.rp),fmt(byM?g.rp:g.mp),fmt(g.c-g.rp-g.mp)]});
+  if(L.length)sr.push(["<b>合计</b>",T.n,fmt(T.v,0),fmt(T.c),"",fmt(byM?T.mp:T.rp),fmt(byM?T.rp:T.mp),fmt(T.c-T.rp-T.mp)]);
+  var dh=["订单","日期","客户","推荐人","客户经理","成交量","佣金比例","佣金金额","推荐人比例","应付推荐人","客户经理比例","应付客户经理"];
+  var dr=L.map(function(x){return[x.o.id,x.o.t.slice(0,5),esc(x.c.name),x.rf?esc(x.rf.name):"—",esc(mgrLabel(x.mc)),fmt(x.o.size,0)+" "+x.o.coin,(x.o.cr*100).toFixed(2)+"%",fmt(x.cv),x.rf?x.rs+"%":"—",fmt(x.rp),x.mc?x.ms+"%":"—",fmt(x.mp)]});
+  var sl=sub==="全部"?"全部":lab(sub);
+  return{id:"S-"+(++SEQS),typ:typ,subl:sl,per:per,time:hm(),by:UCODE+" "+USER,n:L.length,sh:sh,sr:sr,dh:dh,dr:dr};
+}
+function showStmt(S){
+  CURS=S;
+  $("so").innerHTML="<h2>"+esc(S.id)+" · "+esc(S.typ)+" · "+esc(S.subl)+" · "+esc(S.per)+'</h2><p class="sub">生成于 '+S.time+"，生成人 "+esc(S.by)+"，共 "+S.n+' 笔成交</p><h2>汇总表</h2><div class="tw">'+tbl(S.sh,S.sr)+'</div><h2>明细表</h2><div class="tw">'+tbl(S.dh,S.dr)+"</div>";
+  $("sx").style.display="block";
+}
+function rStm(){
+  var H=STMTS.filter(function(s){return !scope()||s.by.indexOf(UCODE)===0});
+  $("sh").innerHTML=H.length?tbl(["编号","类型","对象","期间","笔数","生成时间","生成人","操作"],H.map(function(s){return[s.id,s.typ,esc(s.subl),s.per,s.n,s.time,esc(s.by),btn(s.id,"view","查看")]})):'<p class="sub">还没有生成过佣金表。</p>';
+}
+$("st1").onchange=function(){fillSt()};
+$("stgo").onclick=function(){
+  if(!can("stm"))return;
+  var S=stmBuild();STMTS.unshift(S);if(STMTS.length>8)STMTS.pop();
+  log("生成佣金表 "+S.id+"（"+S.typ+"，"+S.subl+"，"+S.per+"）");rStm();showStmt(S);
+};
+$("sh").onclick=function(e){var b=e.target;if(b.dataset.a!=="view")return;var S=STMTS.filter(function(x){return x.id===b.dataset.i})[0];if(S)showStmt(S)};
+function csvOf(S){
+  var q=function(v){return'"'+String(v).replace(/<[^>]+>/g,"").replace(/"/g,'""')+'"'},row2=function(r){return r.map(q).join(",")};
+  return"\ufeff"+["汇总表",row2(S.sh)].concat(S.sr.map(row2)).concat(["","明细表",row2(S.dh)]).concat(S.dr.map(row2)).join("\n");
+}
+$("sx").onclick=function(){
+  if(!CURS)return;
+  try{var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csvOf(CURS)],{type:"text/csv;charset=utf-8"}));a.download=CURS.id+".csv";document.body.appendChild(a);a.click();document.body.removeChild(a);log("下载佣金表 "+CURS.id+"（CSV）")}
+  catch(e){$("so").insertAdjacentHTML("afterbegin",'<p class="bad">当前环境不支持下载，请使用 GitHub 或 Netlify 部署的网页版。</p>')}
+};
+function fillGr(){
+  var s=$("gr"),cur=s.value||"全部";
+  s.innerHTML='<option value="全部">推荐人：全部</option>'+REFS.map(function(r){return'<option value="'+r.id+'">'+esc(r.name)+"</option>"}).join("")+'<option value="无推荐人">无推荐人</option>';
+  s.value=cur;
+}
+function rGrp(){
+  var per=$("gp").value,gm=$("gg").value,fr=$("gr").value,ft=$("gt").value,L=[];
+  ORDERS.forEach(function(o){
+    if(o.src!=="客户"||o.st!=="已完成"||!o.cid)return;
+    if(per!=="全部"&&!(o.d<=30))return;
+    var c=custById(o.cid),rf=refOf(c),t=tierOf(vol30(c.id));
+    if(fr!=="全部"&&(fr==="无推荐人"?!!rf:(!rf||rf.id!==fr)))return;
+    if(ft!=="全部"&&t.n!==ft)return;
+    var cv=cm(o),sh=rf?rf.share:0,rn=rf?rf.name:"无推荐人",ti=TIERS.indexOf(t);
+    var key=gm==="按推荐人"?rn:gm==="按客户等级"?t.n:gm==="推荐人+等级"?rn+" / "+t.n:"全部";
+    var sk=gm==="按推荐人"?(rf?rf.id:"Z"):gm==="按客户等级"?""+ti:gm==="推荐人+等级"?(rf?rf.id:"Z")+ti:"0";
+    L.push({o:o,c:c,rf:rf,t:t,cv:cv,sh:sh,pay:cv*sh/100,key:key,sk:sk});
+  });
+  L.sort(function(a,b){return a.sk<b.sk?-1:a.sk>b.sk?1:a.o.d-b.o.d});
+  var rows=[],cur=null,sv=0,sc=0,sp=0,sn=0,tv=0,tc=0,tp=0;
+  function flush(){if(cur!==null&&gm!=="不分组")rows.push(["<b>小计 · "+esc(cur)+"（"+sn+" 笔）</b>","","","","",fmt(sv,0),"","<b>"+fmt(sc)+"</b>","","<b>"+fmt(sp)+"</b>"])}
+  L.forEach(function(x){
+    if(x.key!==cur){flush();cur=x.key;sv=sc=sp=sn=0;if(gm!=="不分组")rows.push(["<b>"+esc(cur)+"</b>","","","","","","","","",""])}
+    sv+=x.o.size;sc+=x.cv;sp+=x.pay;sn++;tv+=x.o.size;tc+=x.cv;tp+=x.pay;
+    rows.push([x.o.id,x.o.t.slice(0,5),esc(x.c.name),x.rf?esc(x.rf.name):"—",x.t.n,fmt(x.o.size,0)+" "+x.o.coin,(x.o.cr*100).toFixed(2)+"%",fmt(x.cv),x.rf?x.sh+"%":"—",fmt(x.pay)]);
+  });
+  flush();
+  if(L.length)rows.push(["<b>合计（"+L.length+" 笔）</b>","","","","",fmt(tv,0),"","<b>"+fmt(tc)+"</b>","","<b>"+fmt(tp)+"</b>"]);
+  $("gk").innerHTML="<div>笔数<b>"+L.length+"</b></div><div>成交量（美元等值）<b>"+fmt(tv,0)+"</b></div><div>佣金收入<b>"+fmt(tc)+"</b></div><div>应付推荐人<b>"+fmt(tp)+"</b></div><div>扣除后净佣金<b>"+fmt(tc-tp)+"</b></div>";
+  $("gl").innerHTML=L.length?tbl(["订单","日期","客户","推荐人","等级","数量","佣金比例","佣金金额","推荐人分成比例","应付推荐人金额"],rows):'<p class="sub">没有符合条件的成交。</p>';
+}
+["gg","gp","gr","gt","chc"].forEach(function(i){$(i).onchange=function(){rCrm()}});
+tgUI();lpVis();logS("系统启动");(function(){var s=$("sr");Object.keys(ROLEL).forEach(function(r){var o=document.createElement("option");o.textContent=r;s.appendChild(o)});staffUI()})();
+nets();rails();labels();
+</script>
+</body>
+</html>
