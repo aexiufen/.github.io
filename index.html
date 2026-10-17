@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>稳定币 ⇄ 法币 · 演示版</title>
+<style>
+:root{--bg:#f6f7f4;--card:#fff;--ink:#14212b;--mute:#5e6b73;--line:#dde2df;--brand:#0b4a6f;--brand-ink:#fff;--best:#b8730a;--best-bg:#fbf1dc;--ok:#1b7a57;--warn:#a23b2a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#10181e;--card:#18232b;--ink:#e8eef1;--mute:#98a7b0;--line:#2b3a44;--brand:#5fb3e0;--brand-ink:#08202e;--best:#f0b44c;--best-bg:#3a2d12;--ok:#5ccb9b;--warn:#ff9b87}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#10181e;--card:#18232b;--ink:#e8eef1;--mute:#98a7b0;--line:#2b3a44;--brand:#5fb3e0;--brand-ink:#08202e;--best:#f0b44c;--best-bg:#3a2d12;--ok:#5ccb9b;--warn:#ff9b87}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:480px;margin:0 auto;padding:16px 16px 40px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+h1{font-size:20px;margin:0}
+header{flex-wrap:wrap;gap:8px}
+.hd{display:flex;gap:8px;align-items:center}
+#lang{width:auto;padding:6px 8px;font-size:13px;border-radius:8px}
+.tag{font-size:12px;color:var(--best);background:var(--best-bg);padding:3px 9px;border-radius:999px}
+.note{font-size:13px;color:var(--mute);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:none}
+.card.on{display:block}
+label{display:block;font-size:14px;color:var(--mute);margin:14px 0 6px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;font:inherit;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.seg button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn{width:100%;margin-top:18px;font:inherit;font-weight:600;padding:13px;border:0;border-radius:10px;background:var(--brand);color:var(--brand-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand);margin-top:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.err{color:var(--warn);font-size:13px;min-height:18px;margin:8px 0 0}
+.big{font-size:36px;font-weight:700;line-height:1.15;margin:4px 0 2px;color:var(--brand)}
+.sub{font-size:13px;color:var(--mute)}
+.bar{height:5px;background:var(--line);border-radius:4px;margin:14px 0 4px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--brand);transition:width 1s linear}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.row:last-child{border-bottom:0}
+.row span:first-child{color:var(--mute);flex:none}
+.row span:last-child,.row b{text-align:right;word-break:break-all}
+h2{font-size:15px;margin:20px 0 6px}
+.lp{display:flex;justify-content:space-between;padding:9px 10px;border-radius:8px;font-size:15px}
+.lp.best{background:var(--best-bg);color:var(--best);font-weight:600}
+.addr{word-break:break-all;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:13px;margin:8px 0}
+ol.steps{list-style:none;margin:8px 0 0;padding:0}
+ol.steps li{display:flex;gap:10px;padding:9px 0;color:var(--mute);border-bottom:1px solid var(--line)}
+ol.steps li:last-child{border-bottom:0}
+ol.steps li .d{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none;margin-top:3px}
+ol.steps li.done{color:var(--ink)}
+ol.steps li.done .d{background:var(--ok);border-color:var(--ok)}
+ol.steps li.now .d{border-color:var(--brand)}
+ol.steps li time{margin-left:auto;font-size:13px;color:var(--mute)}
+.final{margin-top:14px;padding:14px;border-radius:10px;background:var(--best-bg);display:none}
+.final.on{display:block}
+.foot{font-size:12px;color:var(--mute);margin-top:18px;text-align:center}
+.wrap.wide{max-width:960px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
+.tabs button{flex:none;font:inherit;font-size:14px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.tabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.view .card{margin-bottom:12px}
+.tw{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--mute);font-weight:500}
+.mini{font:inherit;font-size:12px;padding:4px 9px;border-radius:6px;border:1px solid var(--brand);background:transparent;color:var(--brand);cursor:pointer}
+.hl{color:var(--best);font-weight:700}
+.bad{color:var(--warn);font-weight:600}
+.inv{display:flex;gap:8px;flex-wrap:wrap}
+.inv div{flex:1 1 90px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--mute)}
+.inv b{display:block;font-size:16px;color:var(--ink)}
+.two{display:flex;gap:8px}
+.two>*{flex:1}
+.chk{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:15px}
+.chk input{width:auto}
+.roles{display:grid;gap:10px}
+.rc{font:inherit;text-align:left;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer}
+.rc b{display:block;font-size:16px}
+.rc span{font-size:13px;color:var(--mute)}
+#ubar{display:none;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;color:var(--mute)}
+progress{width:70px;height:8px;vertical-align:middle}
+.view table input{width:auto}
+.ap{display:none}
+textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;resize:vertical}
+textarea:focus{outline:2px solid var(--brand);outline-offset:1px}
+.lnk{background:none;border:0;color:var(--brand);font:inherit;font-size:14px;padding:10px 0 0;cursor:pointer;margin-right:16px}
+.demo{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--best-bg);font-size:13px;line-height:1.6;color:var(--ink)}
+.code{font-family:ui-monospace,Menlo,monospace;letter-spacing:.08em}
+.steps2{display:flex;gap:6px;margin:0 0 6px}
+.steps2 span{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.steps2 span.on{background:var(--brand)}
+.auth h2{margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>稳定币 ⇄ 法币</h1><div class="hd"><select id="lang" data-nt aria-label="Language / 语言"><option value="zh-CN">简体中文</option><option value="zh-TW">繁體中文</option><option value="en">English</option></select><span class="tag">演示版 · 模拟数据</span></div></header>
+<p class="note">价格、汇率、地址和到账过程均为模拟，不涉及真实资金。</p>
+<div id="nojs" class="demo" style="margin-bottom:12px"><b>页面脚本没有运行，按钮暂时无法使用。</b>请用 Chrome、Safari、Edge 或 Firefox 浏览器直接打开这个文件。手机文件预览、聊天软件或邮件里的附件预览、电脑上的快速预览通常不会运行脚本。</div>
+<div id="home">
+ <div class="seg" id="xk"><button class="on" data-k="c">我是客户</button><button data-k="s">我是员工</button></div>
+ <div class="card on auth" id="xc" style="margin-top:12px">
+  <nav class="tabs" id="xct"><button class="on" data-t="l">登录</button><button data-t="r">注册</button></nav>
+  <div id="xcl">
+   <div id="xcl1">
+    <label for="xce">邮箱</label><input id="xce" type="email" autocomplete="username" placeholder="name@example.com">
+    <label for="xcp">密码</label><input id="xcp" type="password" autocomplete="current-password">
+    <p class="err" id="xcm1"></p><button class="btn" id="xcgo">登录</button>
+    <button class="lnk" id="xcfg">忘记密码？</button>
+   </div>
+   <div id="xcl2" style="display:none">
+    <h2>两步验证</h2><p class="sub" id="xcm2"></p>
+    <label for="xcc">6 位验证码</label><input id="xcc" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+    <p class="err" id="xcm3"></p><button class="btn" id="xcv">验证并登录</button>
+    <button class="lnk" id="xcrs">重新发送验证码</button><button class="lnk" id="xcbk">返回</button>
+   </div>
+   <div id="xcl3" style="display:none">
+    <h2>重置密码</h2>
+    <label for="xfe">注册邮箱</label><input id="xfe" type="email" autocomplete="email">
+    <button class="btn" id="xfs">发送验证码</button>
+    <div id="xf2" style="display:none"><p class="sub" id="xfm"></p>
+     <label for="xfc">验证码</label><input id="xfc" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+     <label for="xfp">新密码</label><input id="xfp" type="password" autocomplete="new-password">
+     <p class="sub" style="margin:6px 0 0">至少 8 位，需同时包含字母和数字。</p>
+     <label for="xfp2">确认新密码</label><input id="xfp2" type="password" autocomplete="new-password">
+     <button class="btn" id="xfok">重置密码</button></div>
+    <p class="err" id="xfe1"></p><button class="lnk" id="xfbk">返回登录</button>
+   </div>
+  </div>
+  <div id="xcr" style="display:none">
+   <div class="steps2" id="xrs"><span class="on"></span><span></span><span></span></div>
+   <div id="xr1">
+    <label for="xre">邮箱</label><input id="xre" type="email" autocomplete="email" placeholder="name@example.com">
+    <label for="xrp">设置密码</label><input id="xrp" type="password" autocomplete="new-password">
+    <p class="sub" style="margin:6px 0 0">至少 8 位，需同时包含字母和数字。</p>
+    <label for="xrp2">确认密码</label><input id="xrp2" type="password" autocomplete="new-password">
+    <label for="xrc">居住国家或地区</label>
+    <select id="xrc"><option value="">请选择</option><option>阿联酋</option><option>新加坡</option><option>香港特别行政区</option><option>英国</option><option>欧盟国家</option><option>中国大陆</option><option>其他国家或地区</option></select>
+    <label for="xrf">推荐码（选填）</label><input id="xrf" placeholder="例如 P01" autocapitalize="characters">
+    <label class="chk" style="margin-top:14px"><input type="checkbox" id="xra"> 我已阅读并同意用户协议、隐私政策和风险披露</label>
+    <p class="err" id="xrm1"></p><button class="btn" id="xrgo">发送邮箱验证码</button>
+   </div>
+   <div id="xr2" style="display:none">
+    <p class="sub" id="xrm2"></p>
+    <label for="xrv">邮箱验证码</label><input id="xrv" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+    <p class="err" id="xrm3"></p><button class="btn" id="xrok">验证并创建账户</button><button class="lnk" id="xrbk">返回修改</button>
+   </div>
+   <div id="xr3" style="display:none">
+    <h2>账户已创建</h2><p class="sub" id="xrm4"></p><button class="btn" id="xrlg">去登录</button>
+   </div>
+  </div>
+ </div>
+ <div class="card auth" id="xs" style="margin-top:12px">
+  <nav class="tabs" id="xst"><button class="on" data-t="l">员工登录</button><button data-t="a">激活账号</button></nav>
+  <div id="xsl">
+   <div id="xsl1">
+    <label for="scode">角色代码</label><input id="scode" placeholder="例如 T01" autocapitalize="characters" autocomplete="username">
+    <label for="xsp">密码</label><input id="xsp" type="password" autocomplete="current-password">
+    <p class="err" id="serr"></p><button class="btn" id="slog">下一步</button>
+   </div>
+   <div id="xsl2" style="display:none">
+    <h2>动态验证码</h2><p class="sub" id="xsm2"></p>
+    <label for="xsc">身份验证器上的 6 位动态码</label><input id="xsc" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+    <p class="err" id="xsm3"></p><button class="btn" id="xsv">验证并登录</button><button class="lnk" id="xsbk">返回</button>
+   </div>
+  </div>
+  <div id="xsa" style="display:none">
+   <div id="xsa1">
+    <p class="sub" style="margin-top:0">新员工使用管理员发放的角色代码和一次性激活码激活账号，然后设置密码并绑定身份验证器。</p>
+    <label for="xac">角色代码</label><input id="xac" autocapitalize="characters" placeholder="例如 M04">
+    <label for="xak">激活码</label><input id="xak" autocapitalize="characters" placeholder="例如 ABCD-1234">
+    <label for="xap">设置密码</label><input id="xap" type="password" autocomplete="new-password">
+    <p class="sub" style="margin:6px 0 0">至少 10 位，需包含大写字母、小写字母和数字。</p>
+    <label for="xap2">确认密码</label><input id="xap2" type="password" autocomplete="new-password">
+    <p class="err" id="xam1"></p><button class="btn" id="xago">下一步：绑定身份验证器</button>
+   </div>
+   <div id="xsa2" style="display:none">
+    <h2>绑定身份验证器</h2>
+    <p class="sub">用 Google Authenticator 或 Microsoft Authenticator 等应用添加下面的密钥，再输入应用显示的 6 位动态码。</p>
+    <div class="addr code" id="xasec"></div><p class="sub" id="xam2"></p>
+    <label for="xav">动态码</label><input id="xav" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+    <p class="err" id="xam3"></p><button class="btn" id="xaok">完成激活</button>
+   </div>
+   <div id="xsa3" style="display:none"><h2>账号已激活</h2><p class="sub" id="xam4"></p><button class="btn" id="xalg">去登录</button></div>
+  </div>
+ </div>
+ <div class="demo" id="xdemo"></div>
+</div>
+<div id="ubar"><span id="who2"></span><button class="mini" id="out2">退出登录</button></div>
+<div id="v-cust" style="display:none">
+<nav class="tabs" id="custnav"><button class="on" data-s="1">交易</button><button data-s="6">资产与充值</button><button data-s="7">交易记录</button><button data-s="8">账户与认证</button><button data-s="5">咨询与投诉</button></nav>
+<p class="bad" id="kycbar" style="display:none;margin:0 0 12px"></p>
+
+<section class="card on" id="s1">
+  <div class="seg" id="dir"><button class="on" data-d="sell">卖出稳定币，收法币</button><button data-d="buy">用法币买入稳定币</button></div>
+  <label for="src">资金来源</label>
+  <select id="src"><option value="ext">外部转账或汇款</option><option value="bal">账户余额</option></select>
+  <p class="sub" id="balhint" style="margin:6px 0 0"></p>
+  <label for="fiat">法币币种</label>
+  <select id="fiat"><option>USD</option><option>HKD</option><option>EUR</option><option>GBP</option><option>SGD</option><option>AED</option></select>
+  <label>稳定币</label>
+  <div class="seg" id="coin"><button class="on" data-c="USDC">USDC</button><button data-c="USDT">USDT</button></div>
+  <label for="net">转账网络</label><select id="net"></select>
+  <label for="amt" id="amtL"></label><input id="amt" type="number" inputmode="decimal" value="50000">
+  <label for="rail" id="railL"></label><select id="rail"></select>
+  <label for="who" id="whoL"></label><input id="who" value="示例姓名 SAMPLE NAME">
+  <div id="wbox"><label for="wallet">收款钱包地址</label><input id="wallet" value="DEMO-wallet-address"></div>
+  <p class="err" id="err"></p>
+  <button class="btn" id="go">获取报价</button>
+</section>
+
+<section class="card" id="s2">
+  <div class="sub">你将收到</div>
+  <div class="big" id="out">–</div>
+  <div class="sub" id="left"></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div id="rows"></div>
+  <div id="lpbox" style="display:none"><h2>已比价的流动性渠道（最优价自动选中）</h2>
+  <div id="lps"></div></div>
+  <button class="btn ghost" id="auth">授权人员查看渠道比价</button>
+  <div id="authbox" style="display:none"><label for="code">授权码（演示：8888）</label><input id="code" type="password"><p class="err" id="err2"></p><button class="btn" id="codeok">确认</button></div>
+  <button class="btn" id="accept">接受报价</button>
+  <button class="btn ghost" id="req">重新询价</button>
+</section>
+
+<section class="card" id="s3">
+  <h2 style="margin-top:0" id="s3t"></h2>
+  <div id="s3rows"></div>
+  <label id="addrL"></label>
+  <div class="addr" id="addr"></div>
+  <p class="sub" id="s3n"></p>
+  <button class="btn" id="sim"></button>
+</section>
+
+<section class="card" id="s4">
+  <h2 style="margin-top:0">订单进度</h2>
+  <ol class="steps" id="steps"></ol>
+  <div class="final" id="final"></div>
+  <button class="btn ghost" id="again" style="display:none">再做一笔</button>
+</section>
+
+<section class="card" id="s5">
+  <h2 style="margin-top:0">咨询与投诉</h2>
+  <label for="tt">类型</label><select id="tt"><option>咨询</option><option>投诉</option></select>
+  <label for="tx">内容</label><textarea id="tx" rows="3"></textarea>
+  <p class="err" id="te5"></p><button class="btn" id="tsend">提交</button>
+  <h2>我的记录</h2><div id="tl"></div>
+  <button class="btn ghost" id="tback">返回</button>
+</section>
+
+<section class="card" id="s6">
+  <h2 style="margin-top:0">我的资产</h2>
+  <div class="inv" id="balx"></div>
+  <h2>法币余额</h2><div class="inv" id="balf"></div>
+  <h2>代币余额</h2><div class="inv" id="balt"></div>
+  <div class="seg" id="dk" style="margin-top:20px"><button class="on" data-k="f">法币入金</button><button data-k="t">充币</button></div>
+  <div id="dkf">
+   <label for="dfc">入金币种</label>
+   <select id="dfc"><option>USD</option><option>HKD</option><option>EUR</option><option>GBP</option><option>SGD</option><option>AED</option></select>
+   <label for="dfa">入金金额</label><input id="dfa" type="number" inputmode="decimal" value="10000">
+   <label for="dfr">入金方式</label><select id="dfr"></select>
+   <p class="err" id="dfe"></p><button class="btn" id="dfgo">生成入金指引</button>
+   <div id="dfbox" style="display:none">
+    <h2>汇款指引</h2><div id="dfrows"></div>
+    <div class="addr" id="dfacc" style="white-space:pre-wrap"></div>
+    <p class="sub">付款人姓名必须与开户实名一致，不接受第三方付款；请在附言里填写参考号。</p>
+    <label class="chk"><input type="checkbox" id="df3p"> 模拟第三方付款（付款人姓名不一致）</label>
+    <button class="btn" id="dfsim">模拟我已汇款</button>
+    <ol class="steps" id="dfst"></ol><div class="final" id="dffin"></div>
+   </div>
+  </div>
+  <div id="dkt" style="display:none">
+   <label>代币</label>
+   <div class="seg" id="dtc"><button class="on" data-c="USDC">USDC</button><button data-c="USDT">USDT</button></div>
+   <label for="dtn">网络</label><select id="dtn"></select>
+   <p class="err" id="dte0"></p><button class="btn" id="dtgo">获取充币地址</button>
+   <div id="dtbox" style="display:none">
+    <div id="dtrows"></div>
+    <label>你的专属充币地址（演示）</label><div class="addr" id="dtaddr"></div>
+    <p class="bad" id="dtwarn"></p>
+    <label for="dta">模拟转入数量</label><input id="dta" type="number" inputmode="decimal" value="5000">
+    <label class="chk"><input type="checkbox" id="dtrisk"> 模拟来源地址命中风险标签</label>
+    <p class="err" id="dte"></p><button class="btn" id="dtsim">模拟我已转入</button>
+    <ol class="steps" id="dtst"></ol><div class="final" id="dtfin"></div>
+   </div>
+  </div>
+  <h2>最近的入金与充币</h2><div class="tw" id="depl"></div>
+</section>
+
+<section class="card" id="s7">
+  <h2 style="margin-top:0">交易记录</h2>
+  <div class="two">
+   <select id="hty"><option>全部类型</option><option>入金</option><option>充币</option><option>卖出</option><option>买入</option></select>
+   <select id="hcu"><option value="全部">全部币种</option><option>USD</option><option>HKD</option><option>EUR</option><option>GBP</option><option>SGD</option><option>AED</option><option>USDC</option><option>USDT</option></select>
+  </div>
+  <div class="tw" id="hxl"></div>
+  <p class="sub">包括入金、充币和兑换订单。兑换订单显示付出和收到的金额；“账户余额”表示用余额支付或收款存入余额。</p>
+</section>
+
+<section class="card" id="s8">
+  <h2 style="margin-top:0">账户信息</h2><div id="acinfo"></div>
+  <h2>身份认证（KYC）</h2><p id="kycst" style="margin:6px 0"></p>
+  <div id="kycf">
+   <label for="xkn">姓名（与证件一致）</label><input id="xkn" autocomplete="name">
+   <label for="xkt">证件类型</label><select id="xkt"><option>护照</option><option>阿联酋身份证（Emirates ID）</option><option>其他国家或地区的身份证</option></select>
+   <label for="xkno">证件号码</label><input id="xkno">
+   <label for="xkf">证件照片</label><input id="xkf" type="file" accept="image/*,.pdf">
+   <label class="chk" style="margin-top:14px"><input type="checkbox" id="xkl"> 完成活体检测（演示：勾选即视为通过）</label>
+   <p class="sub">演示环境不会上传或保存证件文件。</p>
+   <p class="err" id="xkm"></p><button class="btn" id="xkgo">提交认证</button>
+  </div>
+  <h2>安全设置</h2><div id="secinfo"></div>
+  <label for="xop">当前密码</label><input id="xop" type="password" autocomplete="current-password">
+  <label for="xnp">新密码</label><input id="xnp" type="password" autocomplete="new-password">
+  <p class="err" id="xpm"></p><button class="btn ghost" id="xpgo">修改密码</button>
+</section>
+</div>
+<div id="v-trader" class="view" style="display:none">
+ <div class="card on"><h2 style="margin-top:0">智能订单</h2><p class="sub" id="tmode"></p>
+  <div class="two"><select id="ts"><option value="sell">卖出</option><option value="buy">买入</option></select><select id="tc"><option>USDC</option><option>USDT</option></select></div>
+  <label for="tz">数量</label><input id="tz" type="number" value="100000">
+  <label for="tg">执行策略</label>
+  <select id="tg"><option value="sor">智能路由 SOR</option><option value="twap">TWAP 时间加权</option><option value="ice">冰山单 Iceberg</option><option value="lim">限价单</option></select>
+  <p class="sub" id="tgd"></p>
+  <div id="tpb"><label for="tp">限价（美元）</label><input id="tp" type="number" step="0.0001" value="0.9995"></div>
+  <div id="tdb"><label for="td">TWAP 时长（分钟，演示中快进）</label><input id="td" type="number" value="3"></div>
+  <p class="err" id="te"></p><button class="btn" id="tgo">提交订单</button></div>
+ <div class="card on"><h2 style="margin-top:0">成本分析（TCA）</h2><div id="tca"></div></div>
+ <div class="card on"><h2 style="margin-top:0">待对冲的客户订单</h2><div class="tw" id="hq"></div></div>
+ <div class="card on"><h2 style="margin-top:0">我的订单（实时）</h2><div class="tw" id="tb"></div></div>
+ <div class="card on" id="rtc"><h2 style="margin-top:0">智能路由实时详情：报价、深度与分配</h2><div id="rt"></div></div>
+ <div class="card on"><h2 style="margin-top:0">渠道行情</h2><div class="tw" id="liq"></div></div>
+ <div class="card on"><h2 style="margin-top:0">头寸</h2><div class="inv" id="inv"></div></div>
+</div>
+<div id="v-admin" class="view" style="display:none">
+ <nav class="tabs" id="atabs"><button class="on" data-t="live">实时交易</button><button data-t="hist">历史记录</button><button data-t="role">角色权限</button><button data-t="aud">审计日志</button><button data-t="brk">对账差异</button><button data-t="staff">员工与角色代码</button><button data-t="cfg">系统配置</button></nav>
+ <p class="bad" id="nop" style="display:none">当前角色没有此页面的权限。</p>
+ <div class="card on ap" id="a-live"><div class="inv" id="kp"></div><div class="tw" id="ll"></div></div>
+ <div class="card on ap" id="a-hist"><div class="two"><select id="hs"><option>全部</option><option>已完成</option><option>已撤销</option><option>已拒绝</option></select><select id="hr"><option>全部</option><option>客户</option><option>交易员</option></select></div><div class="tw" id="hl"></div><button class="btn ghost" id="hx">导出历史记录（演示）</button><p class="sub" id="hxm"></p></div>
+ <div class="card on ap" id="a-role"><div class="tw" id="rm"></div><p class="sub">勾选即授权，修改立即生效并写入审计日志。下单权限分两种、二选一：“手动确认后执行”需交易员核对路由方案后确认；“自动执行”提交即执行，交易员默认为自动执行。管理员默认不含下单和出款权限，以实现职责分离；管理角色权限本身不可取消，避免锁死。</p></div>
+ <div class="card on ap" id="a-aud"><div class="tw" id="al"></div></div>
+ <div class="card on ap" id="a-brk"><div class="tw" id="ab"></div></div>
+ <div class="card on ap" id="a-staff"><div class="tw" id="sl"></div>
+  <h2>分配新的角色代码</h2><div class="two"><select id="sr"></select><input id="sn" placeholder="员工姓名"></div>
+  <button class="btn" id="sadd">生成并启用角色代码</button><p class="sub" id="sm"></p>
+  <p class="sub">规则：同一岗位用同一个字母，数字是该岗位的员工编号。T=交易员，F=财务主管，R=风控主管，C=客户关系部经理，M=客户经理，B=后台管理员，A=管理员。新员工用激活码在首页激活账号。</p></div>
+ <div class="card on ap" id="a-cfg"><label for="cc">默认佣金率（%，仅在客户没有分档时使用）</label><input id="cc" type="number" step="0.01" value="0.15"><label for="pdev">订单价格保护：偏离阈值（bp）</label><input id="pdev" type="number" value="30"><label for="pmax">订单价格保护：单笔数量上限</label><input id="pmax" type="number" value="5000000"><button class="btn" id="csave">保存配置</button>
+  <h2>各角色默认显示语言</h2><div class="tw" id="rlang"></div><button class="btn" id="lsave">保存语言设置</button><p class="sub" id="lsm"></p><p class="sub">每个用户可以在页面右上角自己选择显示语言，用户自己的选择优先于角色默认语言；都没有设置时跟随首页的选择。</p></div>
+</div>
+<div id="v-ops" class="view" style="display:none">
+ <div class="card on"><h2 style="margin-top:0">出款确认（后台管理员）</h2><div class="tw" id="ord"></div></div>
+ <div class="card on"><h2 style="margin-top:0">三方对账</h2><div class="tw" id="rec"></div></div>
+</div>
+<div id="v-fin" class="view" style="display:none">
+ <p class="bad" id="g-fin" style="display:none">当前角色没有此页面的权限。</p>
+ <div id="b-fin">
+  <div class="card on"><h2 style="margin-top:0">资金账户</h2><div class="inv" id="fa"></div></div>
+  <div class="card on"><h2 style="margin-top:0">资金流水（实时）</h2><div class="tw" id="ff"></div></div>
+  <div class="card on"><h2 style="margin-top:0">账本</h2><button class="btn" id="fgen" style="margin-top:0">生成账本</button><div class="tw" id="fl"></div></div>
+  <div class="card on"><h2 style="margin-top:0">日终对账</h2><button class="btn" id="frec" style="margin-top:0">执行日终对账</button><button class="btn ghost" id="fsim">模拟一笔大额差异（演示）</button><div class="tw" id="fr"></div><p class="sub">对账规则：账本与外部余额差异 ≤ 10 美元自动通过；10–1,000 美元需财务主管说明并登记调整凭证；超过 1,000 美元升级给风控主管和管理员。客户资金覆盖率不得低于 100%。</p></div>
+  <div class="card on"><h2 style="margin-top:0">对账差异处理</h2><input id="fnote" placeholder="填写差异原因说明（提交说明时使用）"><p class="err" id="fm"></p><div class="tw" id="fb"></div><p class="sub">流程：10–1,000 美元由财务主管说明后关闭；超过 1,000 美元依次经财务主管说明、风控主管确认、管理员批准后关闭，任一环节可退回。</p></div>
+  <div class="card on"><h2 style="margin-top:0">订单成本与利润</h2><div id="fp"></div></div>
+  <div class="card on"><h2 style="margin-top:0">佣金结算单（推荐人与客户经理）</h2><div class="tw" id="fst"></div><div id="fdt"></div><p class="sub">确认入账后，系统会计提佣金费用和应付佣金；标记已支付时冲减应付佣金并减少运营账户银行存款。生成或支付后请重新生成账本。</p></div>
+  <div class="card on"><h2 style="margin-top:0">科目表</h2><div class="tw" id="coa"></div></div>
+ </div>
+</div>
+<div id="v-risk" class="view" style="display:none">
+ <p class="bad" id="g-risk" style="display:none">当前角色没有此页面的权限。</p>
+ <div id="b-risk">
+  <div class="card on"><h2 style="margin-top:0">自动风控系统</h2><div class="inv" id="rk"></div><div class="tw" id="rr"></div></div>
+  <div class="card on"><h2 style="margin-top:0">身份认证审核（KYC）</h2><div class="tw" id="kq"></div></div>
+  <div class="card on"><h2 style="margin-top:0">风险事件</h2><div class="tw" id="re"></div></div>
+  <div class="card on"><h2 style="margin-top:0">对账差异升级</h2><div class="tw" id="rb"></div></div>
+ </div>
+</div>
+<div id="v-crm" class="view" style="display:none">
+ <nav class="tabs" id="ctabs"><button class="on" data-t="cu">客户与交易</button><button data-t="tier">分级规则</button><button data-t="map">对应关系与比例</button><button data-t="stm">佣金表</button><button data-t="stl">结算单</button><button data-t="grp">分组明细</button><button data-t="tk">投诉与咨询</button></nav>
+ <p class="bad" id="g-crm" style="display:none">当前角色没有此页面的权限。</p>
+ <div class="ap" id="c-cu">
+  <div class="card on"><div class="inv" id="cu0"></div></div>
+  <div class="card on"><h2 style="margin-top:0">客户一览</h2><div class="tw" id="cu1"></div></div>
+  <div class="card on"><h2 style="margin-top:0">实时交易执行</h2><div class="tw" id="cu2"></div></div>
+  <div class="card on"><h2 style="margin-top:0">交易历史</h2><select id="chc"></select><div class="tw" id="cu3"></div></div>
+ </div>
+ <div class="ap" id="c-tier">
+  <div class="card on"><h2 style="margin-top:0">客户分级规则</h2>
+   <p class="sub">按客户前 30 日（不含当天）已完成交易量自动分档，并自动把对应佣金比例加入该客户的报价。</p>
+   <div class="tw"><table><tr><th>档位</th><th>前30日交易量门槛（美元等值）</th><th>佣金比例（%）</th></tr>
+    <tr><td>普通</td><td><input id="th0" type="number" disabled></td><td><input id="tr0" type="number" step="0.01"></td></tr>
+    <tr><td>银卡</td><td><input id="th1" type="number"></td><td><input id="tr1" type="number" step="0.01"></td></tr>
+    <tr><td>金卡</td><td><input id="th2" type="number"></td><td><input id="tr2" type="number" step="0.01"></td></tr>
+    <tr><td>钻石</td><td><input id="th3" type="number"></td><td><input id="tr3" type="number" step="0.01"></td></tr></table></div>
+   <p class="err" id="tm"></p><button class="btn" id="tsave">保存分级规则</button></div>
+  <div class="card on"><h2 style="margin-top:0">客户当前档位</h2><div class="tw" id="tl2"></div></div>
+ </div>
+ <div class="ap" id="c-map">
+  <div class="card on"><h2 style="margin-top:0">推荐人与客户经理对应关系及佣金比例</h2>
+   <p class="sub">客户开户时填写推荐人，系统自动把客户对应到该推荐人的客户经理。佣金比例均为占我方佣金收入的百分比。</p>
+   <div class="tw" id="mp1"></div>
+   <h2>客户经理佣金比例</h2><div class="tw" id="mp2"></div>
+   <p class="err" id="mpm"></p><button class="btn" id="mpsave">保存对应关系与佣金比例</button></div>
+  <div class="card on"><h2 style="margin-top:0">新增推荐人</h2>
+   <input id="nrn" placeholder="推荐人姓名"><div class="two" style="margin-top:8px"><select id="nrm"></select><input id="nrs" type="number" placeholder="佣金比例（%）"></div><button class="btn" id="nradd">新增推荐人</button></div>
+  <div class="card on"><h2 style="margin-top:0">无推荐人客户的分配</h2>
+   <p class="sub" id="mp4"></p>
+   <select id="asel"></select><div class="tw" id="mp3"></div><button class="btn ghost" id="asall">一键分配所有待分配客户给最新入职的客户经理</button></div>
+ </div>
+ <div class="ap" id="c-stm">
+  <div class="card on"><h2 style="margin-top:0">生成佣金明细与汇总表</h2>
+   <div class="two"><select id="st1"><option>按客户经理</option><option>按推荐人</option></select><select id="st3"><option>近30日</option><option>本月</option><option>全部</option></select></div>
+   <label for="st2">对象</label><select id="st2"></select>
+   <button class="btn" id="stgo">生成佣金表</button><p class="sub" id="sscope"></p></div>
+  <div class="card on"><div id="so"><p class="sub">选择类型、对象和期间后点“生成佣金表”，会得到汇总表和明细表。</p></div><button class="btn ghost" id="sx" style="display:none">下载为 CSV（GitHub / Netlify 版可用）</button></div>
+  <div class="card on"><h2 style="margin-top:0">生成记录</h2><div class="tw" id="sh"></div></div>
+ </div>
+ <div class="ap" id="c-stl">
+  <div class="card on"><h2 style="margin-top:0">推荐人与客户经理月度结算单</h2>
+   <div class="two"><select id="sp"></select><select id="sty"><option>全部</option><option>推荐人</option><option>客户经理</option></select></div>
+   <button class="btn" id="sgen">生成结算单（草稿）</button><p class="err" id="sgm"></p>
+   <p class="sub">流程：草稿 → 客户关系部经理提交财务 → 财务主管确认并入账 → 标记已支付。客户经理只能看到本人的结算单。</p></div>
+  <div class="card on"><div class="tw" id="sl2"></div></div>
+  <div class="card on" id="sdet" style="display:none"><div id="sdt"></div></div>
+ </div>
+ <div class="ap" id="c-grp">
+  <div class="card on"><div class="two"><select id="gg"><option>按推荐人</option><option>按客户等级</option><option>推荐人+等级</option><option>不分组</option></select><select id="gp"><option>近30日</option><option>全部</option></select></div>
+   <div class="two" style="margin-top:8px"><select id="gr"></select><select id="gt"><option value="全部">等级：全部</option><option>普通</option><option>银卡</option><option>金卡</option><option>钻石</option></select></div>
+   <div class="inv" id="gk" style="margin-top:12px"></div><div class="tw" id="gl"></div>
+   <p class="sub">客户等级按当前档位显示；佣金比例是下单当时报价使用的比例；应付推荐人金额 = 佣金金额 × 推荐人佣金比例。成交量按稳定币 1:1 折算美元。</p></div>
+ </div>
+ <div class="ap" id="c-tk">
+  <div class="card on"><h2 style="margin-top:0">客户咨询与投诉</h2><div class="tw" id="ct"></div></div>
+  <div class="card on" id="cbox" style="display:none"><h2 style="margin-top:0" id="cth"></h2><p class="sub" id="ctx" style="white-space:pre-wrap"></p><textarea id="crp" rows="3"></textarea><button class="btn" id="csend">发送回复</button></div>
+ </div>
+</div>
+<p class="foot">演示版仅展示界面和流程，非投资或金融服务。交易员、管理员和后台界面借鉴机构交易平台的通用功能布局，数据均为模拟；真实系统需要账号认证、双因素验证和操作审批。</p>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var FX={USD:1,HKD:7.8,EUR:0.92,GBP:0.79,SGD:1.34,AED:3.6725};
+var BID={USDC:0.9998,USDT:0.9991}, ASK={USDC:1.0004,USDT:1.0009};
+var NET={USDC:["Ethereum","Solana","Base"],USDT:["Tron (TRC20)","Ethereum","Solana"]};
+var FEE={"Ethereum":3,"Solana":0.1,"Base":0.05,"Tron (TRC20)":1};
+var LPS=["Fuze Finance","Binance OTC","OKX OTC"];
+var COMM=0.0015, dir="sell", coin="USDC", q=null, tm=null, left=30;
+var S1="美元";
+var RAILS={
+ USD:[["同行内部转账","秒级"],["CHATS 美元清算","几分钟（营业时段内）"],["SWIFT 电汇","1–2 个工作日"]],
+ HKD:[["FPS 转数快","秒级"],["CHATS 港币","当天"]],
+ EUR:[["SEPA Instant","秒级"],["SEPA 转账","当天至 1 个工作日"],["SWIFT 电汇","1–2 个工作日"]],
+ GBP:[["Faster Payments","秒级"],["SWIFT 电汇","1–2 个工作日"]],
+ SGD:[["FAST / PayNow","秒级"],["SWIFT 电汇","1–2 个工作日"]],
+ AED:[["本地转账","当天"],["SWIFT 电汇","1–2 个工作日"]]
+};
+var SELL=[["检测到链上转账","T+8秒"],["地址风险筛查通过","T+20秒"],["确认数达标，订单确认","T+45秒"],["市场对冲成交","T+52秒"],["法币出款已发起","T+70秒"],["法币到账",""]];
+var BUY=[["收到法币入账",""],["付款人姓名核对一致","T+10秒"],["风险筛查通过","T+20秒"],["订单确认","T+30秒"],["市场买入稳定币","T+45秒"],["稳定币已转出到你的钱包","T+70秒"]];
+function fmt(n,d){d=d===undefined?2:d;return n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function show(n){for(var i=1;i<=8;i++)$("s"+i).classList.toggle("on",i===n);var t=n<=4?1:n;document.querySelectorAll("#custnav button").forEach(function(b){b.classList.toggle("on",+b.dataset.s===t)});window.scrollTo(0,0)}
+function opts(sel,arr){sel.innerHTML="";arr.forEach(function(t){var o=document.createElement("option");o.textContent=t;sel.appendChild(o)})}
+function fiat(){return $("fiat").value}
+function eta(){var r=RAILS[fiat()],v=$("rail").value;if(v===TOBAL)return"即时";for(var i=0;i<r.length;i++)if(r[i][0]===v)return r[i][1];return ""}
+function labels(){
+  var s=dir==="sell",f=fiat();
+  $("amtL").textContent=s?"卖出数量（"+coin+"）":"付款金额（"+f+"）";
+  $("railL").textContent=s?"法币出款方式":"法币付款方式";
+  $("whoL").textContent=s?"收款人姓名":"付款人姓名（须与实名一致）";
+  $("wbox").style.display=s?"none":"block";
+  rails();srcUI();
+}
+function rails(){var v=$("rail").value,a=RAILS[fiat()].map(function(r){return r[0]});if(dir==="sell")a.push(TOBAL);opts($("rail"),a);if(a.indexOf(v)>=0)$("rail").value=v}
+function nets(){opts($("net"),NET[coin])}
+document.querySelectorAll("#dir button").forEach(function(b){b.onclick=function(){dir=b.dataset.d;document.querySelectorAll("#dir button").forEach(function(x){x.classList.toggle("on",x===b)});labels()}});
+document.querySelectorAll("#coin button").forEach(function(b){b.onclick=function(){coin=b.dataset.c;document.querySelectorAll("#coin button").forEach(function(x){x.classList.toggle("on",x===b)});nets();labels()}});
+$("fiat").onchange=function(){labels()};
+function row(k,v){var d=document.createElement("div");d.className="row";var a=document.createElement("span");a.textContent=k;var b=document.createElement("span");b.textContent=v;d.appendChild(a);d.appendChild(b);return d}
+function quote(){COMM=custRate();if(!kycOk("err"))return;
+  var s=dir==="sell",f=fiat(),fx=FX[f],amt=parseFloat($("amt").value),net=$("net").value,isB=SRC()==="bal",bb=bal(CURC);
+  if(!(amt>=(s?1000:1000*fx))){$("err").textContent="最小"+(s?"卖出数量为 1,000 "+coin:"付款金额为 "+fmt(1000*fx,0)+" "+f)+"（演示设定）。";return}
+  if(isB&&(s?bb[coin]:bb[f])<amt){$("err").textContent="账户余额不足：可用 "+(s?fmt(bb[coin])+" "+coin:fmt(bb[f])+" "+f)+"。可以先到“资产与充值”入金或充币。";return}
+  if(!s&&!isB&&!$("wallet").value.trim()){$("err").textContent="请填写收款钱包地址（演示可随意填写）。";return}
+  $("err").textContent="";
+  var lps=LPS.map(function(n){var u=s?BID[coin]+(Math.random()-0.45)*0.001:ASK[coin]+(Math.random()-0.55)*0.001;return{n:n,p:u*fx}});
+  var best=lps.reduce(function(a,b){return(s?b.p>a.p:b.p<a.p)?b:a});
+  var r=$("rows");r.innerHTML="";
+  var out,comm;
+  if(s){var g=amt*best.p;comm=g*COMM;var fee=(isB?0:FEE[net])*fx;out=fmt(g-comm-fee)+" "+f;
+    r.appendChild(row("卖出",fmt(amt)+" "+coin));
+    if(isB)r.appendChild(row("资金来源","账户余额（即时扣除）"));
+    r.appendChild(row("最优市场价","1 "+coin+" = "+best.p.toFixed(4)+" "+f));
+    r.appendChild(row("平台佣金（"+cTier()+(COMM*100).toFixed(2)+"%）","− "+fmt(comm)+" "+f));
+    r.appendChild(row("链上手续费","− "+fmt(fee)+" "+f));
+    r.appendChild(row("法币出款",$("rail").value+"，预计"+eta()));
+  }else{comm=amt*COMM;var c=(amt-comm)/best.p-(isB?0:FEE[net]);out=fmt(c)+" "+coin;
+    r.appendChild(row("付款",fmt(amt)+" "+f));
+    r.appendChild(row("最优市场价","1 "+coin+" = "+best.p.toFixed(4)+" "+f));
+    r.appendChild(row("平台佣金（"+cTier()+(COMM*100).toFixed(2)+"%）","− "+fmt(comm)+" "+f));
+    r.appendChild(row("链上手续费","− "+(isB?0:FEE[net])+" "+coin));
+    if(isB){r.appendChild(row("付款方式","账户余额（即时扣款）"));r.appendChild(row("稳定币收款",TOBAL))}
+    else{r.appendChild(row("法币付款",$("rail").value+"，预计"+eta()+"入账"));r.appendChild(row("收款钱包（"+net+"）",$("wallet").value.trim()))}
+  }
+  q={s:s,f:f,amt:amt,net:net,out:out,rail:s||!isB?$("rail").value:"",eta:eta(),coin:coin,who:$("who").value,src:isB?"bal":"ext",cid:CURC,outN:s?g-comm-fee:c};
+  $("out").textContent=out;
+  var l=$("lps");l.innerHTML="";
+  lps.forEach(function(x){var d=document.createElement("div");d.className="lp"+(x===best?" best":"");var a=document.createElement("span");a.textContent=x.n+(x===best?"（最优）":"");var b=document.createElement("span");b.textContent=x.p.toFixed(4)+" "+f;d.appendChild(a);d.appendChild(b);l.appendChild(d)});
+  lpVis();$("accept").disabled=false;left=30;clearInterval(tm);tick();tm=setInterval(tick,1000);show(2);
+}
+function tick(){
+  $("bar").style.width=(left/30*100)+"%";
+  if(left<=0){clearInterval(tm);$("left").textContent="报价已过期，请重新询价";$("accept").disabled=true;return}
+  $("left").textContent="报价还剩 "+left+" 秒";left--;
+}
+function hex(n){var h="";for(var i=0;i<n;i++)h+="0123456789abcdef"[Math.floor(Math.random()*16)];return h}
+$("go").onclick=quote;$("req").onclick=quote;
+$("accept").onclick=function(){
+  clearInterval(tm);
+  if(q.src==="bal"){var bb=bal(q.cid),k=q.s?q.coin:q.f;if(bb[k]<q.amt){$("left").textContent="账户余额不足，请重新询价";$("accept").disabled=true;return}bb[k]-=q.amt;$("sim").onclick();return}
+  var r=$("s3rows");r.innerHTML="";
+  if(q.s){
+    $("s3t").textContent="请转入稳定币";
+    r.appendChild(row("转账金额",fmt(q.amt)+" "+q.coin));r.appendChild(row("网络",q.net));
+    $("addrL").textContent="本订单专用充值地址（演示）";
+    $("addr").textContent="DEMO-"+hex(34)+"（仅演示，请勿转账）";
+    $("s3n").textContent="真实系统会为每个订单生成唯一地址，并在入账前做链上风险筛查。";
+    $("sim").textContent="模拟我已转账";
+  }else{
+    $("s3t").textContent="请汇入法币";
+    r.appendChild(row("汇款金额",fmt(q.amt)+" "+q.f));r.appendChild(row("付款方式",q.rail));
+    $("addrL").textContent="收款账户与附言（演示）";
+    $("addr").textContent="户名：DEMO PLATFORM LTD（演示）\n账号：DEMO-"+hex(10)+"\n附言：REF-"+hex(6);
+    $("addr").style.whiteSpace="pre-wrap";
+    $("s3n").textContent="真实系统要求付款人姓名与实名一致，不接受第三方付款。";
+    $("sim").textContent="模拟我已付款";
+  }
+  show(3);
+};
+$("sim").onclick=function(){
+  show(4);var ol=$("steps");ol.innerHTML="";$("final").className="final";$("again").style.display="none";
+  var st=stepsFor(q);
+  var items=st.map(function(s){var li=document.createElement("li");var d=document.createElement("span");d.className="d";var t=document.createElement("span");t.textContent=s[0];var tt=document.createElement("time");tt.textContent=s[1];li.appendChild(d);li.appendChild(t);li.appendChild(tt);ol.appendChild(li);return li});
+  var i=0;
+  (function next(){
+    if(i>0)items[i-1].className="done";
+    if(i>=items.length){
+      var f=$("final");
+      creditOut(q);f.textContent=finalMsg(q);
+      f.className="final on";$("again").style.display="block";return;
+    }
+    items[i].className="now";i++;setTimeout(next,1100);
+  })();
+};
+$("again").onclick=function(){show(1)};
+var USER=null,UCODE="",LINK=null,DET=null,SEL=null,AT="live",authed=false,LOG=[],SEQ=1051,ESEQ=301,TSEQ=101,LEDGER=null,LV=0,INV={USDC:500000,USDT:300000,USD:800000};
+var ROLES=["客户","交易员","财务主管","风控主管","客户关系部经理","客户经理","后台管理员","管理员"];
+var P=[["lp","查看渠道比价"],["trade","下单：手动确认后执行"],["auto","下单：自动执行"],["cancel","撤销订单"],["cost","查看成本分析"],["fin","查看资金流水"],["ledger","生成与查看账本"],["settleok","确认佣金结算单入账与标记支付"],["brk","确认与批准对账差异"],["riskmon","监控自动风控"],["riskhandle","处理风险事件"],["crm","回复客户咨询与投诉"],["cust","查看客户与交易（客户经理仅限本人客户）"],["tier","定义客户分级规则"],["map","定义推荐人与客户经理对应及佣金比例"],["stm","查询、生成佣金明细与汇总表（客户经理仅限本人）"],["settle","查看月度结算单（客户经理仅限本人）"],["settlegen","生成并提交月度结算单"],["rpt","分组明细查询"],["approve","出款确认与对账"],["live","查看实时交易"],["hist","查看历史记录"],["export","导出报表"],["staff","管理员工角色代码"],["rbac","管理角色权限"],["cfg","修改佣金与保护参数"],["audit","查看审计日志"]];
+var PM={"客户":{},"交易员":{lp:1,auto:1,cancel:1,cost:1,live:1},"财务主管":{fin:1,ledger:1,settleok:1,cost:1,live:1,hist:1,export:1},"风控主管":{lp:1,riskmon:1,riskhandle:1,brk:1,live:1,hist:1,audit:1},"客户关系部经理":{crm:1,cust:1,tier:1,map:1,stm:1,settle:1,settlegen:1,rpt:1,hist:1},"客户经理":{cust:1,stm:1,settle:1},"后台管理员":{approve:1,live:1,hist:1},"管理员":{lp:1,live:1,hist:1,export:1,brk:1,staff:1,rbac:1,cfg:1,audit:1}};
+var VIEW={"客户":"cust","交易员":"trader","财务主管":"fin","风控主管":"risk","客户关系部经理":"crm","客户经理":"crm","管理员":"admin","后台管理员":"ops"};
+var LPD=["Fuze Finance","Binance OTC","OKX OTC","Circle Mint（USDC 赎回）"],DONE=["已完成","已撤销","已拒绝"];
+var GN={sor:"智能路由 SOR",twap:"TWAP",ice:"冰山单",lim:"限价单","":"客户订单"};
+var GD={sor:"同时询价多个渠道，按最优价拆单成交，适合急单。",twap:"把订单按时间均匀切片，减小对价格的冲击。",ice:"只露出一小部分数量，成交后再补量，隐藏真实规模。",lim:"只在价格不劣于限价时成交，否则等待。"};
+function mk(id,src,side,coin,size,g,fill,avg,st,t,v){return{id:id,src:src,side:side,coin:coin,size:size,g:g,fill:fill,avg:avg,st:st,t:t,v:v||{},dur:3,px:0,link:null,plan:null,d:0,cid:null,cr:undefined}}
+var ORDERS=[
+ mk("T-1051","客户","买入","USDT",20000,"",0,0,"待出款","10-15 09:52"),
+ mk("T-1050","客户","卖出","USDC",50000,"",0,0,"待风险审核","10-15 09:40"),
+ mk("S-1049","交易员","卖出","USDC",200000,"sor",200000,0.99981,"已完成","10-14 16:20",{"Fuze Finance":120000,"OKX OTC":80000}),
+ mk("S-1048","交易员","买入","USDT",150000,"twap",150000,1.00072,"已完成","10-14 11:05",{"Binance OTC":90000,"Fuze Finance":60000}),
+ mk("T-1047","客户","卖出","USDT",50000,"",50000,0.99902,"已完成","10-14 10:31",{"OKX OTC":50000}),
+ mk("S-1046","交易员","卖出","USDC",80000,"lim",30000,0.99974,"已撤销","10-13 15:44",{"Binance OTC":30000}),
+ mk("T-1045","客户","卖出","USDC",12000,"",0,0,"已拒绝","10-13 09:12")
+];
+function can(p){return !!(USER&&PM[USER][p])}
+function tbl(h,rows){return "<table><tr>"+h.map(function(x){return "<th>"+x+"</th>"}).join("")+"</tr>"+rows.map(function(r){return "<tr>"+r.map(function(c){return "<td>"+c+"</td>"}).join("")+"</tr>"}).join("")+"</table>"}
+function btn(i,a,t){return '<button class="mini" data-i="'+i+'" data-a="'+a+'">'+t+'</button>'}
+function hm(){return new Date().toLocaleTimeString("en-GB")}
+function log(m){LOG.unshift(hm()+" "+(USER?USER+(UCODE?" "+UCODE:""):"系统")+"："+m);if(LOG.length>20)LOG.pop()}
+function logS(m){LOG.unshift(hm()+" 系统："+m);if(LOG.length>20)LOG.pop()}
+function find(id){return ORDERS.filter(function(o){return o.id===id})[0]}
+function rnd(c,s){return s?BID[c]+(Math.random()-0.45)*0.001:ASK[c]+(Math.random()-0.55)*0.001}
+function isM(n){return n.indexOf("Circle")===0}
+function lpList(c){return LPD.filter(function(n){return c==="USDC"||!isM(n)})}
+function prog(o){return '<progress value="'+o.fill+'" max="'+o.size+'"></progress> '+(o.size?Math.round(o.fill/o.size*100):0)+"%"}
+function lpVis(){var v=can("lp")||authed;$("lpbox").style.display=v?"block":"none";$("auth").style.display=v?"none":"block"}
+var ROLEL={"交易员":"T","财务主管":"F","风控主管":"R","客户关系部经理":"C","客户经理":"M","后台管理员":"B","管理员":"A"};
+var STAFF=[{code:"T01",name:"李明",role:"交易员",on:true,hire:"2022-05-10"},{code:"T02",name:"陈晨",role:"交易员",on:true,hire:"2024-02-01"},{code:"F01",name:"周婷",role:"财务主管",on:true,hire:"2021-09-01"},{code:"R01",name:"赵刚",role:"风控主管",on:true,hire:"2022-01-15"},{code:"C01",name:"孙倩",role:"客户关系部经理",on:true,hire:"2020-03-01"},{code:"M01",name:"刘洋",role:"客户经理",on:true,hire:"2023-03-01"},{code:"M02",name:"黄磊",role:"客户经理",on:true,hire:"2024-06-15"},{code:"M03",name:"杨帆",role:"客户经理",on:true,hire:"2025-09-01"},{code:"B01",name:"吴凡",role:"后台管理员",on:true,hire:"2023-07-01"},{code:"A01",name:"张伟",role:"管理员",on:true,hire:"2019-01-01"}];
+var VIEWS=["cust","trader","fin","risk","crm","admin","ops"];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function gate(v,p){var ok=can(p);$("g-"+v).style.display=ok?"none":"block";$("b-"+v).style.display=ok?"block":"none";return ok}
+function login(r,code,name){
+  USER=r;UCODE=code||"";$("home").style.display="none";$("ubar").style.display="flex";
+  $("who2").textContent="当前："+r+(code?" · "+code:"")+" · "+name;
+  VIEWS.forEach(function(x){$("v-"+x).style.display=x===VIEW[r]?"block":"none"});
+  document.querySelector(".wrap").classList.toggle("wide",r!=="客户");
+  log("登录");setLang(pickLang());render(true);lpVis();if(r==="客户"){show(1);labels()}window.scrollTo(0,0);
+}
+$("out2").onclick=function(){
+  log("退出登录");USER=null;UCODE="";authed=false;
+  VIEWS.forEach(function(x){$("v-"+x).style.display="none"});
+  $("home").style.display="block";$("ubar").style.display="none";document.querySelector(".wrap").classList.remove("wide");
+  setLang(pickLang());
+};
+$("slog").onclick=function(){
+  var c=$("scode").value.trim().toUpperCase();
+  if(!/^[A-Z]\d{2}$/.test(c)){$("serr").textContent="角色代码是一个字母加两位数字，例如 T01。";return}
+  var s=STAFF.filter(function(x){return x.code===c})[0];
+  if(!s){$("serr").textContent="角色代码不存在，请联系管理员分配。";logS("员工登录失败：代码 "+c+" 不存在");return}
+  if(!s.on){$("serr").textContent="该角色代码已停用，请联系管理员。";logS("员工登录失败：代码 "+c+" 已停用");return}
+  $("serr").textContent="";$("scode").value="";login(s.role,s.code,s.name);
+};
+function book(c,s){
+  return lpList(c).map(function(n){
+    var m=isM(n),p0=m?1:rnd(c,s),lv=[];
+    if(m){lv.push({p:1,q:1000000})}
+    else for(var i=0;i<3;i++)lv.push({p:p0+(s?-1:1)*i*0.0001,q:(2+Math.floor(Math.random()*18))*100000});
+    return{n:n,lv:lv,ms:8+Math.floor(Math.random()*12)};
+  });
+}
+function plan(c,s,z){
+  var all=[];
+  book(c,s).forEach(function(b){b.lv.forEach(function(l){all.push({n:b.n,p:l.p,q:l.q})})});
+  all.sort(function(a,b){return s?b.p-a.p:a.p-b.p});
+  var rem=z,alloc={},val={},best=all[0].p;
+  all.forEach(function(l){if(rem<=0)return;var t=Math.min(rem,l.q);alloc[l.n]=(alloc[l.n]||0)+t;val[l.n]=(val[l.n]||0)+t*l.p;rem-=t});
+  if(rem>0){var k=all[0].n;alloc[k]=(alloc[k]||0)+rem;val[k]=(val[k]||0)+rem*all[0].p}
+  var px={},tot=0;
+  Object.keys(alloc).forEach(function(n){px[n]=val[n]/alloc[n];tot+=val[n]});
+  return{alloc:alloc,px:px,vwap:tot/z,best:best};
+}
+function step(){
+  ORDERS.forEach(function(o){
+    if(o.st!=="运行中"||!o.plan)return;
+    var c=o.coin,s=o.side==="卖出",q2;
+    if(o.g==="sor")q2=o.size*0.35;else if(o.g==="twap")q2=o.size/(o.dur*6);else if(o.g==="ice")q2=o.size*0.1;
+    else{var m=rnd(c,s);if(s?m<o.px:m>o.px)return;q2=o.size*0.25}
+    q2=Math.min(q2,o.size-o.fill);
+    var f=q2/o.size,tv=0,tq=0;
+    Object.keys(o.plan.alloc).forEach(function(v){
+      var qv=Math.min(o.plan.alloc[v]*f,o.plan.alloc[v]-(o.v[v]||0));if(qv<=0)return;
+      var p=o.plan.px[v]+(Math.random()-0.5)*0.00006;
+      o.v[v]=(o.v[v]||0)+qv;tv+=qv*p;tq+=qv;
+    });
+    if(tq>0){o.avg=(o.avg*o.fill+tv)/(o.fill+tq);o.fill+=tq;INV[c]+=s?-tq:tq;INV.USD+=s?tv:-tv}
+    if(o.size-o.fill<0.01){
+      o.fill=o.size;o.st="已完成";
+      var k=o.link?find(o.link):null;if(k&&k.st==="待对冲")k.st="待出款";
+      log("订单 "+o.id+" 执行完成"+(k?"，客户订单 "+k.id+" 转为待出款":""));
+    }
+  });
+}
+function render(full){
+  if(!USER)return;var v=VIEW[USER];
+  if(v==="trader")rTrader();else if(v==="admin")rAdmin(full);else if(v==="ops")rOps();
+  else if(v==="fin")rFin(full);else if(v==="risk")rRisk();else if(v==="crm")rCrm(full);
+}
+setInterval(function(){step();render(false)},1000);
+function tgUI(){var g=$("tg").value;$("tgd").textContent=GD[g];$("tpb").style.display=g==="lim"?"block":"none";$("tdb").style.display=g==="twap"?"block":"none"}
+$("tg").onchange=tgUI;
+$("tgo").onclick=function(){
+  var mode=can("auto")?"auto":can("trade")?"manual":null;
+  if(!mode){$("te").textContent="当前角色没有下达智能订单的权限。";return}
+  var z=parseFloat($("tz").value),g=$("tg").value,px=parseFloat($("tp").value),du=parseFloat($("td").value);
+  if(!(z>0)){$("te").textContent="请输入数量。";return}
+  if(g==="lim"&&!(px>0)){$("te").textContent="请输入限价。";return}
+  if(g==="twap"&&!(du>0)){$("te").textContent="请输入 TWAP 时长。";return}
+  $("te").textContent="";
+  var s=$("ts").value==="sell",c=$("tc").value;
+  var pr=protect(c,s,z,g,px);if(pr){$("te").textContent="订单价格保护拦截："+pr;return}
+  var o=mk("S-"+(++SEQ),"交易员",s?"卖出":"买入",c,z,g,0,0,mode==="auto"?"运行中":"待确认","10-15 "+hm());
+  o.px=px;o.dur=du||3;o.link=LINK;LINK=null;o.plan=plan(c,s,z);o.arr=o.plan.best;
+  ORDERS.unshift(o);DET=o.id;
+  log("提交"+GN[g]+" "+o.id+"："+o.side+" "+fmt(z,0)+" "+c+(mode==="auto"?"（自动执行）":"（待手动确认）"));
+  rTrader();goRoute();
+};
+function rRoute(){
+  var d=find(DET);
+  if(!d){$("rt").innerHTML='<p class="sub">提交订单后，这里会实时显示所有渠道的报价、深度、路由分配和成交。</p>';return}
+  if(!d.plan){
+    var ks=Object.keys(d.v),sb=slipBp(d);
+    $("rt").innerHTML='<div class="inv"><div>'+d.id+" · "+d.side+" "+d.coin+"<b>"+fmt(d.size,0)+"</b></div><div>状态<b>"+d.st+"</b></div><div>进度<b>"+prog(d)+"</b></div><div>成交均价<b>"+(d.avg?d.avg.toFixed(4):"—")+"</b></div><div>到达价<b>"+(d.arr?d.arr.toFixed(4):"—")+"</b></div><div>滑点<b>"+(d.arr&&d.fill?sb.toFixed(2)+" bp":"—")+"</b></div></div>"+(ks.length?'<div class="tw">'+tbl(["渠道","成交量","占比"],ks.map(function(k){return[k,fmt(d.v[k],0),d.fill?Math.round(d.v[k]/d.fill*100)+"%":"—"]}))+"</div>":'<p class="sub">没有成交记录。</p>')+'<p class="sub">这是历史订单，系统没有保存当时各渠道的报价和深度快照，只显示最终的成交分布。新提交的订单会实时显示报价、深度和路由分配。</p>';
+    return;
+  }
+  var s=d.side==="卖出",B=book(d.coin,s),slip=Math.abs(d.plan.best-d.plan.vwap)/d.plan.best*10000;
+  var rows=B.map(function(b){
+    var a=d.plan.alloc[b.n]||0,f=d.v[b.n]||0;
+    var depth=b.lv.map(function(l){return l.p.toFixed(4)+"×"+(l.q>=1e6?(l.q/1e6)+"M":Math.round(l.q/1000)+"K")}).join(" / ");
+    var stt=!a?"未分配":d.st==="待确认"?"待确认":d.st==="已撤销"?"已撤销":f>=a-0.01?"已完成":"执行中";
+    return[b.n,'<span class="hl">'+b.lv[0].p.toFixed(4)+"</span>",depth,fmt(a,0),fmt(f,0),stt,b.ms+" ms"];
+  });
+  var ask=d.st==="待确认"?'<p class="bad">待确认：请核对下面的路由方案，确认后才会执行。</p><div>'+btn(d.id,"confirm","确认执行")+" "+btn(d.id,"cancel","取消订单")+"</div>":"";
+  $("rt").innerHTML='<div class="inv"><div>'+d.id+" · "+d.side+" "+d.coin+"<b>"+fmt(d.size,0)+"</b></div><div>状态<b>"+d.st+"</b></div><div>进度<b>"+prog(d)+"</b></div><div>预计均价<b>"+d.plan.vwap.toFixed(4)+"</b></div><div>已成交均价<b>"+(d.avg?d.avg.toFixed(4):"—")+"</b></div><div>预计滑点<b>"+slip.toFixed(1)+" bp</b></div></div>"+ask+'<div class="tw">'+tbl(["渠道","实时最优价","实时三档深度（价×量）","路由分配","已成交","状态","延迟"],rows)+'</div><p class="sub">深度和报价每秒刷新；分配按价格从优到劣、逐档吃单计算，超出各档深度的部分追加到最优渠道（演示规则）。</p>';
+}
+function rTrader(){
+  var c=$("tc").value;
+  $("tmode").textContent="当前执行权限："+(can("auto")?"自动执行":can("trade")?"手动确认后执行":"无下单权限");
+  var L=lpList(c).map(function(n){var m=isM(n);return{n:n,b:m?1:rnd(c,true),a:m?1:rnd(c,false)}});
+  var bb=Math.max.apply(null,L.map(function(l){return l.b})),ba=Math.min.apply(null,L.map(function(l){return l.a}));
+  $("liq").innerHTML=tbl(["渠道","买价 Bid","卖价 Ask","延迟"],L.map(function(l){return[l.n,'<span class="'+(l.b===bb?"hl":"")+'">'+l.b.toFixed(4)+"</span>",'<span class="'+(l.a===ba?"hl":"")+'">'+l.a.toFixed(4)+"</span>",(8+Math.floor(Math.random()*12))+" ms"]}));
+  var H=ORDERS.filter(function(o){return o.src==="客户"&&o.st==="待对冲"});
+  $("hq").innerHTML=H.length?tbl(["订单","方向","数量","操作"],H.map(function(o){return[o.id,o.side+" "+o.coin,fmt(o.size,0),btn(o.id,"hedge","载入对冲")]})):'<p class="sub">暂无。客户下单并通过风控审核后会出现在这里。</p>';
+  var M=ORDERS.filter(function(o){return o.src==="交易员"});
+  $("tb").innerHTML=M.length?tbl(["订单","方向","策略","进度","均价","状态","操作"],M.map(function(o){
+    var a="";
+    if(o.st==="待确认")a=btn(o.id,"confirm","确认执行")+" "+btn(o.id,"cancel","取消")+" ";
+    else if(o.st==="运行中"&&can("cancel"))a=btn(o.id,"cancel","撤单")+" ";
+    return[o.id,o.side+" "+o.coin,GN[o.g],prog(o),o.avg?o.avg.toFixed(4):"—",o.st,a+btn(o.id,"det","路由详情")]})):'<p class="sub">暂无订单。</p>';
+  rRoute();rTca();
+  $("inv").innerHTML=Object.keys(INV).map(function(k){return "<div>"+k+"<b>"+fmt(INV[k],0)+"</b></div>"}).join("");
+}
+function act(a,id){
+  var o=find(id);if(!o)return;
+  if(a==="confirm"&&o.st==="待确认"){o.plan=plan(o.coin,o.side==="卖出",o.size);o.st="运行中";log("手动确认执行 "+o.id)}
+  else if(a==="cancel"&&(o.st==="运行中"||o.st==="待确认")&&(can("cancel")||o.st==="待确认")){o.st="已撤销";log("撤销订单 "+o.id)}
+  else if(a==="det"){DET=o.id}
+  rTrader();
+  if(a==="det")goRoute();
+}
+$("tb").onclick=function(e){var b=e.target;if(b.dataset.a)act(b.dataset.a,b.dataset.i)};
+$("rt").onclick=function(e){var b=e.target;if(b.dataset.a)act(b.dataset.a,b.dataset.i)};
+$("hq").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="hedge")return;var o=find(b.dataset.i);
+  $("ts").value=o.side==="卖出"?"sell":"buy";$("tc").value=o.coin;$("tz").value=o.size;$("tg").value="sor";tgUI();
+  LINK=o.id;$("te").textContent="已载入客户订单 "+o.id+"，确认后点“提交订单”对冲。";window.scrollTo(0,0);
+};
+function rOps(){
+  var Q=ORDERS.filter(function(o){return o.src==="客户"&&(o.st==="待风险审核"||o.st==="待对冲"||o.st==="待出款")});
+  $("ord").innerHTML=Q.length?tbl(["订单","内容","状态","操作"],Q.map(function(o){var a="—";if(can("approve")&&o.st==="待出款")a=btn(o.id,"pay","确认出款");return[o.id,o.side+" "+o.coin+" "+fmt(o.size,0),o.st,a]})):'<p class="sub">暂无处理中的客户订单。</p>';
+  $("rec").innerHTML=tbl(["项目","我方账本","外部余额","差异"],[["Circle Mint · USDC","512,300.00","512,300.00","0.00"],["Fireblocks · USDT","301,850.00","301,850.00","0.00"],["香港银行 · USD","798,420.50","798,408.00",'<span class="bad">12.50</span>']]);
+}
+$("ord").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="pay"||!can("approve"))return;
+  var o=find(b.dataset.i);o.st="已完成";o.fill=o.size;log("确认出款 "+o.id);rOps();
+};
+document.querySelectorAll("#atabs button").forEach(function(b){b.onclick=function(){AT=b.dataset.t;rAdmin(true)}});
+function rAdmin(full){
+  document.querySelectorAll("#atabs button").forEach(function(b){b.classList.toggle("on",b.dataset.t===AT)});
+  var need={live:"live",hist:"hist",brk:"brk",staff:"staff",role:"rbac",aud:"audit",cfg:"cfg"}[AT],ok=can(need);
+  ["live","hist","brk","staff","role","aud","cfg"].forEach(function(t){$("a-"+t).style.display=(ok&&t===AT)?"block":"none"});
+  $("nop").style.display=ok?"none":"block";
+  if(!ok)return;
+  if(AT==="live"){
+    var A=ORDERS.filter(function(o){return DONE.indexOf(o.st)<0}),vol=0;
+    ORDERS.forEach(function(o){if(o.g)vol+=o.fill*o.avg});
+    $("kp").innerHTML="<div>进行中订单<b>"+A.length+"</b></div><div>运行中智能订单<b>"+ORDERS.filter(function(o){return o.st==="运行中"}).length+"</b></div><div>待风控审核<b>"+ORDERS.filter(function(o){return o.st==="待风险审核"}).length+"</b></div><div>智能订单成交额（美元）<b>"+fmt(vol,0)+"</b></div>";
+    $("ll").innerHTML=tbl(["订单","来源","内容","进度","状态","时间"],A.map(function(o){return[o.id,o.src,o.side+" "+o.coin+" "+fmt(o.size,0),o.g?prog(o):"—",o.st,o.t]}));
+  }
+  if(AT==="hist"){
+    var H=ORDERS.filter(function(o){return DONE.indexOf(o.st)>=0&&($("hs").value==="全部"||o.st===$("hs").value)&&($("hr").value==="全部"||o.src===$("hr").value)});
+    $("hl").innerHTML=tbl(["订单","来源","内容","策略","成交/数量","均价","状态","时间"],H.map(function(o){return[o.id,o.src,o.side+" "+o.coin,GN[o.g],fmt(o.fill,0)+" / "+fmt(o.size,0),o.avg?o.avg.toFixed(4):"—",o.st,o.t]}));
+  }
+  if(AT==="brk")$("ab").innerHTML=brkTable();if(full&&AT==="staff")rStaff();if(full&&AT==="cfg")rLangCfg();
+  if(full&&AT==="role"){
+    $("rm").innerHTML=tbl(["权限"].concat(ROLES),P.map(function(p){return[p[1]].concat(ROLES.map(function(r){return '<input type="checkbox" data-r="'+r+'" data-p="'+p[0]+'"'+(PM[r][p[0]]?" checked":"")+((r==="管理员"&&(p[0]==="rbac"||p[0]==="staff"))?" disabled":"")+'>'}))}));
+  }
+  if(AT==="aud")$("al").innerHTML=tbl(["审计日志"],LOG.map(function(x){return[esc(x)]}));
+}
+function staffUI(){
+  $("shint").textContent="演示代码："+STAFF.filter(function(s){return s.on}).map(function(s){return s.code}).join("、");
+}
+function rStaff(){
+  $("sl").innerHTML=tbl(["角色代码","姓名","岗位","入职日期","状态","操作"],STAFF.map(function(s){return[s.code,esc(s.name),s.role,s.hire,s.on?"已启用":'<span class="bad">已停用</span>',btn(s.code,"tog",s.on?"停用":"启用")]}));
+  staffUI();
+}
+$("sl").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="tog"||!can("staff"))return;
+  var s=STAFF.filter(function(x){return x.code===b.dataset.i})[0];
+  if(s.code===UCODE){$("sm").textContent="不能停用自己正在使用的代码。";return}
+  s.on=!s.on;$("sm").textContent="";log((s.on?"启用":"停用")+"员工代码 "+s.code);rStaff();
+};
+$("sadd").onclick=function(){
+  if(!can("staff"))return;
+  var r=$("sr").value,n=$("sn").value.trim();
+  if(!n){$("sm").textContent="请输入员工姓名。";return}
+  var L=ROLEL[r],mx=0;
+  STAFF.forEach(function(x){if(x.code.charAt(0)===L)mx=Math.max(mx,parseInt(x.code.slice(1),10))});
+  var code=L+(mx+1<10?"0":"")+(mx+1);
+  STAFF.push({code:code,name:n,role:r,on:true,hire:"2026-10-15"});
+  $("sn").value="";$("sm").textContent="已分配角色代码 "+code+"（"+r+"）。";
+  log("新增员工代码 "+code+"（"+r+"，"+n+"）");rStaff();
+};
+$("rm").onchange=function(e){
+  var c=e.target,r=c.dataset.r,p=c.dataset.p;if(!r||!can("rbac"))return;
+  PM[r][p]=c.checked?1:0;
+  if(c.checked&&p==="auto")PM[r].trade=0;
+  if(c.checked&&p==="trade")PM[r].auto=0;
+  log("修改权限："+r+(c.checked?" 获得「":" 取消「")+P.filter(function(x){return x[0]===p})[0][1]+"」");
+  rAdmin(true);
+};
+$("hx").onclick=function(){
+  if(can("export")){log("导出历史记录（演示，不生成文件）");$("hxm").textContent="已记录导出请求（演示，不生成文件）。"}
+  else $("hxm").textContent="当前角色没有“导出报表”权限。";
+};
+$("csave").onclick=function(){
+  var v=parseFloat($("cc").value),d=parseFloat($("pdev").value),m=parseFloat($("pmax").value);
+  if(!(v>=0&&v<=2)||!(d>0)||!(m>0))return;
+  COMM=v/100;PCFG.dev=d;PCFG.max=m;
+  log("修改配置：佣金率 "+v+"%，价格保护偏离阈值 "+d+" bp，单笔上限 "+fmt(m,0));
+};
+$("hs").onchange=function(){rAdmin(false)};$("hr").onchange=function(){rAdmin(false)};
+var RULES=[{n:"单笔大额复核（≥100,000）",ev:12,hit:3},{n:"链上地址风险筛查",ev:12,hit:2},{n:"客户居住地准入",ev:12,hit:1},{n:"价格偏离保护",ev:12,hit:0}];
+var EVT=[{id:"E-301",oid:"T-1050",sev:"中",rule:"链上地址风险筛查",desc:"充值地址与高风险标签存在间接关联（模拟）",st:"待处理",t:"10-15 09:41"},{id:"E-300",oid:"T-1045",sev:"高",rule:"客户居住地准入",desc:"居住地疑似受限地区（模拟）",st:"已拒绝",t:"10-13 09:13"}];
+var TICKETS=[{id:"Q-101",type:"咨询",from:"王先生",text:"USDT 转账大概多久能确认？",st:"待回复",reply:"",t:"10-15 08:30"},{id:"Q-100",type:"投诉",from:"王先生",text:"昨天的出款比预计晚了两个小时。",st:"待回复",reply:"",t:"10-14 17:05"},{id:"Q-099",type:"咨询",from:"王先生",text:"最小卖出金额是多少？",st:"已回复",reply:"演示设定为 1,000 稳定币起。",t:"10-13 14:10"}];
+function autoRisk(o){
+  var hits=[];
+  RULES.forEach(function(r){r.ev++});
+  if(o.size>=100000){RULES[0].hit++;hits.push([0,"中","单笔 "+fmt(o.size,0)+" "+o.coin+" 超过复核线"])}
+  if(Math.random()<0.25){RULES[1].hit++;hits.push([1,"高","充值地址与高风险标签存在间接关联（模拟）"])}
+  if(hits.length){
+    var h=hits[hits.length-1];
+    EVT.unshift({id:"E-"+(++ESEQ),oid:o.id,sev:h[1],rule:RULES[h[0]].n,desc:h[2],st:"待处理",t:"10-15 "+hm()});
+    o.st="待风险审核";logS("自动风控拦截订单 "+o.id+"，等待风控主管处理");
+  }else{o.st="待对冲";logS("自动风控放行订单 "+o.id)}
+}
+var _sim=$("sim").onclick;
+$("sim").onclick=function(){
+  _sim();
+  var sz=q.s?q.amt:parseFloat(q.out.replace(/,/g,""));
+  var o=mk("T-"+(++SEQ),"客户",q.s?"卖出":"买入",q.coin,sz,"",0,0,"待风险审核","10-15 "+hm());
+  o.railc=RAILC[q.rail]||0;o.cid=CURC;o.cr=COMM;o.qf=q.f;o.qout=q.s?q.outN:undefined;o.qin=q.s?undefined:q.amt;o.qsrc=q.src;o.qrail=q.rail;o.custDone=(q.s&&q.rail===TOBAL)||(!q.s&&q.src==="bal");ORDERS.unshift(o);autoRisk(o);
+};
+function rRisk(){
+  if(!gate("risk","riskmon"))return;
+  var ev=0,ht=0;RULES.forEach(function(r){ev+=r.ev;ht+=r.hit});
+  var pend=EVT.filter(function(e){return e.st==="待处理"||e.st==="已升级"}).length;
+  $("rk").innerHTML="<div>自动风控<b>运行中</b></div><div>累计检查<b>"+ev+"</b></div><div>规则触发<b>"+ht+"</b></div><div>待处理事件<b>"+pend+"</b></div>";
+  $("rb").innerHTML=brkTable();$("rr").innerHTML=tbl(["规则","状态","检查次数","触发次数"],RULES.map(function(r){return[r.n,"运行中",r.ev,r.hit]}).concat([["订单价格保护（交易员订单）","运行中",PROT.ev,PROT.hit]]));
+  $("re").innerHTML=EVT.length?tbl(["事件","关联单号","风险等级","规则","说明","状态","操作"],EVT.map(function(e){
+    var a="";
+    if(can("riskhandle")&&(e.st==="待处理"||e.st==="已升级"))a=btn(e.id,"ok","放行")+" "+btn(e.id,"no","拒绝")+(e.st==="待处理"?" "+btn(e.id,"up","升级"):"");
+    return[e.id,e.oid,e.sev==="高"?'<span class="bad">高</span>':e.sev,e.rule,e.desc,e.st,a||"—"]})):'<p class="sub">暂无风险事件。</p>';
+  rKyc();
+}
+$("re").onclick=function(e){
+  var b=e.target,a=b.dataset.a;if(!a||!can("riskhandle"))return;
+  var ev=EVT.filter(function(x){return x.id===b.dataset.i})[0],o=find(ev.oid);
+  if(a==="ok"){ev.st="已放行";if(o&&o.st==="待风险审核")o.st="待对冲"}
+  else if(a==="no"){ev.st="已拒绝";if(o)o.st="已拒绝"}
+  else ev.st="已升级";
+  var dp=ev.dep?depById(ev.dep):null;
+  if(dp&&a==="ok"&&dp.st==="风控审核中"){dp.st="已入账";bal(dp.cid)[dp.cur]+=dp.amt}
+  if(dp&&a==="no"&&dp.st==="风控审核中")dp.st="已冻结，待退回";
+  log("风险事件 "+ev.id+"（"+(dp?"充币 ":"订单 ")+ev.oid+"）→ "+ev.st);rRisk();
+};
+var CT="cu",NEED={cu:"cust",tier:"tier",map:"map",stm:"stm",stl:"settle",grp:"rpt",tk:"crm"};
+document.querySelectorAll("#ctabs button").forEach(function(b){b.onclick=function(){CT=b.dataset.t;rCrm(true)}});
+function rCrm(full){
+  if(!can(NEED[CT])){var f=Object.keys(NEED).filter(function(k){return can(NEED[k])})[0];if(f)CT=f}
+  document.querySelectorAll("#ctabs button").forEach(function(b){b.classList.toggle("on",b.dataset.t===CT);b.style.display=can(NEED[b.dataset.t])?"":"none"});
+  var ok=can(NEED[CT]);
+  ["cu","tier","map","stm","stl","grp","tk"].forEach(function(t){$("c-"+t).style.display=(ok&&t===CT)?"block":"none"});
+  $("g-crm").style.display=ok?"none":"block";
+  if(!ok)return;
+  if(CT==="cu"){if(full)fillChc();rCu()}
+  else if(CT==="tier"){if(full)fillTier();rTier()}
+  else if(CT==="map"){if(full)rMap()}
+  else if(CT==="stm"){if(full){fillSt();rStm()}}
+  else if(CT==="stl"){if(full)fillSp();rStl()}
+  else if(CT==="grp"){if(full)fillGr();rGrp()}
+  else rTk();
+}
+function rTk(){
+  $("ct").innerHTML=tbl(["编号","类型","客户","内容","状态","时间","操作"],TICKETS.map(function(t){return[t.id,t.type==="投诉"?'<span class="bad">投诉</span>':"咨询",esc(t.from),esc(t.text),t.st,t.t,btn(t.id,"open",t.st==="待回复"?"回复":"查看")]}));
+}
+$("ct").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="open"||!can("crm"))return;
+  var t=TICKETS.filter(function(x){return x.id===b.dataset.i})[0];SEL=t.id;
+  $("cth").textContent=t.id+" · "+t.type;
+  $("ctx").textContent="客户："+t.text+(t.reply?"\n上次回复："+t.reply:"");
+  $("crp").value=t.reply;$("cbox").style.display="block";
+};
+$("csend").onclick=function(){
+  var t=TICKETS.filter(function(x){return x.id===SEL})[0],x=$("crp").value.trim();
+  if(!t||!x||!can("crm"))return;
+  t.reply=x;t.st="已回复";log("回复客户 "+t.id);$("cbox").style.display="none";SEL=null;rCrm();
+};
+$("tsend").onclick=function(){
+  var x=$("tx").value.trim();
+  if(!x){$("te5").textContent="请输入内容。";return}
+  $("te5").textContent="";
+  TICKETS.unshift({id:"Q-"+(++TSEQ),type:$("tt").value,from:custName(),text:x,st:"待回复",reply:"",t:"10-15 "+hm()});
+  $("tx").value="";logS("客户提交"+TICKETS[0].type+" "+TICKETS[0].id);rTickets();
+};
+function rTickets(){
+  var l=$("tl");l.innerHTML="";
+  TICKETS.forEach(function(t){l.appendChild(row(t.id+" · "+t.type+" · "+t.st,t.text));if(t.reply)l.appendChild(row("客服回复",t.reply))});
+}
+$("tback").onclick=function(){show(1)};
+var COA=[["1001","银行-USD（客户资金）","资产","客户资金","借"],["1002","银行-USD（交易）","资产","交易","借"],["1003","银行-USD（运营）","资产","运营","借"],["1101","托管账户-USDC（客户资金）","资产","客户资金","借"],["1102","托管账户-USDT（客户资金）","资产","客户资金","借"],["1103","托管账户-USDC（交易）","资产","交易","借"],["1104","托管账户-USDT（交易）","资产","交易","借"],["2001","客户应付款","负债","客户资金","贷"],["2002","应付推荐人佣金","负债","运营","贷"],["2003","应付客户经理佣金","负债","运营","贷"],["3001","所有者权益","权益","运营","贷"],["4001","手续费收入（运营）","收入","运营","贷"],["5001","银行手续费","费用","运营","借"],["5002","推荐人佣金费用","费用","运营","借"],["5003","客户经理佣金费用","费用","运营","借"]];
+var ADJ=[],RECON=null,ADJDONE=false;
+function ac(n){var r=COA.filter(function(a){return a[1]===n})[0];return r?r[0]+" "+n:n}
+function flows(){
+  var F=[];
+  DEP.forEach(function(d){
+    if(d.d||d.st!=="已入账")return;
+    F.push({t:d.t,oid:d.id,ty:d.kind==="fiat"?"客户入金 "+fmt(d.amt)+" "+d.cur+"（折合美元）":"客户充币 "+d.cur,ac:"客户资金账户",cu:"USD",amt:usdEq(d.cur,d.amt),st:"已入账",dr:d.kind==="fiat"?"银行-USD（客户资金）":"托管账户-"+d.cur+"（客户资金）",cr:"客户应付款"});
+  });
+  ORDERS.forEach(function(o){
+    if(o.src==="客户"&&o.st!=="已拒绝"&&o.st!=="待风险审核"&&!o.d){
+      var sell=o.side==="卖出",cw="托管账户-"+o.coin+"（客户资金）";
+      F.push({t:o.t,oid:o.id,ty:sell?"稳定币入账（客户转入）":"法币入金（客户汇入）",ac:"客户资金账户",cu:sell?o.coin:"USD",amt:o.size,st:"已确认",dr:sell?cw:"银行-USD（客户资金）",cr:"客户应付款"});
+      if(o.st==="已完成")F.push({t:o.t,oid:o.id,ty:sell?"美元出款（客户收款）":"稳定币转出（客户钱包）",ac:"客户资金账户",cu:sell?"USD":o.coin,amt:-o.size,st:"已完成",dr:"客户应付款",cr:sell?"银行-USD（客户资金）":cw});
+    }
+    if(o.src==="交易员"&&o.fill>0){
+      var s=o.side==="卖出",v=o.fill*o.avg,tw="托管账户-"+o.coin+"（交易）";
+      F.push({t:o.t,oid:o.id,ty:"对冲成交（"+GN[o.g]+"）",ac:"交易账户",cu:"USD",amt:s?v:-v,st:o.st==="运行中"?"成交中":o.st,dr:s?"银行-USD（交易）":tw,cr:s?tw:"银行-USD（交易）"});
+    }
+  });
+  return F;
+}
+function rFin(full){
+  if(!gate("fin","fin"))return;
+  var F=flows(),cust=0,com=0;
+  F.forEach(function(f){if(f.ac==="客户资金账户")cust+=f.amt});
+  ORDERS.forEach(function(o){if(o.src==="客户"&&o.st==="已完成"&&!o.d)com+=cm(o)});
+  $("fa").innerHTML="<div>客户资金账户（美元等值）<b>"+fmt(1250000+cust,0)+"</b></div><div>交易账户 USD<b>"+fmt(INV.USD,0)+"</b></div><div>稳定币库存 USDC<b>"+fmt(INV.USDC,0)+"</b></div><div>稳定币库存 USDT<b>"+fmt(INV.USDT,0)+"</b></div><div>运营账户（含佣金）<b>"+fmt(42380+com,0)+"</b></div>";
+  $("ff").innerHTML=tbl(["时间","订单","类型","账户","币种","金额","状态"],F.map(function(f){return[f.t,f.oid,f.ty,f.ac,f.cu,(f.amt>0?"+":"")+fmt(f.amt),f.st]}));
+  $("fb").innerHTML=brkTable();$("fst").innerHTML=can("settleok")?stlTable(true):'<p class="bad">当前角色没有结算单权限。</p>';$("fp").innerHTML=can("cost")?profitHtml():'<p class="bad">当前角色没有成本分析权限。</p>';
+  var ok=can("ledger");
+  $("fgen").style.display=ok?"block":"none";$("frec").style.display=ok?"block":"none";$("fsim").style.display=ok?"block":"none";
+  if(!ok){var msg='<p class="bad">当前角色没有账本权限。</p>';$("fl").innerHTML=msg;$("fr").innerHTML=msg;$("coa").innerHTML=msg}
+  else if(full){
+    $("coa").innerHTML=tbl(["科目编码","科目名称","类别","资金账户","余额方向"],COA);
+    rLedger();rRecon();
+  }
+}
+function opening(){return[
+  ["J-0001","期初余额：客户资金账户","银行-USD（客户资金）","客户应付款",1250000],
+  ["J-0002","期初余额：交易账户 USD","银行-USD（交易）","所有者权益",800000],
+  ["J-0003","期初余额：交易账户 USDC","托管账户-USDC（交易）","所有者权益",500000],
+  ["J-0004","期初余额：交易账户 USDT","托管账户-USDT（交易）","所有者权益",300000],
+  ["J-0005","期初余额：运营账户","银行-USD（运营）","所有者权益",42380]]}
+function bals(){
+  var m={};COA.forEach(function(a){m[a[1]]={d:0,c:0,a:a,b:0}});
+  LEDGER.E.forEach(function(e){m[e[2]].d+=e[4];m[e[3]].c+=e[4]});
+  COA.forEach(function(a){var x=m[a[1]];x.b=a[4]==="借"?x.d-x.c:x.c-x.d});
+  return m;
+}
+function coverage(m){
+  var a=m["银行-USD（客户资金）"].b+m["托管账户-USDC（客户资金）"].b+m["托管账户-USDT（客户资金）"].b,l=m["客户应付款"].b;
+  return{a:a,l:l,r:l?a/l:1};
+}
+$("fgen").onclick=function(){
+  if(!can("ledger"))return;
+  var n=1000,E=opening();
+  flows().forEach(function(f){E.push(["J-"+(++n),f.oid+" "+f.ty,f.dr,f.cr,Math.abs(f.amt)])});
+  ORDERS.forEach(function(o){
+    if(o.src==="客户"&&o.st==="已完成"&&!o.d){
+      var c=cm(o);
+      E.push(["J-"+(++n),o.id+" 佣金收入","客户应付款","手续费收入（运营）",c]);
+      E.push(["J-"+(++n),o.id+" 佣金划转运营账户（客户资金隔离）","银行-USD（运营）","银行-USD（客户资金）",c]);
+    }
+  });
+  ADJ.forEach(function(a){E.push(a)});POSTS.forEach(function(a){E.push(a)});
+  LEDGER={ver:++LV,time:hm(),E:E};RECON=null;
+  log("生成账本 v"+LV+"（"+E.length+" 笔凭证）");rLedger();rRecon();
+};
+function rLedger(){
+  if(!LEDGER){$("fl").innerHTML='<p class="sub">尚未生成账本。点击“生成账本”，按当前资金流水生成带科目编码的复式记账凭证和试算平衡表（稳定币按 1:1 折算美元，演示设定）。</p>';return}
+  var m=bals(),td=0,cv=coverage(m);
+  LEDGER.E.forEach(function(e){td+=e[4]});
+  $("fl").innerHTML='<p class="sub">账本 v'+LEDGER.ver+"，生成于 "+LEDGER.time+"，共 "+LEDGER.E.length+" 笔凭证；借方合计 "+fmt(td)+"，贷方合计 "+fmt(td)+"，试算平衡 ✓</p>"
+   +'<p class="'+(cv.r>=1-1e-9?"sub":"bad")+'">客户资金覆盖率 '+(cv.r*100).toFixed(1)+"%（客户资金账户资产 "+fmt(cv.a)+" ÷ 客户应付款 "+fmt(cv.l)+"），规则：不得低于 100%</p>"
+   +tbl(["凭证","摘要","借方科目","贷方科目","金额"],LEDGER.E.map(function(e){return[e[0],e[1],ac(e[2]),ac(e[3]),fmt(e[4])]}))
+   +"<h2>试算平衡表</h2>"+tbl(["科目","借方发生额","贷方发生额","余额"],COA.map(function(a){var x=m[a[1]];return[a[0]+" "+a[1],fmt(x.d),fmt(x.c),fmt(x.b)+" "+a[4]]}));
+}
+function rRecon(){
+  var el=$("fr");
+  if(!LEDGER){el.innerHTML='<p class="sub">请先生成账本，再执行日终对账。</p>';return}
+  if(!RECON){el.innerHTML='<p class="sub">账本 v'+LEDGER.ver+" 已生成。点击“执行日终对账”，把账本余额与托管方和银行的外部余额逐项核对。</p>";return}
+  var open=0;
+  var rows=RECON.rows.map(function(r){
+    var res=r.rule==="自动通过"?(Math.abs(r.d)<0.005?"✓ 一致":"✓ 容差内"):'<span class="bad">'+r.rule+"</span>";
+    if(r.rule!=="自动通过")open++;
+    var a=(r.adj&&!ADJDONE&&r.rule!=="自动通过")?btn("x","adj","登记调整凭证"):"—";
+    return[r.n,fmt(r.l),fmt(r.e),fmt(r.d),res,r.note||"—",a];
+  });
+  el.innerHTML='<p class="'+(open?"bad":"sub")+'">日终对账 '+RECON.time+"：共 "+RECON.rows.length+" 项，"+(RECON.rows.length-open)+" 项通过，"+open+" 项需处理；客户资金覆盖率 "+(RECON.cov.r*100).toFixed(1)+"%</p>"+tbl(["项目","我方账本","外部余额","差异","结果","说明","操作"],rows);
+}
+$("frec").onclick=function(){
+  if(!can("ledger")||!LEDGER)return;
+  var m=bals(),rows=[];
+  function add(n,l,e,note,adj){var d=l-e,ad=Math.abs(d);rows.push({n:n,l:l,e:e,d:d,rule:ad<=10?"自动通过":ad<=1000?"主管说明":"升级处理",note:note,adj:adj})}
+  add("Circle Mint · USDC 余额",m["托管账户-USDC（客户资金）"].b+m["托管账户-USDC（交易）"].b,m["托管账户-USDC（客户资金）"].b+m["托管账户-USDC（交易）"].b,"");
+  add("Fireblocks · USDT 余额",m["托管账户-USDT（客户资金）"].b+m["托管账户-USDT（交易）"].b,m["托管账户-USDT（客户资金）"].b+m["托管账户-USDT（交易）"].b-(SIMBIG?2500:0),SIMBIG?"链上到账与账本不一致，疑似转入尚未确认":"");
+  var bc=m["银行-USD（客户资金）"].b;
+  add("香港银行 · USD（客户资金）",bc,bc-(ADJDONE?0:12.5),ADJDONE?"已按调整凭证入账":"银行扣收的在途手续费 12.50",true);
+  add("香港银行 · USD（交易）",m["银行-USD（交易）"].b,m["银行-USD（交易）"].b,"");
+  syncCases(rows);RECON={time:hm(),rows:rows,cov:coverage(m)};
+  log("执行日终对账（账本 v"+LEDGER.ver+"）");rRecon();
+};
+$("fr").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="adj"||!can("ledger")||ADJDONE)return;
+  ADJ.push(["J-ADJ1","对账差异调整：银行扣收手续费","银行手续费","银行-USD（客户资金）",12.5]);ADJ.push(["J-ADJ2","运营账户补足客户资金账户（保持 100% 覆盖）","银行-USD（客户资金）","银行-USD（运营）",12.5]);
+  ADJDONE=true;log("登记对账调整凭证 J-ADJ1、J-ADJ2（12.50 美元）");BREAKS.forEach(function(c){if(c.item.indexOf("客户资金")>=0&&c.st!=="已关闭"){c.st="已关闭";c.note="已登记调整凭证 J-ADJ1、J-ADJ2"}});
+  $("fr").innerHTML='<p class="sub">已登记调整凭证（银行手续费入账，并由运营账户补足客户资金账户）。请重新生成账本，并再次执行日终对账。</p>';
+};
+var PROT={ev:0,hit:0},PCFG={dev:30,max:5000000},LASTO=null,SIMBIG=false,BREAKS=[],BSEQ=0;
+var RAILC={"同行内部转账":0,"CHATS 美元清算":5,"SWIFT 电汇":25,"FPS 转数快":0,"CHATS 港币":4,"SEPA Instant":0.5,"SEPA 转账":0.3,"Faster Payments":0.5,"FAST / PayNow":0.5,"本地转账":2};
+find("S-1049").arr=0.9999;find("S-1048").arr=1.0006;find("S-1046").arr=0.99985;
+(function(){var t=find("T-1047");t.hc=18.4;t.railc=25})();
+function protect(c,s,z,g,px){
+  PROT.ev++;
+  var fair=(BID[c]+ASK[c])/2,r="",key=(s?"卖":"买")+"|"+c+"|"+z+"|"+g;
+  if(z>PCFG.max)r="数量 "+fmt(z,0)+" 超过单笔上限 "+fmt(PCFG.max,0);
+  else if(g==="lim"&&Math.abs(px-fair)/fair*1e4>PCFG.dev)r="限价偏离公允价 "+(Math.abs(px-fair)/fair*1e4).toFixed(0)+" bp，超过阈值 "+PCFG.dev+" bp";
+  else{
+    var pl=plan(c,s,z),sl=Math.abs(pl.best-pl.vwap)/pl.best*1e4;
+    if(sl>PCFG.dev)r="预计滑点 "+sl.toFixed(0)+" bp，超过阈值 "+PCFG.dev+" bp";
+    else if(LASTO&&LASTO.k===key&&Date.now()-LASTO.t<10000)r="疑似重复订单（10 秒内相同订单）";
+  }
+  if(r){PROT.hit++;EVT.unshift({id:"E-"+(++ESEQ),oid:"—",sev:"中",rule:"订单价格保护",desc:r+"（"+UCODE+"）",st:"已拦截",t:"10-15 "+hm()});log("订单价格保护拦截："+r)}
+  else LASTO={k:key,t:Date.now()};
+  return r;
+}
+function slipBp(o){return(o.fill&&o.arr)?(o.side==="卖出"?(o.arr-o.avg):(o.avg-o.arr))/o.arr*1e4:0}
+function slipCost(o){return(o.fill&&o.arr)?(o.side==="卖出"?(o.arr-o.avg):(o.avg-o.arr))*o.fill:0}
+function rTca(){
+  if(!can("cost")){$("tca").innerHTML='<p class="bad">当前角色没有成本分析权限。</p>';return}
+  var S=ORDERS.filter(function(o){return o.src==="交易员"&&o.arr&&o.fill>0});
+  var q=0,wb=0,cost=0,G={},V={};
+  S.forEach(function(o){
+    var b=slipBp(o);q+=o.fill;wb+=b*o.fill;cost+=slipCost(o);
+    var g=G[o.g]||(G[o.g]={n:0,q:0,w:0});g.n++;g.q+=o.fill;g.w+=b*o.fill;
+    Object.keys(o.v).forEach(function(k){var x=V[k]||(V[k]={q:0,w:0});x.q+=o.v[k];x.w+=b*o.v[k]});
+  });
+  var bp=function(x){return(x>2?'<span class="bad">':"")+x.toFixed(2)+(x>2?"</span>":"")};
+  $("tca").innerHTML='<div class="inv"><div>已分析订单<b>'+S.length+"</b></div><div>加权平均滑点（bp）<b>"+(q?(wb/q).toFixed(2):"—")+"</b></div><div>累计滑点成本（美元）<b>"+fmt(cost)+"</b></div><div>价格保护拦截<b>"+PROT.hit+" / "+PROT.ev+"</b></div></div>"
+   +'<div class="tw">'+tbl(["订单","方向","策略","到达价","预计均价","成交均价","滑点 bp","成本（美元）"],S.map(function(o){return[o.id,o.side+" "+o.coin,GN[o.g],o.arr.toFixed(4),o.plan?o.plan.vwap.toFixed(4):"—",o.avg.toFixed(4),bp(slipBp(o)),fmt(slipCost(o))]}))+"</div>"
+   +"<h2>按策略</h2>"+tbl(["策略","订单数","成交量","加权滑点 bp"],Object.keys(G).map(function(k){return[GN[k],G[k].n,fmt(G[k].q,0),bp(G[k].w/G[k].q)]}))
+   +"<h2>按渠道</h2>"+tbl(["渠道","成交量","加权滑点 bp"],Object.keys(V).map(function(k){return[k,fmt(V[k].q,0),bp(V[k].w/V[k].q)]}))
+   +'<p class="sub">到达价 = 提交订单时的最优价；滑点为成交均价相对到达价的不利偏离，正数表示成本。</p>';
+}
+function hedgeCost(o){if(o.hc!==undefined)return o.hc;var h=ORDERS.filter(function(x){return x.link===o.id})[0];return h?slipCost(h):0}
+function profitHtml(){
+  var C=ORDERS.filter(function(o){return o.src==="客户"&&o.st==="已完成"&&(!o.d||o.hc!==undefined)}),tr=0,tc=0;
+  var rows=C.map(function(o){var rev=cm(o),hc=hedgeCost(o),rc=o.railc||0,net=rev-hc-rc;tr+=rev;tc+=hc+rc;return[o.id,o.side+" "+o.coin+" "+fmt(o.size,0),fmt(rev),fmt(hc),fmt(rc),(net<0?'<span class="bad">':"")+fmt(net)+(net<0?"</span>":""),rev?(net/rev*100).toFixed(0)+"%":"—"]});
+  return '<div class="inv"><div>佣金收入<b>'+fmt(tr)+"</b></div><div>对冲与出款成本<b>"+fmt(tc)+"</b></div><div>净利润<b>"+fmt(tr-tc)+"</b></div></div>"+(rows.length?'<div class="tw">'+tbl(["订单","内容","佣金收入","对冲滑点成本","出款通道费","净利润","利润率"],rows)+"</div>":'<p class="sub">暂无已完成的客户订单。</p>')+'<p class="sub">成本 = 对冲滑点成本（相对到达价）+ 出款通道费用；链上手续费由客户承担，未计入；佣金按当前费率估算。</p>';
+}
+function brkTable(){
+  return BREAKS.length?tbl(["编号","项目","差异","级别","状态","说明","操作"],BREAKS.map(function(c){
+    var a="";
+    if(c.st==="待财务说明"&&can("ledger"))a=btn(c.id,"exp","提交说明");
+    else if(c.st==="待风控确认"&&can("brk")&&USER==="风控主管")a=btn(c.id,"rk","确认")+" "+btn(c.id,"bk","退回");
+    else if(c.st==="待管理员批准"&&can("brk")&&USER==="管理员")a=btn(c.id,"ad","批准关闭")+" "+btn(c.id,"bk","退回");
+    return[c.id,c.item,fmt(c.diff),c.lv==="升级"?'<span class="bad">升级</span>':"说明",c.st,esc(c.note)||"—",a||"—"]
+  })):'<p class="sub">暂无对账差异。执行日终对账后，超出容差的项目会在这里生成待办。</p>';
+}
+function syncCases(rows){
+  rows.forEach(function(r){
+    var open=BREAKS.filter(function(c){return c.item===r.n&&c.st!=="已关闭"})[0];
+    if(r.rule==="自动通过"){if(open){open.st="已关闭";open.note=(open.note?open.note+"；":"")+"对账已通过，自动关闭";log("差异 "+open.id+" 对账通过，自动关闭")}return}
+    if(!open){
+      var c={id:"D-"+(++BSEQ),item:r.n,diff:r.d,lv:r.rule==="升级处理"?"升级":"说明",st:"待财务说明",note:"",t:"10-15 "+hm()};
+      BREAKS.unshift(c);log("对账差异 "+c.id+"（"+r.n+" "+fmt(r.d)+"）生成待办，级别："+c.lv+(c.lv==="升级"?"，需财务主管说明、风控主管确认、管理员批准":""));
+    }else if(r.rule==="升级处理")open.lv="升级";
+  });
+}
+function brkAct(a,id){
+  var c=BREAKS.filter(function(x){return x.id===id})[0];if(!c)return;
+  if(a==="exp"&&can("ledger")&&c.st==="待财务说明"){
+    var t=$("fnote").value.trim();
+    if(!t){$("fm").textContent="请先填写差异原因说明。";return}
+    $("fm").textContent="";$("fnote").value="";c.note=t;c.st=c.lv==="升级"?"待风控确认":"已关闭";
+    log("提交差异说明 "+c.id+"："+(c.lv==="升级"?"转风控主管确认":"已关闭"));
+  }else if(a==="rk"&&USER==="风控主管"&&can("brk")&&c.st==="待风控确认"){c.st="待管理员批准";log("风控确认差异 "+c.id+"，转管理员批准")}
+  else if(a==="ad"&&USER==="管理员"&&can("brk")&&c.st==="待管理员批准"){c.st="已关闭";if(c.item.indexOf("Fireblocks")===0)SIMBIG=false;log("管理员批准关闭差异 "+c.id)}
+  else if(a==="bk"&&can("brk")&&(c.st==="待风控确认"||c.st==="待管理员批准")){c.st="待财务说明";log("退回差异 "+c.id+" 至财务主管")}
+  render(false);
+}
+["fb","rb","ab"].forEach(function(i){$(i).onclick=function(e){var b=e.target;if(b.dataset.a)brkAct(b.dataset.a,b.dataset.i)}});
+$("fsim").onclick=function(){
+  if(!can("ledger"))return;
+  SIMBIG=!SIMBIG;
+  $("fr").innerHTML='<p class="sub">已'+(SIMBIG?"模拟":"取消")+"一笔 2,500 美元的 USDT 外部余额差异。请重新执行日终对账。</p>";
+  log((SIMBIG?"模拟":"取消")+"大额对账差异（演示）");
+};
+var CUST=[{id:"C001",name:"王先生",ref:"P01",mgr:"",open:"2025-11-03"},{id:"C002",name:"李女士",ref:"P01",mgr:"",open:"2026-02-18"},{id:"C003",name:"Acme Trading Ltd",ref:"P02",mgr:"",open:"2025-08-21"},{id:"C004",name:"赵先生",ref:"",mgr:"",open:"2026-10-12"},{id:"C005",name:"Orion Capital",ref:"P02",mgr:"",open:"2025-05-09"},{id:"C006",name:"周女士",ref:"",mgr:"M02",open:"2026-01-27"}];
+var REFS=[{id:"P01",name:"陈经纪",share:25,mgr:"M01"},{id:"P02",name:"林顾问",share:30,mgr:"M02"},{id:"P03",name:"黄顾问",share:20,mgr:"M03"}];
+var MS={M01:10,M02:12,M03:8};
+var TIERS=[{n:"普通",th:0,r:0.30},{n:"银卡",th:500000,r:0.25},{n:"金卡",th:2000000,r:0.20},{n:"钻石",th:10000000,r:0.15}];
+var CURC="C001",STMTS=[],SEQS=100,CURS=null;
+function custById(id){return CUST.filter(function(c){return c.id===id})[0]}
+function custName(){var c=custById(CURC);return c?c.name:"客户"}
+function refOf(c){return REFS.filter(function(r){return r.id===c.ref})[0]}
+function staffBy(code){return STAFF.filter(function(s){return s.code===code})[0]}
+function mgrs(){return STAFF.filter(function(s){return s.role==="客户经理"})}
+function mgrOf(c){var r=refOf(c);return r?r.mgr:(c.mgr||"")}
+function mgrLabel(code){var s=staffBy(code);return s?code+" "+s.name:"未分配"}
+function mshare(code){return code?(MS[code]!==undefined?MS[code]:10):0}
+function newestMgr(){var a=mgrs().filter(function(s){return s.on});a.sort(function(x,y){return x.hire<y.hire?1:x.hire>y.hire?-1:(x.code<y.code?1:-1)});return a[0]}
+function scope(){return USER==="客户经理"?UCODE:null}
+function visible(c){var sc=scope();return sc===null||mgrOf(c)===sc}
+function visO(o){var c=custById(o.cid);return !!c&&visible(c)}
+function cm(o){return o.size*(o.cr!==undefined?o.cr:COMM)}
+function vol30(cid){var v=0;ORDERS.forEach(function(o){if(o.src==="客户"&&o.cid===cid&&o.st==="已完成"&&o.d>=1&&o.d<=30)v+=o.size});return v}
+function tierOf(v){var t=TIERS[0];TIERS.forEach(function(x){if(v>=x.th)t=x});return t}
+function custRate(){var c=custById(CURC);return c?tierOf(vol30(c.id)).r/100:COMM}
+function cTier(){var c=custById(CURC);return c?tierOf(vol30(c.id)).n+" ":""}
+function dstr(d){var x=new Date(2026,9,15-d);return("0"+(x.getMonth()+1)).slice(-2)+"-"+("0"+x.getDate()).slice(-2)}
+(function(){
+  find("T-1051").cid="C002";find("T-1050").cid="C001";
+  var a=find("T-1047");a.cid="C003";a.d=1;a.t="10-14 10:31";
+  var b=find("T-1045");b.cid="C004";b.d=2;b.t="10-13 09:12";
+  var x=mk("T-1049","客户","卖出","USDC",800000,"",0,0,"待对冲","10-15 09:58");x.cid="C005";ORDERS.push(x);
+  var y=mk("T-1048","客户","买入","USDT",300000,"",0,0,"待出款","10-15 09:55");y.cid="C003";ORDERS.push(y);
+  var HS={C001:[[3,400000,"卖出","USDC"],[9,350000,"卖出","USDT"],[17,300000,"买入","USDC"],[25,270000,"卖出","USDC"],[41,200000,"卖出","USDC"]],
+   C002:[[5,90000,"卖出","USDC"],[20,60000,"买入","USDT"],[33,50000,"卖出","USDC"]],
+   C003:[[2,1800000,"卖出","USDT"],[8,1500000,"卖出","USDC"],[14,1300000,"买入","USDT"],[22,1100000,"卖出","USDC"],[28,700000,"卖出","USDT"],[38,900000,"卖出","USDC"]],
+   C004:[[6,150000,"卖出","USDC"],[19,120000,"买入","USDC"],[27,80000,"卖出","USDT"]],
+   C005:[[1,3200000,"卖出","USDC"],[4,2800000,"卖出","USDT"],[10,2500000,"买入","USDC"],[16,2300000,"卖出","USDC"],[24,2000000,"卖出","USDT"],[35,1500000,"卖出","USDC"]],
+   C006:[[7,900000,"卖出","USDC"],[13,700000,"卖出","USDT"],[21,450000,"买入","USDC"],[29,300000,"卖出","USDC"]]};
+  var n=2000;
+  Object.keys(HS).forEach(function(cid){HS[cid].forEach(function(h){var o=mk("H-"+(++n),"客户",h[2],h[3],h[1],"",h[1],1,"已完成",dstr(h[0])+" 10:00");o.d=h[0];o.cid=cid;ORDERS.push(o)})});
+  ORDERS.forEach(function(o){if(o.src==="客户"&&o.cid&&o.cr===undefined)o.cr=tierOf(vol30(o.cid)).r/100});
+  refreshRefs();
+})();
+function refreshRefs0(){$("ore").innerHTML='<option value="">推荐人：无（留空）</option>'+REFS.map(function(r){return'<option value="'+r.id+'">'+esc(r.name)+'</option>'}).join("")}
+function cnm(o){var c=custById(o.cid);return c?esc(c.name):"—"}
+function cmg(o){var c=custById(o.cid);return c?esc(mgrLabel(mgrOf(c))):"—"}
+function fillChc(){
+  var s=$("chc"),cur=s.value||"全部";s.innerHTML="";
+  var a=document.createElement("option");a.value="全部";a.textContent="全部客户";s.appendChild(a);
+  CUST.filter(visible).forEach(function(c){var p=document.createElement("option");p.value=c.id;p.textContent=c.name;s.appendChild(p)});
+  s.value=cur;
+}
+function rCu(){
+  var V=CUST.filter(visible),live=ORDERS.filter(function(o){return o.src==="客户"&&DONE.indexOf(o.st)<0&&visO(o)});
+  var tv=0;V.forEach(function(c){tv+=vol30(c.id)});
+  $("cu0").innerHTML="<div>"+(scope()?"我的客户":"客户数")+"<b>"+V.length+"</b></div><div>进行中订单<b>"+live.length+"</b></div><div>今日客户订单<b>"+ORDERS.filter(function(o){return o.src==="客户"&&!o.d&&visO(o)}).length+"</b></div><div>前30日总成交量<b>"+fmt(tv,0)+"</b></div>";
+  $("cu1").innerHTML=tbl(["客户","认证状态","推荐人","客户经理","档位","前30日交易量","累计完成订单","进行中"],V.map(function(c){var rf=refOf(c),v=vol30(c.id);return[esc(c.name),c.kyc||"已认证",rf?esc(rf.name):"—",esc(mgrLabel(mgrOf(c))),tierOf(v).n,fmt(v,0),ORDERS.filter(function(o){return o.cid===c.id&&o.st==="已完成"}).length,ORDERS.filter(function(o){return o.cid===c.id&&DONE.indexOf(o.st)<0}).length]}));
+  $("cu2").innerHTML=live.length?tbl(["订单","客户","客户经理","内容","状态","对冲进度","时间"],live.map(function(o){var h=ORDERS.filter(function(x){return x.link===o.id})[0];return[o.id,cnm(o),cmg(o),o.side+" "+o.coin+" "+fmt(o.size,0),o.st,h?prog(h):"—",o.t]})):'<p class="sub">暂无进行中的客户订单。</p>';
+  var sel=$("chc").value||"全部";
+  var H=ORDERS.filter(function(o){return o.src==="客户"&&o.cid&&DONE.indexOf(o.st)>=0&&visO(o)&&(sel==="全部"||o.cid===sel)}).sort(function(a,b){return a.d-b.d});
+  $("cu3").innerHTML=tbl(["订单","日期","客户","客户经理","内容","佣金比例","佣金金额","状态"],H.map(function(o){return[o.id,o.t,cnm(o),cmg(o),o.side+" "+o.coin+" "+fmt(o.size,0),o.cr!==undefined?(o.cr*100).toFixed(2)+"%":"—",o.st==="已完成"?fmt(cm(o)):"—",o.st]}));
+}
+function fillTier(){TIERS.forEach(function(t,i){$("th"+i).value=t.th;$("tr"+i).value=t.r})}
+function rTier(){
+  $("tl2").innerHTML=tbl(["客户","推荐人","客户经理","前30日交易量","档位","佣金比例","距下一档"],CUST.map(function(c){
+    var rf=refOf(c),v=vol30(c.id),t=tierOf(v),nx=TIERS[TIERS.indexOf(t)+1];
+    return[esc(c.name),rf?esc(rf.name):"—",esc(mgrLabel(mgrOf(c))),fmt(v,0),t.n,t.r.toFixed(2)+"%",nx?"还差 "+fmt(nx.th-v,0)+" 升至"+nx.n:"最高档"];
+  }));
+}
+$("tsave").onclick=function(){
+  if(!can("tier"))return;
+  var th=[0,1,2,3].map(function(i){return i?parseFloat($("th"+i).value):0}),r=[0,1,2,3].map(function(i){return parseFloat($("tr"+i).value)});
+  if(th.some(isNaN)||r.some(isNaN)){$("tm").textContent="请填写完整的数字。";return}
+  for(var i=1;i<4;i++)if(th[i]<=th[i-1]){$("tm").textContent="门槛必须逐档升高。";return}
+  if(r.some(function(x){return x<=0||x>2})){$("tm").textContent="佣金比例需在 0–2% 之间。";return}
+  TIERS.forEach(function(t,i){t.th=th[i];t.r=r[i]});
+  $("tm").textContent="已保存，新的分级规则将用于之后的报价。";
+  log("修改客户分级规则：门槛 "+th.slice(1).map(function(x){return fmt(x,0)}).join("/")+"，佣金 "+r.join("/")+"%");rTier();
+};
+function rMap(){
+  var mo=mgrs().map(function(s){return'<option value="'+s.code+'">'+esc(s.code+" "+s.name)+(s.on?"":"（已停用）")+"</option>"}).join("");
+  var h='<table><tr><th>推荐人</th><th>对应客户经理</th><th>推荐人佣金比例（%）</th><th>客户数</th></tr>';
+  REFS.forEach(function(r){h+="<tr><td>"+esc(r.name)+"（"+r.id+'）</td><td><select id="rm_'+r.id+'">'+mo+'</select></td><td><input id="rs_'+r.id+'" type="number" value="'+r.share+'"></td><td>'+CUST.filter(function(c){return c.ref===r.id}).length+"</td></tr>"});
+  $("mp1").innerHTML=h+"</table>";
+  REFS.forEach(function(r){$("rm_"+r.id).value=r.mgr});
+  var g='<table><tr><th>客户经理</th><th>入职日期</th><th>状态</th><th>佣金比例（%）</th><th>负责客户数</th></tr>';
+  mgrs().forEach(function(s){g+="<tr><td>"+esc(s.code+" "+s.name)+"</td><td>"+s.hire+"</td><td>"+(s.on?"在职":"已停用")+'</td><td><input id="ms_'+s.code+'" type="number" value="'+mshare(s.code)+'"></td><td>'+CUST.filter(function(c){return mgrOf(c)===s.code}).length+"</td></tr>"});
+  $("mp2").innerHTML=g+"</table>";
+  $("nrm").innerHTML=mo;
+  var nw=newestMgr(),NR=CUST.filter(function(c){return !c.ref});
+  $("asel").innerHTML=mo;if(nw)$("asel").value=nw.code;
+  $("mp4").textContent=nw?"最新入职的客户经理："+nw.code+" "+nw.name+"（入职 "+nw.hire+"）。下拉框默认选中他，也可以改选其他客户经理。":"当前没有在职的客户经理。";
+  $("mp3").innerHTML=NR.length?tbl(["客户","开户日期","当前客户经理","操作"],NR.map(function(c){return[esc(c.name),c.open,c.mgr?esc(mgrLabel(c.mgr)):'<span class="bad">待分配</span>',btn(c.id,"as","分配给所选客户经理")]})):'<p class="sub">没有无推荐人的客户。</p>';
+}
+$("mpsave").onclick=function(){
+  if(!can("map"))return;
+  var bad="",nr=REFS.map(function(r){return{r:r,m:$("rm_"+r.id).value,s:parseFloat($("rs_"+r.id).value)}}),nm=mgrs().map(function(s){return{s:s,v:parseFloat($("ms_"+s.code).value)}});
+  nr.forEach(function(x){if(isNaN(x.s)||x.s<0||x.s>100)bad="推荐人佣金比例需在 0–100% 之间。"});
+  nm.forEach(function(x){if(isNaN(x.v)||x.v<0||x.v>100)bad="客户经理佣金比例需在 0–100% 之间。"});
+  if(!bad)nr.forEach(function(x){var y=nm.filter(function(z){return z.s.code===x.m})[0];if(y&&x.s+y.v>100)bad="推荐人 "+x.r.name+" 与其对应客户经理的佣金比例合计超过 100%。"});
+  if(bad){$("mpm").textContent=bad;return}
+  nr.forEach(function(x){x.r.share=x.s;x.r.mgr=x.m});nm.forEach(function(x){MS[x.s.code]=x.v});
+  log("修改推荐人与客户经理对应关系及佣金比例");rMap();$("mpm").textContent="已保存。";
+};
+$("nradd").onclick=function(){
+  if(!can("map"))return;
+  var n=$("nrn").value.trim(),m=$("nrm").value,sh=parseFloat($("nrs").value);
+  if(!n||!m||isNaN(sh)||sh<0||sh>100){$("mpm").textContent="请填写推荐人姓名、对应客户经理，以及 0–100 之间的佣金比例。";return}
+  var id="P"+("0"+(REFS.length+1)).slice(-2);
+  REFS.push({id:id,name:n,share:sh,mgr:m});refreshRefs();
+  $("nrn").value="";$("nrs").value="";log("新增推荐人 "+id+" "+n+"，对应客户经理 "+mgrLabel(m)+"，佣金比例 "+sh+"%");rMap();$("mpm").textContent="已新增推荐人 "+id+"。";
+};
+$("mp3").onclick=function(e){
+  var b=e.target;if(b.dataset.a!=="as"||!can("map"))return;
+  var c=custById(b.dataset.i),m=$("asel").value;if(!c||!m)return;
+  c.mgr=m;log("分配客户 "+c.name+" 给客户经理 "+mgrLabel(m));rMap();
+};
+$("asall").onclick=function(){
+  if(!can("map"))return;
+  var nw=newestMgr();if(!nw)return;var n=0;
+  CUST.forEach(function(c){if(!c.ref&&!c.mgr){c.mgr=nw.code;n++}});
+  log("一键分配 "+n+" 个待分配客户给最新入职的客户经理 "+mgrLabel(nw.code));rMap();
+};
+function fillSt(){
+  var t=$("st1").value,sc=scope(),h='<option value="全部">全部</option>';
+  if(t==="按客户经理"){(sc?[sc]:mgrs().map(function(x){return x.code}).concat([""])).forEach(function(c){h+='<option value="'+c+'">'+esc(c?mgrLabel(c):"未分配")+"</option>"})}
+  else{var seen={};CUST.filter(visible).forEach(function(c){var k=c.ref||"无推荐人";if(!seen[k]){seen[k]=1;var r=refOf(c);h+='<option value="'+k+'">'+esc(r?r.name:"无推荐人")+"</option>"}})}
+  $("st2").innerHTML=h;
+  $("sscope").textContent=sc?"你只能查看自己管理的客户，以及这些客户对应的推荐人佣金。":"可查看全部客户经理和推荐人。";
+}
+function stmBuild(){
+  var typ=$("st1").value,sub=$("st2").value,per=$("st3").value,L=[];
+  ORDERS.forEach(function(o){
+    if(o.src!=="客户"||o.st!=="已完成"||!o.cid)return;
+    if(per==="近30日"&&!(o.d<=30))return;
+    if(per==="本月"&&!(o.d<=14))return;
+    var c=custById(o.cid);if(!c||!visible(c))return;
+    var rf=refOf(c),mc=mgrOf(c),cv=cm(o),rs=rf?rf.share:0,ms=mshare(mc);
+    var gk=typ==="按客户经理"?mc:(c.ref||"无推荐人");
+    if(sub!=="全部"&&gk!==sub)return;
+    L.push({o:o,c:c,rf:rf,mc:mc,cv:cv,rs:rs,rp:cv*rs/100,ms:ms,mp:cv*ms/100,gk:gk});
+  });
+  L.sort(function(a,b){return a.gk<b.gk?-1:a.gk>b.gk?1:a.o.d-b.o.d});
+  var G={},ord=[],T={n:0,v:0,c:0,rp:0,mp:0};
+  L.forEach(function(x){
+    if(!G[x.gk]){G[x.gk]={n:0,v:0,c:0,rp:0,mp:0,rs:x.rs,ms:x.ms};ord.push(x.gk)}
+    var g=G[x.gk];g.n++;g.v+=x.o.size;g.c+=x.cv;g.rp+=x.rp;g.mp+=x.mp;
+    T.n++;T.v+=x.o.size;T.c+=x.cv;T.rp+=x.rp;T.mp+=x.mp;
+  });
+  var byM=typ==="按客户经理";
+  function lab(k){if(byM)return mgrLabel(k);var r=REFS.filter(function(z){return z.id===k})[0];return r?r.name:"无推荐人"}
+  var sh=byM?["客户经理","笔数","成交量（美元等值）","佣金收入","客户经理比例","客户经理佣金","推荐人佣金","公司净佣金"]:["推荐人","笔数","成交量（美元等值）","佣金收入","推荐人比例","推荐人佣金","客户经理佣金","公司净佣金"];
+  var sr=ord.map(function(k){var g=G[k];return[esc(lab(k)),g.n,fmt(g.v,0),fmt(g.c),byM?(k?g.ms+"%":"—"):(k==="无推荐人"?"—":g.rs+"%"),fmt(byM?g.mp:g.rp),fmt(byM?g.rp:g.mp),fmt(g.c-g.rp-g.mp)]});
+  if(L.length)sr.push(["<b>合计</b>",T.n,fmt(T.v,0),fmt(T.c),"",fmt(byM?T.mp:T.rp),fmt(byM?T.rp:T.mp),fmt(T.c-T.rp-T.mp)]);
+  var dh=["订单","日期","客户","推荐人","客户经理","成交量","佣金比例","佣金金额","推荐人比例","应付推荐人","客户经理比例","应付客户经理"];
+  var dr=L.map(function(x){return[x.o.id,x.o.t.slice(0,5),esc(x.c.name),x.rf?esc(x.rf.name):"—",esc(mgrLabel(x.mc)),fmt(x.o.size,0)+" "+x.o.coin,(x.o.cr*100).toFixed(2)+"%",fmt(x.cv),x.rf?x.rs+"%":"—",fmt(x.rp),x.mc?x.ms+"%":"—",fmt(x.mp)]});
+  var sl=sub==="全部"?"全部":lab(sub);
+  return{id:"S-"+(++SEQS),typ:typ,subl:sl,per:per,time:hm(),by:UCODE+" "+USER,n:L.length,sh:sh,sr:sr,dh:dh,dr:dr};
+}
+function showStmt(S){
+  CURS=S;
+  $("so").innerHTML="<h2>"+esc(S.id)+" · "+esc(S.typ)+" · "+esc(S.subl)+" · "+esc(S.per)+'</h2><p class="sub">生成于 '+S.time+"，生成人 "+esc(S.by)+"，共 "+S.n+' 笔成交</p><h2>汇总表</h2><div class="tw">'+tbl(S.sh,S.sr)+'</div><h2>明细表</h2><div class="tw">'+tbl(S.dh,S.dr)+"</div>";
+  $("sx").style.display="block";
+}
+function rStm(){
+  var H=STMTS.filter(function(s){return !scope()||s.by.indexOf(UCODE)===0});
+  $("sh").innerHTML=H.length?tbl(["编号","类型","对象","期间","笔数","生成时间","生成人","操作"],H.map(function(s){return[s.id,s.typ,esc(s.subl),s.per,s.n,s.time,esc(s.by),btn(s.id,"view","查看")]})):'<p class="sub">还没有生成过佣金表。</p>';
+}
+$("st1").onchange=function(){fillSt()};
+$("stgo").onclick=function(){
+  if(!can("stm"))return;
+  var S=stmBuild();STMTS.unshift(S);if(STMTS.length>8)STMTS.pop();
+  log("生成佣金表 "+S.id+"（"+S.typ+"，"+S.subl+"，"+S.per+"）");rStm();showStmt(S);
+};
+$("sh").onclick=function(e){var b=e.target;if(b.dataset.a!=="view")return;var S=STMTS.filter(function(x){return x.id===b.dataset.i})[0];if(S)showStmt(S)};
+function csvOf(S){
+  var q=function(v){return'"'+String(v).replace(/<[^>]+>/g,"").replace(/"/g,'""')+'"'},row2=function(r){return r.map(q).join(",")};
+  return"\ufeff"+["汇总表",row2(S.sh)].concat(S.sr.map(row2)).concat(["","明细表",row2(S.dh)]).concat(S.dr.map(row2)).join("\n");
+}
+$("sx").onclick=function(){
+  if(!CURS)return;
+  try{var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csvOf(CURS)],{type:"text/csv;charset=utf-8"}));a.download=CURS.id+".csv";document.body.appendChild(a);a.click();document.body.removeChild(a);log("下载佣金表 "+CURS.id+"（CSV）")}
+  catch(e){$("so").insertAdjacentHTML("afterbegin",'<p class="bad">当前环境不支持下载，请使用 GitHub 或 Netlify 部署的网页版。</p>')}
+};
+function fillGr(){
+  var s=$("gr"),cur=s.value||"全部";
+  s.innerHTML='<option value="全部">推荐人：全部</option>'+REFS.map(function(r){return'<option value="'+r.id+'">'+esc(r.name)+"</option>"}).join("")+'<option value="无推荐人">无推荐人</option>';
+  s.value=cur;
+}
+function rGrp(){
+  var per=$("gp").value,gm=$("gg").value,fr=$("gr").value,ft=$("gt").value,L=[];
+  ORDERS.forEach(function(o){
+    if(o.src!=="客户"||o.st!=="已完成"||!o.cid)return;
+    if(per!=="全部"&&!(o.d<=30))return;
+    var c=custById(o.cid),rf=refOf(c),t=tierOf(vol30(c.id));
+    if(fr!=="全部"&&(fr==="无推荐人"?!!rf:(!rf||rf.id!==fr)))return;
+    if(ft!=="全部"&&t.n!==ft)return;
+    var cv=cm(o),sh=rf?rf.share:0,rn=rf?rf.name:"无推荐人",ti=TIERS.indexOf(t);
+    var key=gm==="按推荐人"?rn:gm==="按客户等级"?t.n:gm==="推荐人+等级"?rn+" / "+t.n:"全部";
+    var sk=gm==="按推荐人"?(rf?rf.id:"Z"):gm==="按客户等级"?""+ti:gm==="推荐人+等级"?(rf?rf.id:"Z")+ti:"0";
+    L.push({o:o,c:c,rf:rf,t:t,cv:cv,sh:sh,pay:cv*sh/100,key:key,sk:sk});
+  });
+  L.sort(function(a,b){return a.sk<b.sk?-1:a.sk>b.sk?1:a.o.d-b.o.d});
+  var rows=[],cur=null,sv=0,sc=0,sp=0,sn=0,tv=0,tc=0,tp=0;
+  function flush(){if(cur!==null&&gm!=="不分组")rows.push(["<b>小计 · "+esc(cur)+"（"+sn+" 笔）</b>","","","","",fmt(sv,0),"","<b>"+fmt(sc)+"</b>","","<b>"+fmt(sp)+"</b>"])}
+  L.forEach(function(x){
+    if(x.key!==cur){flush();cur=x.key;sv=sc=sp=sn=0;if(gm!=="不分组")rows.push(["<b>"+esc(cur)+"</b>","","","","","","","","",""])}
+    sv+=x.o.size;sc+=x.cv;sp+=x.pay;sn++;tv+=x.o.size;tc+=x.cv;tp+=x.pay;
+    rows.push([x.o.id,x.o.t.slice(0,5),esc(x.c.name),x.rf?esc(x.rf.name):"—",x.t.n,fmt(x.o.size,0)+" "+x.o.coin,(x.o.cr*100).toFixed(2)+"%",fmt(x.cv),x.rf?x.sh+"%":"—",fmt(x.pay)]);
+  });
+  flush();
+  if(L.length)rows.push(["<b>合计（"+L.length+" 笔）</b>","","","","",fmt(tv,0),"","<b>"+fmt(tc)+"</b>","","<b>"+fmt(tp)+"</b>"]);
+  $("gk").innerHTML="<div>笔数<b>"+L.length+"</b></div><div>成交量（美元等值）<b>"+fmt(tv,0)+"</b></div><div>佣金收入<b>"+fmt(tc)+"</b></div><div>应付推荐人<b>"+fmt(tp)+"</b></div><div>扣除后净佣金<b>"+fmt(tc-tp)+"</b></div>";
+  $("gl").innerHTML=L.length?tbl(["订单","日期","客户","推荐人","等级","数量","佣金比例","佣金金额","推荐人分成比例","应付推荐人金额"],rows):'<p class="sub">没有符合条件的成交。</p>';
+}
+["gg","gp","gr","gt","chc"].forEach(function(i){$(i).onchange=function(){rCrm()}});
+var PERIODS=[{k:"2026-09",lab:"2026-09",lo:15,hi:44},{k:"2026-10",lab:"2026-10（本月至今）",lo:0,hi:14}];
+var SETTLE=[],POSTS=[];
+function perOf(k){return PERIODS.filter(function(p){return p.k===k})[0]}
+function fillSp(){$("sp").innerHTML=PERIODS.map(function(p){return'<option value="'+p.k+'">'+p.lab+"</option>"}).join("")}
+function stlLines(typ,pid,per){
+  var P=perOf(per),L=[];
+  ORDERS.forEach(function(o){
+    if(o.src!=="客户"||o.st!=="已完成"||!o.cid||o.d<P.lo||o.d>P.hi)return;
+    var c=custById(o.cid),rf=refOf(c);
+    if(typ==="推荐人"?!(rf&&rf.id===pid):mgrOf(c)!==pid)return;
+    L.push({o:o,c:c,cv:cm(o)});
+  });
+  return L;
+}
+$("sgen").onclick=function(){
+  if(!can("settlegen"))return;
+  var per=$("sp").value,ty=$("sty").value,n=0,sk=0,pay=[];
+  if(ty!=="客户经理")REFS.forEach(function(r){pay.push({typ:"推荐人",pid:r.id,name:r.name,sh:r.share})});
+  if(ty!=="推荐人")mgrs().forEach(function(m){pay.push({typ:"客户经理",pid:m.code,name:m.code+" "+m.name,sh:mshare(m.code)})});
+  pay.forEach(function(p){
+    var L=stlLines(p.typ,p.pid,per);if(!L.length)return;
+    if(SETTLE.some(function(s){return s.typ===p.typ&&s.pid===p.pid&&s.per===per&&s.st!=="已作废"})){sk++;return}
+    var vol=0,comm=0,base="ST-"+per.replace("-","")+"-"+p.pid,id=base,k=1;
+    while(SETTLE.some(function(s){return s.id===id}))id=base+"-"+(++k);
+    L.forEach(function(x){vol+=x.o.size;comm+=x.cv});
+    SETTLE.unshift({id:id,typ:p.typ,pid:p.pid,name:p.name,per:per,n:L.length,vol:vol,comm:comm,sh:p.sh,amt:comm*p.sh/100,st:"草稿",by:UCODE+" "+hm(),
+      lines:L.map(function(x){return[x.o.id,x.o.t.slice(0,5),esc(x.c.name),fmt(x.o.size,0)+" "+x.o.coin,fmt(x.cv),(x.o.cr*100).toFixed(2)+"%",fmt(x.cv*p.sh/100)]})});
+    n++;
+  });
+  $("sgm").textContent="已生成 "+n+" 张结算单"+(sk?"，另有 "+sk+" 张已存在而跳过":"")+"。";
+  log("生成月度结算单（"+perOf(per).lab+"），共 "+n+" 张");rStl();
+};
+function stlTable(fin){
+  var H=SETTLE.filter(function(s){var sc=scope();return(sc===null||(s.typ==="客户经理"&&s.pid===sc))&&(!fin||s.st==="待财务确认"||s.st==="已入账"||s.st==="已支付")});
+  return H.length?tbl(["结算单","类型","对象","期间","笔数","佣金收入","比例","结算金额","状态","操作"],H.map(function(s){
+    var a=btn(s.id,"view","明细");
+    if(!fin&&can("settlegen")&&s.st==="草稿")a+=" "+btn(s.id,"sub","提交财务")+" "+btn(s.id,"void","作废");
+    if(fin&&can("settleok")){if(s.st==="待财务确认")a+=" "+btn(s.id,"ok","确认入账")+" "+btn(s.id,"bk","退回");else if(s.st==="已入账")a+=" "+btn(s.id,"pay","标记已支付")}
+    return[s.id,s.typ,esc(s.name),perOf(s.per).lab,s.n,fmt(s.comm),s.sh+"%",fmt(s.amt),s.st,a];
+  })):'<p class="sub">暂无结算单。</p>';
+}
+function rStl(){$("sl2").innerHTML=stlTable(false)}
+function showStl(s,t){
+  $(t).innerHTML="<h2>"+esc(s.id)+" 明细</h2><p class=\"sub\">"+esc(s.typ)+" "+esc(s.name)+" · "+perOf(s.per).lab+" · 共 "+s.n+" 笔 · 比例 "+s.sh+"% · 结算金额 "+fmt(s.amt)+'</p><div class="tw">'+tbl(["订单","日期","客户","成交量","佣金金额","佣金比例","结算金额"],s.lines)+"</div>";
+  if(t==="sdt")$("sdet").style.display="block";
+}
+function postStl(s){
+  if(s.posted)return;s.posted=true;
+  var r=s.typ==="推荐人";
+  POSTS.push(["J-"+s.id,"结算单 "+s.id+" 计提"+s.typ+"佣金",r?"推荐人佣金费用":"客户经理佣金费用",r?"应付推荐人佣金":"应付客户经理佣金",s.amt]);
+}
+function postPay(s){
+  var r=s.typ==="推荐人";
+  POSTS.push(["J-"+s.id+"-P","结算单 "+s.id+" 支付"+s.typ+"佣金",r?"应付推荐人佣金":"应付客户经理佣金","银行-USD（运营）",s.amt]);
+}
+function stlAct(a,id){
+  var s=SETTLE.filter(function(x){return x.id===id})[0];if(!s)return;
+  var sc=scope();if(sc!==null&&!(s.typ==="客户经理"&&s.pid===sc))return;
+  if(a==="view"){showStl(s,USER==="财务主管"?"fdt":"sdt");return}
+  if(a==="sub"&&can("settlegen")&&s.st==="草稿"){s.st="待财务确认";log("提交结算单 "+s.id+" 至财务主管")}
+  else if(a==="void"&&can("settlegen")&&s.st==="草稿"){s.st="已作废";log("作废结算单 "+s.id)}
+  else if(a==="ok"&&can("settleok")&&s.st==="待财务确认"){s.st="已入账";postStl(s);log("确认结算单 "+s.id+" 并入账（"+fmt(s.amt)+" 美元）")}
+  else if(a==="bk"&&can("settleok")&&s.st==="待财务确认"){s.st="草稿";log("退回结算单 "+s.id+" 至客户关系部经理")}
+  else if(a==="pay"&&can("settleok")&&s.st==="已入账"){s.st="已支付";postPay(s);log("结算单 "+s.id+" 标记已支付")}
+  render(false);
+}
+$("sl2").onclick=function(e){var b=e.target;if(b.dataset.a)stlAct(b.dataset.a,b.dataset.i)};
+$("fst").onclick=function(e){var b=e.target;if(b.dataset.a)stlAct(b.dataset.a,b.dataset.i)};
+function goRoute(){try{$("rtc").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}
+(function(){
+  if(typeof Element==="undefined")return;
+  var d=Object.getOwnPropertyDescriptor(Element.prototype,"innerHTML");
+  ["tb","hq","rt","ord","re","rb","fb","fst","sl2","ab","ct","cu2","ll"].forEach(function(id){
+    var el=document.getElementById(id),last=null;if(!el||!d)return;
+    Object.defineProperty(el,"innerHTML",{configurable:true,get:function(){return d.get.call(el)},set:function(v){if(v===last)return;last=v;d.set.call(el,v)}});
+  });
+})();
+var FIATS=["USD","HKD","EUR","GBP","SGD","AED"],TOKS=["USDC","USDT"],TOBAL="存入账户余额";
+var CONF={"Ethereum":12,"Solana":32,"Base":12,"Tron (TRC20)":19};
+var BAL={C001:{USD:25000,HKD:80000,USDC:12500,USDT:3000},C002:{USD:5000,USDT:20000},C003:{USD:150000,EUR:40000,USDC:300000,USDT:120000},C004:{AED:50000,USDC:8000},C005:{USD:500000,USDC:1200000,USDT:800000},C006:{SGD:30000,USDC:60000}};
+var DEP=[
+ {id:"IN-1001",cid:"C001",kind:"fiat",cur:"USD",amt:30000,via:"SWIFT 电汇",st:"已入账",t:"10-03 11:20",d:12},
+ {id:"CB-1001",cid:"C001",kind:"token",cur:"USDC",amt:15000,via:"Ethereum",st:"已入账",t:"10-09 16:45",d:6},
+ {id:"CB-1002",cid:"C002",kind:"token",cur:"USDT",amt:20000,via:"Tron (TRC20)",st:"已入账",t:"10-08 09:30",d:7},
+ {id:"IN-1002",cid:"C003",kind:"fiat",cur:"EUR",amt:40000,via:"SEPA 转账",st:"已入账",t:"10-05 14:00",d:10},
+ {id:"CB-1003",cid:"C003",kind:"token",cur:"USDC",amt:300000,via:"Solana",st:"已入账",t:"10-10 10:10",d:5},
+ {id:"IN-1003",cid:"C004",kind:"fiat",cur:"AED",amt:50000,via:"本地转账",st:"已入账",t:"10-07 12:00",d:8},
+ {id:"IN-1004",cid:"C005",kind:"fiat",cur:"USD",amt:500000,via:"同行内部转账",st:"已入账",t:"10-02 09:00",d:13},
+ {id:"CB-1004",cid:"C005",kind:"token",cur:"USDT",amt:800000,via:"Tron (TRC20)",st:"已入账",t:"10-11 15:30",d:4},
+ {id:"IN-1005",cid:"C006",kind:"fiat",cur:"SGD",amt:30000,via:"FAST / PayNow",st:"已入账",t:"10-06 10:00",d:9},
+ {id:"CB-1005",cid:"C006",kind:"token",cur:"USDC",amt:60000,via:"Base",st:"已入账",t:"10-12 08:15",d:3}];
+var INSEQ=1005,CBSEQ=1005,DFCUR=null,DTC="USDC";
+function bal(cid){if(!BAL[cid])BAL[cid]={};var b=BAL[cid];FIATS.concat(TOKS).forEach(function(k){if(b[k]===undefined)b[k]=0});return b}
+function usdEq(cur,a){return TOKS.indexOf(cur)>=0?a:a/FX[cur]}
+function depById(id){return DEP.filter(function(d){return d.id===id})[0]}
+function hsh(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}var o="";for(var k=0;k<5;k++){o+=("00000000"+h.toString(16)).slice(-8);h=Math.imul(h^(h>>>13),2654435761)>>>0}return o}
+function SRC(){return $("src").value}
+function runSteps(ol,steps,done){
+  ol.innerHTML="";
+  var items=steps.map(function(s){var li=document.createElement("li"),d=document.createElement("span"),t=document.createElement("span"),tt=document.createElement("time");d.className="d";t.textContent=s[0];tt.textContent=s[1]||"";li.appendChild(d);li.appendChild(t);li.appendChild(tt);ol.appendChild(li);return li});
+  var i=0;
+  (function next(){if(i>0)items[i-1].className="done";if(i>=items.length){done();return}items[i].className="now";i++;setTimeout(next,900)})();
+}
+function srcUI(){
+  var s=dir==="sell",b=bal(CURC),isB=SRC()==="bal";
+  $("balhint").textContent=isB?"可用余额："+(s?fmt(b[coin])+" "+coin:fmt(b[fiat()])+" "+fiat()):"";
+  if(!s){$("wbox").style.display=isB?"none":"block";$("rail").style.display=isB?"none":"";$("railL").style.display=isB?"none":""}
+  else{$("rail").style.display="";$("railL").style.display=""}
+}
+function stepsFor(q){
+  if(q.src==="bal"){
+    if(q.s)return[["从账户余额扣除 "+fmt(q.amt)+" "+q.coin,"T+1秒"],["风险筛查通过","T+5秒"],["市场对冲成交","T+12秒"]].concat(q.rail===TOBAL?[["法币已存入账户余额","T+15秒"]]:[["法币出款已发起","T+30秒"],["法币到账",""]]);
+    return[["从账户余额扣除 "+fmt(q.amt)+" "+q.f,"T+1秒"],["风险筛查通过","T+5秒"],["市场买入稳定币","T+12秒"],["稳定币已存入账户余额","T+15秒"]];
+  }
+  if(q.s&&q.rail===TOBAL)return SELL.slice(0,4).concat([["法币已存入账户余额","T+55秒"]]);
+  return q.s?SELL:BUY;
+}
+function creditOut(q){
+  if(q.credited)return;q.credited=true;
+  var b=bal(q.cid);
+  if(q.s&&q.rail===TOBAL)b[q.f]+=q.outN;
+  if(!q.s&&q.src==="bal")b[q.coin]+=q.outN;
+}
+function finalMsg(q){
+  if((q.s&&q.rail===TOBAL)||(!q.s&&q.src==="bal"))return"演示完成："+q.out+" 已存入你的账户余额。";
+  return q.s?"演示完成："+q.out+" 已汇出（"+q.rail+"），收款人："+q.who+"（"+q.f+" 账户）。真实到账时间取决于出款通道："+q.eta+"。":"演示完成："+q.out+" 已转入你的钱包（"+q.net+"）。";
+}
+function rWallet(){
+  var b=bal(CURC),tot=0;FIATS.concat(TOKS).forEach(function(k){tot+=usdEq(k,b[k])});
+  var pend=DEP.filter(function(d){return d.cid===CURC&&d.st!=="已入账"&&d.st.indexOf("退回")<0&&d.st.indexOf("冻结")<0}).length;
+  $("balx").innerHTML="<div>总资产（折合美元）<b>"+fmt(tot)+"</b></div><div>处理中的入金与充币<b>"+pend+"</b></div>";
+  $("balf").innerHTML=FIATS.map(function(k){return"<div>"+k+"<b>"+fmt(b[k])+"</b></div>"}).join("");
+  $("balt").innerHTML=TOKS.map(function(k){return"<div>"+k+"<b>"+fmt(b[k])+"</b></div>"}).join("");
+  var L=DEP.filter(function(d){return d.cid===CURC}).sort(function(x,y){return x.t<y.t?1:-1}).slice(0,6);
+  $("depl").innerHTML=L.length?tbl(["时间","编号","类型","金额","方式或网络","状态"],L.map(function(d){return[d.t,d.id,d.kind==="fiat"?"入金":"充币",fmt(d.amt)+" "+d.cur,d.via,d.st==="已入账"?d.st:'<span class="bad">'+d.st+"</span>"]})):'<p class="sub">还没有入金或充币记录。</p>';
+}
+function dfRails(){opts($("dfr"),RAILS[$("dfc").value].map(function(r){return r[0]}))}
+$("dfc").onchange=function(){dfRails();$("dfbox").style.display="none"};
+document.querySelectorAll("#dk button").forEach(function(b){b.onclick=function(){document.querySelectorAll("#dk button").forEach(function(x){x.classList.toggle("on",x===b)});$("dkf").style.display=b.dataset.k==="f"?"block":"none";$("dkt").style.display=b.dataset.k==="t"?"block":"none"}});
+$("dfgo").onclick=function(){
+  if(!kycOk("dfe"))return;
+  var cur=$("dfc").value,a=parseFloat($("dfa").value),via=$("dfr").value;
+  if(!(a>=100)){$("dfe").textContent="最小入金金额为 100（演示设定）。";return}
+  $("dfe").textContent="";
+  var c=custById(CURC),d={id:"IN-"+(++INSEQ),cid:CURC,kind:"fiat",cur:cur,amt:a,via:via,st:"待汇款",t:"10-15 "+hm()};
+  DEP.unshift(d);DFCUR=d.id;
+  var r=$("dfrows");r.innerHTML="";
+  r.appendChild(row("入金编号",d.id));r.appendChild(row("汇款金额",fmt(a)+" "+cur));r.appendChild(row("入金方式",via));r.appendChild(row("付款人姓名",c?c.name:"—"));
+  $("dfacc").textContent="收款银行：DEMO BANK（演示）\n户名：DEMO PLATFORM LTD — 客户资金账户\n账号：DEMO-"+cur+"-"+hsh(CURC+cur).slice(0,10).toUpperCase()+"\n附言（参考号）：REF-"+d.id;
+  $("df3p").checked=false;$("dfst").innerHTML="";$("dffin").className="final";$("dfsim").disabled=false;
+  $("dfbox").style.display="block";logS("客户 "+(c?c.name:CURC)+" 创建入金单 "+d.id+"（"+fmt(a)+" "+cur+"）");rWallet();
+};
+$("dfsim").onclick=function(){
+  var d=depById(DFCUR);if(!d||d.st!=="待汇款")return;
+  $("dfsim").disabled=true;d.st="处理中";var bad=$("df3p").checked;
+  var steps=[["收到汇款，参考号匹配","T+5分钟"],bad?["付款人姓名与实名不一致","T+6分钟"]:["付款人姓名核对一致","T+6分钟"],bad?["已退回付款账户",""]:["已入账",""]];
+  runSteps($("dfst"),steps,function(){
+    if(bad){d.st="已退回（第三方付款）";logS("入金单 "+d.id+" 付款人与实名不一致，已退回")}
+    else{d.st="已入账";bal(d.cid)[d.cur]+=d.amt;logS("入金单 "+d.id+" 已入账（"+fmt(d.amt)+" "+d.cur+"）")}
+    var f=$("dffin");f.textContent=bad?"演示：付款人姓名与实名不一致，款项已退回。真实系统会通知客户并记录合规留痕。":"演示完成："+fmt(d.amt)+" "+d.cur+" 已存入你的账户余额。真实到账时间取决于入金方式。";f.className="final on";rWallet();
+  });
+};
+function dtNets(){opts($("dtn"),NET[DTC])}
+document.querySelectorAll("#dtc button").forEach(function(b){b.onclick=function(){DTC=b.dataset.c;document.querySelectorAll("#dtc button").forEach(function(x){x.classList.toggle("on",x===b)});dtNets();$("dtbox").style.display="none"}});
+$("dtn").onchange=function(){$("dtbox").style.display="none"};
+$("dtgo").onclick=function(){
+  if(!kycOk("dte0"))return;$("dte0").textContent="";
+  var net=$("dtn").value,r=$("dtrows");r.innerHTML="";
+  r.appendChild(row("代币",DTC));r.appendChild(row("网络",net));r.appendChild(row("最小充值数量","10 "+DTC));r.appendChild(row("到账所需确认数（演示）",CONF[net]+" 个区块"));
+  $("dtaddr").textContent="DEMO-"+hsh(CURC+DTC+net).slice(0,34)+"（仅演示，请勿转账）";
+  $("dtwarn").textContent="只能向此地址转入 "+DTC+"（"+net+" 网络）。转入其他代币或通过其他网络转账，资产可能无法找回。";
+  $("dtst").innerHTML="";$("dtfin").className="final";$("dte").textContent="";$("dtrisk").checked=false;$("dtsim").disabled=false;
+  $("dtbox").style.display="block";
+};
+$("dtsim").onclick=function(){
+  var a=parseFloat($("dta").value),net=$("dtn").value;
+  if(!(a>=10)){$("dte").textContent="最小充值数量为 10 "+DTC+"。";return}
+  $("dte").textContent="";$("dtsim").disabled=true;
+  var c=custById(CURC),risky=$("dtrisk").checked,d={id:"CB-"+(++CBSEQ),cid:CURC,kind:"token",cur:DTC,amt:a,via:net,st:"确认中",t:"10-15 "+hm()};
+  DEP.unshift(d);RULES[1].ev++;
+  var steps=[["检测到链上转账","T+8秒"],risky?["来源地址命中风险标签，转人工审核","T+15秒"]:["来源地址风险筛查通过","T+15秒"]].concat(risky?[]:[["确认数达标（"+CONF[net]+" 个区块）","T+3分钟"],["已入账",""]]);
+  runSteps($("dtst"),steps,function(){
+    var f=$("dtfin");
+    if(risky){
+      d.st="风控审核中";RULES[1].hit++;
+      EVT.unshift({id:"E-"+(++ESEQ),oid:d.id,dep:d.id,sev:"高",rule:"链上地址风险筛查",desc:"充币来源地址命中风险标签（模拟），"+fmt(a)+" "+d.cur,st:"待处理",t:"10-15 "+hm()});
+      logS("充币 "+d.id+" 来源地址命中风险标签，等待风控主管处理");
+      f.textContent="演示：这笔充币需要风控审核，审核通过后才会入账。可以用风控主管代码 R01 登录处理。";
+    }else{
+      d.st="已入账";bal(d.cid)[d.cur]+=a;logS("充币 "+d.id+" 已入账（"+fmt(a)+" "+d.cur+"）");
+      f.textContent="演示完成："+fmt(a)+" "+d.cur+" 已存入你的账户余额。";
+    }
+    f.className="final on";rWallet();
+  });
+};
+function custSt(s){return{"待风险审核":"审核中","待对冲":"处理中","待出款":"处理中","运行中":"处理中"}[s]||s}
+function rHist(){
+  var ty=$("hty").value,cu=$("hcu").value,L=[];
+  DEP.forEach(function(d){
+    if(d.cid!==CURC)return;
+    L.push({t:d.t,id:d.id,ty:d.kind==="fiat"?"入金":"充币",cs:[d.cur],amt:"+"+fmt(d.amt)+" "+d.cur,st:d.st,note:d.via});
+  });
+  ORDERS.forEach(function(o){
+    if(o.src!=="客户"||o.cid!==CURC)return;
+    var f=o.qf||"USD",cr=o.cr||0,sell=o.side==="卖出",amt;
+    if(sell){var got=o.qout!==undefined?o.qout:o.size*(1-cr);amt="−"+fmt(o.size)+" "+o.coin+" / +"+fmt(got)+" "+f}
+    else{var paid=o.qin!==undefined?o.qin:o.size*(1+cr);amt="−"+fmt(paid)+" "+f+" / +"+fmt(o.size)+" "+o.coin}
+    var note=(o.qsrc==="bal"?"账户余额":"外部转账")+(o.qrail?" · "+o.qrail:"");
+    L.push({t:o.t,id:o.id,ty:o.side,cs:[o.coin,f],amt:amt,st:o.custDone&&o.st!=="已拒绝"?"已完成":custSt(o.st),note:note});
+  });
+  L=L.filter(function(x){return(ty==="全部类型"||x.ty===ty)&&(cu==="全部"||x.cs.indexOf(cu)>=0)}).sort(function(a,b){return a.t<b.t?1:a.t>b.t?-1:0});
+  $("hxl").innerHTML=L.length?tbl(["时间","编号","类型","金额","状态","说明"],L.map(function(x){return[x.t,x.id,x.ty,x.amt,x.st,esc(x.note)]})):'<p class="sub">没有符合条件的记录。</p>';
+}
+$("hty").onchange=rHist;$("hcu").onchange=rHist;
+$("src").onchange=function(){srcUI()};
+document.querySelectorAll("#custnav button").forEach(function(b){b.onclick=function(){
+  var n=+b.dataset.s;if(n===6)rWallet();if(n===7)rHist();if(n===5)rTickets();show(n);
+}});
+dfRails();dtNets();
+var CRED={C001:"wang@demo.com",C002:"li@demo.com",C003:"ops@acme.example",C004:"zhao@demo.com",C005:"desk@orion.example",C006:"zhou@demo.com"};
+var OTP={},PEND=null,SPEND=null,REG=null,ACT=null,KSEQ=0,KYCQ=[];
+function ph(p){return hsh("salt:"+p).slice(0,24)}
+CUST.forEach(function(c){c.email=CRED[c.id]||c.id.toLowerCase()+"@demo.com";c.pw=ph("Demo1234");c.kyc="已认证";c.res="阿联酋";c.fail=0;c.lock=false;c.logins=[]});
+CUST[2].res="香港特别行政区";CUST[4].res="英国";CUST[5].res="新加坡";
+STAFF.forEach(function(s){s.pw=ph("Staff1234");s.act=true;s.fail=0;s.lock=false});
+P.splice(11,0,["kyc","审核客户身份认证"]);PM["风控主管"].kyc=1;
+function msg(id,t){$(id).textContent=t}
+function otp(k){var c=String(100000+Math.floor(Math.random()*900000));OTP[k]={c:c,n:0};return c}
+function chkOtp(k,v){var o=OTP[k];if(!o)return"验证码已失效，请重新发送。";if(o.n>=5)return"错误次数过多，请重新发送验证码。";if(v!==o.c){o.n++;return"验证码不正确。"}delete OTP[k];return""}
+function mask(e){var p=e.split("@");return p[0].charAt(0)+"***@"+(p[1]||"")}
+function demoCode(c,lab){return(lab||"演示验证码")+'：<b class="code">'+c+"</b>"}
+function pwOk(p,staff){return staff?(p.length>=10&&/[A-Z]/.test(p)&&/[a-z]/.test(p)&&/\d/.test(p)):(p.length>=8&&/[A-Za-z]/.test(p)&&/\d/.test(p))}
+function only(ids,on){ids.forEach(function(i){$(i).style.display=i===on?"block":"none"})}
+function navOn(nav,t){document.querySelectorAll("#"+nav+" button").forEach(function(b){b.classList.toggle("on",b.dataset.t===t)})}
+function custByEmail(e){e=(e||"").trim().toLowerCase();return CUST.filter(function(c){return c.email===e})[0]}
+function newAk(){var a=hsh(String(Math.random())).toUpperCase();return a.slice(0,4)+"-"+a.slice(4,8)}
+function custLogin(c){var t=tierOf(vol30(c.id));CURC=c.id;COMM=t.r/100;c.logins.unshift("10-15 "+hm());login("客户","",c.name+" · "+t.n+"（佣金 "+t.r.toFixed(2)+"%）");kycBar();if(c.kyc!=="已认证"){rAcct();show(8)}}
+function staffUI(){
+  var on=STAFF.filter(function(s){return s.on&&s.act&&s.pw===ph("Staff1234")}).map(function(s){return s.code}).join("、");
+  $("xdemo").innerHTML="<b>演示环境说明</b><br>验证码和动态码会直接显示在页面上；真实系统会发到邮箱，或由身份验证器应用生成。<br>演示客户：wang@demo.com、li@demo.com、ops@acme.example 等，密码均为 Demo1234。<br>员工角色代码："+on+"，密码均为 Staff1234。<br>注册用推荐码："+REFS.map(function(r){return r.id}).join("、")+"。";
+}
+function refreshRefs(){staffUI()}
+/* ---------- home navigation ---------- */
+document.querySelectorAll("#xk button").forEach(function(b){b.onclick=function(){
+  document.querySelectorAll("#xk button").forEach(function(x){x.classList.toggle("on",x===b)});
+  $("xc").classList.toggle("on",b.dataset.k==="c");$("xs").classList.toggle("on",b.dataset.k==="s");
+}});
+function custTab(t){navOn("xct",t);$("xcl").style.display=t==="l"?"block":"none";$("xcr").style.display=t==="r"?"block":"none";if(t==="l")only(["xcl1","xcl2","xcl3"],"xcl1");else regStep(1)}
+function staffTab(t){navOn("xst",t);$("xsl").style.display=t==="l"?"block":"none";$("xsa").style.display=t==="a"?"block":"none";if(t==="l")only(["xsl1","xsl2"],"xsl1");else only(["xsa1","xsa2","xsa3"],"xsa1")}
+document.querySelectorAll("#xct button").forEach(function(b){b.onclick=function(){custTab(b.dataset.t)}});
+document.querySelectorAll("#xst button").forEach(function(b){b.onclick=function(){staffTab(b.dataset.t)}});
+/* ---------- customer login ---------- */
+function sendLoginCode(c){var code=otp("c:"+c.id);$("xcm2").innerHTML="验证码已发送至 "+esc(mask(c.email))+"，有效期 5 分钟。"+demoCode(code)}
+$("xcgo").onclick=function(){
+  var e=$("xce").value.trim(),p=$("xcp").value,c=custByEmail(e);
+  if(!e||!p){msg("xcm1","请输入邮箱和密码。");return}
+  if(c&&c.lock){msg("xcm1","密码连续输错 5 次，账户已锁定。请通过“忘记密码”重置后再登录。");return}
+  if(!c||c.pw!==ph(p)){
+    if(c){c.fail++;if(c.fail>=5){c.lock=true;logS("客户账户 "+c.id+" 密码连续输错 5 次，已锁定")}}
+    msg("xcm1",c&&c.lock?"密码连续输错 5 次，账户已锁定。请通过“忘记密码”重置后再登录。":"邮箱或密码不正确。");return;
+  }
+  c.fail=0;PEND=c.id;msg("xcm1","");$("xcc").value="";msg("xcm3","");sendLoginCode(c);only(["xcl1","xcl2","xcl3"],"xcl2");
+};
+$("xcrs").onclick=function(){var c=custById(PEND);if(c){sendLoginCode(c);msg("xcm3","")}};
+$("xcbk").onclick=function(){only(["xcl1","xcl2","xcl3"],"xcl1")};
+$("xcv").onclick=function(){
+  var c=custById(PEND);if(!c)return;
+  var r=chkOtp("c:"+c.id,$("xcc").value.trim());if(r){msg("xcm3",r);return}
+  PEND=null;$("xcp").value="";only(["xcl1","xcl2","xcl3"],"xcl1");custLogin(c);
+};
+/* ---------- forgot password ---------- */
+$("xcfg").onclick=function(){$("xfe").value=$("xce").value;$("xf2").style.display="none";msg("xfe1","");only(["xcl1","xcl2","xcl3"],"xcl3")};
+$("xfbk").onclick=function(){only(["xcl1","xcl2","xcl3"],"xcl1")};
+$("xfs").onclick=function(){
+  var e=$("xfe").value.trim(),c=custByEmail(e);msg("xfe1","");
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){msg("xfe1","请输入有效的邮箱地址。");return}
+  $("xfm").innerHTML="如果该邮箱已注册，验证码已发送。"+(c?demoCode(otp("f:"+c.id)):"（演示：这个邮箱没有注册，所以不会收到验证码。）");
+  $("xfc").value="";$("xfp").value="";$("xfp2").value="";$("xf2").style.display="block";
+};
+$("xfok").onclick=function(){
+  var c=custByEmail($("xfe").value),p=$("xfp").value;
+  if(!c){msg("xfe1","验证码不正确。");return}
+  var r=chkOtp("f:"+c.id,$("xfc").value.trim());if(r){msg("xfe1",r);return}
+  if(!pwOk(p)){OTP["f:"+c.id]={c:$("xfc").value.trim(),n:0};msg("xfe1","密码至少 8 位，需同时包含字母和数字。");return}
+  if(p!==$("xfp2").value){OTP["f:"+c.id]={c:$("xfc").value.trim(),n:0};msg("xfe1","两次输入的密码不一致。");return}
+  c.pw=ph(p);c.lock=false;c.fail=0;logS("客户 "+c.id+" 重置了密码");
+  $("xce").value=c.email;$("xcp").value="";only(["xcl1","xcl2","xcl3"],"xcl1");msg("xcm1","");$("xcm1").textContent="";
+  $("xcm1").className="sub";$("xcm1").textContent="密码已重置，请用新密码登录。";setTimeout(function(){$("xcm1").className="err"},0);
+};
+/* ---------- customer registration ---------- */
+function regStep(n){only(["xr1","xr2","xr3"],"xr"+n);[].slice.call($("xrs").children).forEach(function(s,i){s.classList.toggle("on",i<n)})}
+$("xrgo").onclick=function(){
+  var e=$("xre").value.trim().toLowerCase(),p=$("xrp").value,res=$("xrc").value,rf=$("xrf").value.trim().toUpperCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){msg("xrm1","请输入有效的邮箱地址。");return}
+  if(custByEmail(e)){msg("xrm1","该邮箱已注册，请直接登录，或用“忘记密码”找回。");return}
+  if(!pwOk(p)){msg("xrm1","密码至少 8 位，需同时包含字母和数字。");return}
+  if(p!==$("xrp2").value){msg("xrm1","两次输入的密码不一致。");return}
+  if(!res){msg("xrm1","请选择居住国家或地区。");return}
+  if(res==="中国大陆"){msg("xrm1","根据本平台的合规政策，暂不向中国大陆居民提供服务。");return}
+  if(rf&&!REFS.some(function(r){return r.id===rf})){msg("xrm1","推荐码不存在，请核对，或留空。");return}
+  if(!$("xra").checked){msg("xrm1","请先阅读并同意用户协议、隐私政策和风险披露。");return}
+  msg("xrm1","");REG={e:e,p:p,res:res,ref:rf};
+  $("xrm2").innerHTML="验证码已发送至 "+esc(e)+"，有效期 5 分钟。"+demoCode(otp("r:"+e));
+  $("xrv").value="";msg("xrm3","");regStep(2);
+};
+$("xrbk").onclick=function(){regStep(1)};
+$("xrok").onclick=function(){
+  if(!REG)return;
+  var r=chkOtp("r:"+REG.e,$("xrv").value.trim());if(r){msg("xrm3",r);return}
+  var id="C"+("00"+(CUST.length+1)).slice(-3),c={id:id,name:REG.e.split("@")[0],ref:REG.ref,mgr:"",open:"2026-10-15",email:REG.e,pw:ph(REG.p),kyc:"未认证",res:REG.res,fail:0,lock:false,logins:[]};
+  CUST.push(c);bal(id);
+  var rf=refOf(c);
+  logS("新客户注册 "+id+"（"+mask(c.email)+"）"+(rf?"，推荐人 "+rf.name+"，客户经理 "+mgrLabel(rf.mgr):"，无推荐人，待分配客户经理"));
+  $("xrm4").textContent="客户编号 "+id+"。"+(rf?"你的推荐人是 "+rf.name+"，对应的客户经理会跟进。":"客户经理会在分配后与你联系。")+"登录后请在“账户与认证”完成身份认证，认证通过后才能使用资金和交易功能。";
+  $("xre").value=$("xrp").value=$("xrp2").value=$("xrf").value="";$("xrc").value="";$("xra").checked=false;
+  REG.done=c.email;regStep(3);
+};
+$("xrlg").onclick=function(){$("xce").value=REG&&REG.done||"";custTab("l");$("xcp").focus()};
+/* ---------- staff login ---------- */
+$("slog").onclick=function(){
+  var c=$("scode").value.trim().toUpperCase(),p=$("xsp").value;
+  if(!/^[A-Z]\d{2}$/.test(c)){msg("serr","角色代码是一个字母加两位数字，例如 T01。");return}
+  var s=STAFF.filter(function(x){return x.code===c})[0];
+  if(!s||(s.act&&s.pw!==ph(p))){
+    if(s&&s.act){s.fail++;if(s.fail>=5){s.lock=true;logS("员工 "+c+" 密码连续输错 5 次，账号已锁定")}}
+    msg("serr",s&&s.lock?"账号已锁定，请联系管理员解锁。":"角色代码或密码不正确。");logS("员工登录失败：代码 "+c);return;
+  }
+  if(!s.act){msg("serr","该账号尚未激活，请在“激活账号”中使用激活码激活。");return}
+  if(s.lock){msg("serr","账号已锁定，请联系管理员解锁。");return}
+  if(!s.on){msg("serr","该角色代码已停用，请联系管理员。");logS("员工登录失败：代码 "+c+" 已停用");return}
+  s.fail=0;SPEND=s.code;msg("serr","");$("xsc").value="";msg("xsm3","");
+  $("xsm2").innerHTML="请打开绑定的身份验证器，输入当前的 6 位动态码。"+demoCode(otp("s:"+s.code),"演示动态码");
+  only(["xsl1","xsl2"],"xsl2");
+};
+$("xsbk").onclick=function(){only(["xsl1","xsl2"],"xsl1")};
+$("xsv").onclick=function(){
+  var s=staffBy(SPEND);if(!s)return;
+  var r=chkOtp("s:"+s.code,$("xsc").value.trim());if(r){msg("xsm3",r);return}
+  SPEND=null;$("xsp").value="";$("scode").value="";only(["xsl1","xsl2"],"xsl1");login(s.role,s.code,s.name);
+};
+/* ---------- staff activation ---------- */
+$("xago").onclick=function(){
+  var c=$("xac").value.trim().toUpperCase(),k=$("xak").value.trim().toUpperCase(),p=$("xap").value,s=staffBy(c);
+  if(!s||s.act||!s.ak||s.ak!==k){msg("xam1","角色代码或激活码不正确，或该账号已激活。");return}
+  if(!pwOk(p,true)){msg("xam1","密码至少 10 位，需包含大写字母、小写字母和数字。");return}
+  if(p!==$("xap2").value){msg("xam1","两次输入的密码不一致。");return}
+  msg("xam1","");ACT={code:c,p:p};
+  var sec=hsh("totp"+c+Math.random()).slice(0,16).toUpperCase();
+  $("xasec").textContent=sec.replace(/(.{4})/g,"$1 ").trim();
+  $("xam2").innerHTML=demoCode(otp("a:"+c),"演示动态码");$("xav").value="";msg("xam3","");
+  only(["xsa1","xsa2","xsa3"],"xsa2");
+};
+$("xaok").onclick=function(){
+  var s=staffBy(ACT&&ACT.code);if(!s)return;
+  var r=chkOtp("a:"+s.code,$("xav").value.trim());if(r){msg("xam3",r);return}
+  s.pw=ph(ACT.p);s.act=true;s.ak=null;s.fail=0;s.lock=false;logS("员工 "+s.code+" 已激活账号并绑定身份验证器");
+  $("xam4").textContent=s.code+"（"+s.role+"）已激活。以后用角色代码、密码和身份验证器动态码登录。";
+  $("xac").value=$("xak").value=$("xap").value=$("xap2").value="";only(["xsa1","xsa2","xsa3"],"xsa3");staffUI();
+};
+$("xalg").onclick=function(){$("scode").value=ACT?ACT.code:"";staffTab("l");$("xsp").focus()};
+/* ---------- admin: staff accounts ---------- */
+function rStaff(){
+  $("sl").innerHTML=tbl(["角色代码","姓名","岗位","入职日期","账号状态","启用状态","操作"],STAFF.map(function(s){
+    var st=!s.act?"待激活":s.lock?'<span class="bad">已锁定</span>':"已激活";
+    var a=btn(s.code,"tog",s.on?"停用":"启用");
+    if(s.lock)a+=" "+btn(s.code,"unl","解锁");
+    if(s.act)a+=" "+btn(s.code,"rst","重置密码");else a+=" "+btn(s.code,"rak","重新生成激活码");
+    return[s.code,esc(s.name),s.role,s.hire,st,s.on?"已启用":'<span class="bad">已停用</span>',a];
+  }));
+  staffUI();
+}
+$("sl").onclick=function(e){
+  var b=e.target,a=b.dataset.a;if(!a||!can("staff"))return;
+  var s=staffBy(b.dataset.i);if(!s)return;
+  if(s.code===UCODE&&a!=="unl"){msg("sm","不能修改自己正在使用的账号。");return}
+  if(a==="tog"){s.on=!s.on;msg("sm","");log((s.on?"启用":"停用")+"员工代码 "+s.code)}
+  else if(a==="unl"){s.lock=false;s.fail=0;msg("sm","已解锁 "+s.code+"。");log("解锁员工账号 "+s.code)}
+  else{s.act=false;s.lock=false;s.fail=0;s.ak=newAk();msg("sm",s.code+" 的激活码："+s.ak+"（演示：真实系统会通过邮件发给员工，员工用它重新设置密码和身份验证器）");log((a==="rst"?"重置员工密码 ":"重新生成激活码 ")+s.code)}
+  rStaff();
+};
+$("sadd").onclick=function(){
+  if(!can("staff"))return;
+  var r=$("sr").value,n=$("sn").value.trim();
+  if(!n){msg("sm","请输入员工姓名。");return}
+  var L=ROLEL[r],mx=0;
+  STAFF.forEach(function(x){if(x.code.charAt(0)===L)mx=Math.max(mx,parseInt(x.code.slice(1),10))});
+  var code=L+(mx+1<10?"0":"")+(mx+1),ak=newAk();
+  STAFF.push({code:code,name:n,role:r,on:true,hire:"2026-10-15",act:false,ak:ak,fail:0,lock:false});
+  $("sn").value="";msg("sm","已分配角色代码 "+code+"（"+r+"），激活码："+ak+"。演示：真实系统会通过邮件发给员工，员工在首页“激活账号”中使用。");
+  log("新增员工代码 "+code+"（"+r+"，"+n+"）");rStaff();
+};
+/* ---------- customer: account & KYC ---------- */
+function kycOk(id){var c=custById(CURC);if(c&&c.kyc!=="已认证"){$(id).textContent="请先在“账户与认证”完成身份认证（当前状态："+c.kyc+"）。";return false}return true}
+function kycBar(){
+  var c=custById(CURC),b=$("kycbar");if(!c||USER!=="客户"){b.style.display="none";return}
+  if(c.kyc==="已认证"){b.style.display="none";return}
+  b.innerHTML=(c.kyc==="审核中"?"你的身份认证正在审核，通过后即可使用资金和交易功能。":c.kyc==="已拒绝"?"身份认证未通过："+esc(c.kycr||"")+" ":"你的账户尚未完成身份认证，暂时不能使用资金和交易功能。 ")+(c.kyc==="审核中"?"":' <button class="mini" data-a="kyc">去认证</button>');
+  b.style.display="block";
+}
+$("kycbar").onclick=function(e){if(e.target.dataset.a==="kyc"){rAcct();show(8)}};
+function rAcct(){
+  var c=custById(CURC);if(!c)return;var rf=refOf(c),t=tierOf(vol30(c.id));
+  var r=$("acinfo");r.innerHTML="";
+  [["客户编号",c.id],["邮箱",c.email],["居住国家或地区",c.res],["推荐人",rf?rf.name:"无"],["档位",t.n+"（佣金 "+t.r.toFixed(2)+"%）"],["开户日期",c.open],["最近登录",c.logins.slice(0,3).join("、")||"—"]].forEach(function(x){r.appendChild(row(x[0],x[1]))});
+  var st=$("kycst");
+  st.className=c.kyc==="已认证"?"sub":"bad";
+  st.textContent="状态："+c.kyc+(c.kyc==="已拒绝"&&c.kycr?"（"+c.kycr+"）":"")+(c.kyc==="审核中"?"。风控合规人员审核后会通知你。":"");
+  $("kycf").style.display=(c.kyc==="未认证"||c.kyc==="已拒绝")?"block":"none";
+  var s=$("secinfo");s.innerHTML="";s.appendChild(row("两步验证","已开启（邮箱验证码）"));s.appendChild(row("登录失败锁定","连续输错 5 次锁定"));
+}
+$("xkgo").onclick=function(){
+  var c=custById(CURC);if(!c)return;
+  var n=$("xkn").value.trim(),no=$("xkno").value.trim(),f=$("xkf").files&&$("xkf").files[0];
+  if(!n||!no){msg("xkm","请填写姓名和证件号码。");return}
+  if(!f){msg("xkm","请选择证件照片（演示不会上传）。");return}
+  if(!$("xkl").checked){msg("xkm","请先完成活体检测。");return}
+  msg("xkm","");c.kyc="审核中";c.kycr="";
+  KYCQ.unshift({id:"K-"+(++KSEQ),cid:c.id,name:n,type:$("xkt").value,no:no.slice(0,2)+"****"+no.slice(-2),st:"待审核",t:"10-15 "+hm()});
+  logS("客户 "+c.id+" 提交身份认证，等待风控审核");
+  $("xkn").value=$("xkno").value="";$("xkf").value="";$("xkl").checked=false;rAcct();kycBar();
+};
+$("xpgo").onclick=function(){
+  var c=custById(CURC),o=$("xop").value,n=$("xnp").value;if(!c)return;
+  if(c.pw!==ph(o)){msg("xpm","当前密码不正确。");return}
+  if(!pwOk(n)){msg("xpm","新密码至少 8 位，需同时包含字母和数字。");return}
+  c.pw=ph(n);$("xop").value=$("xnp").value="";msg("xpm","密码已修改。");logS("客户 "+c.id+" 修改了密码");
+};
+document.querySelectorAll("#custnav button").forEach(function(b){b.onclick=function(){
+  var n=+b.dataset.s;if(n===6)rWallet();if(n===7)rHist();if(n===5)rTickets();if(n===8)rAcct();show(n);
+}});
+/* ---------- risk head: KYC review ---------- */
+function rKyc(){
+  var ok=can("kyc");
+  $("kq").innerHTML=KYCQ.length?tbl(["编号","客户","邮箱","居住地","证件","自动检查","提交时间","状态","操作"],KYCQ.map(function(k){
+    var c=custById(k.cid),a="—";
+    if(ok&&k.st==="待审核")a=btn(k.id,"ok","通过")+" "+btn(k.id,"no","拒绝");
+    return[k.id,esc(k.name),esc(c?c.email:""),esc(c?c.res:""),esc(k.type)+" "+esc(k.no),"证件有效 · 活体通过 · 制裁名单未命中（模拟）",k.t,k.st,a];
+  })):'<p class="sub">暂无待审核的身份认证。</p>';
+}
+$("kq").onclick=function(e){
+  var b=e.target,a=b.dataset.a;if(!a||!can("kyc"))return;
+  var k=KYCQ.filter(function(x){return x.id===b.dataset.i})[0],c=k&&custById(k.cid);if(!c||k.st!=="待审核")return;
+  if(a==="ok"){k.st="已通过";c.kyc="已认证";c.name=k.name;log("通过客户 "+c.id+" 的身份认证")}
+  else{k.st="已拒绝";c.kyc="已拒绝";c.kycr="证件信息不清晰，请重新提交（演示）";log("拒绝客户 "+c.id+" 的身份认证")}
+  rKyc();
+};
+(function(){
+  if(typeof Element==="undefined")return;
+  var d=Object.getOwnPropertyDescriptor(Element.prototype,"innerHTML");
+  ["kq","sl"].forEach(function(id){
+    var el=document.getElementById(id),last=null;if(!el||!d)return;
+    Object.defineProperty(el,"innerHTML",{configurable:true,get:function(){return d.get.call(el)},set:function(v){if(v===last)return;last=v;d.set.call(el,v)}});
+  });
+})();
+staffUI();
+tgUI();lpVis();logS("系统启动");(function(){var s=$("sr");Object.keys(ROLEL).forEach(function(r){var o=document.createElement("option");o.textContent=r;s.appendChild(o)});staffUI()})();
+nets();rails();labels();
+var EN={"中":"Medium","买":"buy","价":"price","借":"Dr","共":"total","前":"Prior","卖":"sell","已":"","张":"","或":"or","无":"none","日":"days","月":"month","的":"of","秒":"s","笔":"trades","贷":"Cr","近":"Last","量":"qty","项":"items","高":"High","一笔":"a","一致":"matched","下单":"Place orders","之间":"range","买价":"","买入":"Buy","事件":"Event","交易":"Trading","付款":"Pay","代币":"Token","代码":"code","以及":"and","价格":"Prices","余额":"Balance","作废":"Void","佣金":"commission","例如":"e.g.","保持":"keeping","停用":"Disable","充币":"Crypto deposit","入职":"hired","入账":"to credit","入金":"Fiat deposit","全部":"All","内容":"Content","冻结":"frozen","凭证":"Voucher","分钟":"min","刘洋":"Liu Yang","升级":"Escalate","升至":"to reach","单笔":"Single order","卖价":"","卖出":"Sell","占比":"Share","即时":"Instant","取消":"revoked","另有":"plus","可用":"available","合计":"Total","启用":"Enable","吴凡":"Wu Fan","周婷":"Zhou Ting","咨询":"Inquiry","回复":"Reply","在职":"Active","均价":"Avg price","头寸":"Positions","姓名":"Name","字母":"letter","孙倩":"Sun Qian","实时":"live","客户":"Customer","对冲":"hedge","对象":"Subject","小计":"Subtotal","岗位":"Position","差异":"Difference","币种":"Currency","延迟":"Latency","开户":"Open account","张伟":"Zhang Wei","当前":"Current","当天":"Same day","成交":"Filled","成本":"Cost","户名":"Account name","投诉":"Complaint","报价":"quotes","拒绝":"Reject","提交":"Submit","摘要":"Description","撤单":"Cancel","操作":"Actions","支付":"paid","收入":"Income","放行":"Release","数字":"digits","数量":"Quantity","方向":"Side","日期":"Date","时长":"duration","时间":"Time","明细":"Details","普通":"Standard","暂无":"None yet","最优":"best","最小":"Minimum","期间":"Period","本月":"This month","权益":"Equity","权限":"Permission","李明":"Li Ming","来源":"Source","杨帆":"Yang Fan","查看":"View","查询":"query","档位":"Tier","模拟":"simulated","比例":"Rate","汇率":"exchange rates","汇至":"sent to","法币":"Fiat","流程":"Process","深度":"depth","渠道":"Venue","港币":"HKD","滑点":"Slippage","演示":"demo","点击":"Click","状态":"Status","生成":"Generate","电汇":"wire","留空":"leave blank","登录":"Log in","确认":"Confirm","科目":"Account","秒级":"Seconds","笔数":"Trades","等级":"Tier","策略":"Strategy","类别":"Type","类型":"Type","系统":"System","级别":"Level","结果":"Result","编号":"ID","网络":"Network","美元":"USD","草稿":"Draft","获得":"granted","覆盖":"coverage","规则":"Rule","计提":"accrued","订单":"Order","说明":"Note","负债":"Liability","账号":"Account no.","账户":"account","账本":"Ledger","费用":"Expense","资产":"Asset","赎回":"redemption","赵刚":"Zhao Gang","超过":"over","转账":"transfer","运营":"Operating","返回":"Back","还差":"needs","进度":"Progress","退回":"Return","金卡":"Gold","金额":"Amount","钻石":"Diamond","银卡":"Silver","银行":"Bank","门槛":"thresholds","附言":"Payment note","陈晨":"Chen Chen","限价":"Limit price","项目":"Item","预计":"expected","黄磊":"Huang Lei","月度":"monthly","角色":"Role","汇出":"paid out","收款人":"Payee","下载为":"Download as","不分组":"No grouping","不存在":"does not exist","个区块":"blocks","二选一":"choose one","交易员":"Trader","仅演示":"demo only","佣金率":"commission rate","佣金表":"Commission reports","入金单":"Fiat deposit","冰山单":"Iceberg","净利润":"Net profit","几分钟":"Minutes","利润率":"Margin","到达价":"Arrival price","参考号":"reference","含佣金":"incl. commission","周女士":"Ms. Zhou","处理中":"Processing","审核中":"Under review","客户数":"Customers","容差内":"Within tolerance","已作废":"Void","已保存":"Saved","已停用":"Disabled","已启用":"Enabled","已入账":"Posted","已关闭":"Closed","已冻结":"Frozen","已升级":"Escalated","已回复":"Replied","已完成":"Completed","已成交":"Filled","已拒绝":"Rejected","已拦截":"Blocked","已撤销":"Cancelled","已支付":"Paid","已放行":"Released","已生成":"Generated","已确认":"Confirmed","已退回":"Returned","已汇出":"paid out","并入账":"and posted","当天至":"Same day to","待出款":"Pending payout","待分配":"Unassigned","待回复":"Awaiting reply","待处理":"Open","待对冲":"Pending hedge","待汇款":"Awaiting transfer","待确认":"Pending confirmation","待退回":"pending return","总资产":"Total assets","成交中":"Filling","成交量":"Volume","执行中":"Executing","按渠道":"By venue","按策略":"By strategy","授权码":"Authorization code","推荐人":"Referrer","收法币":"receive fiat","明细表":"Detail table","最高档":"Top tier","未分配":"Unassigned","未计入":"not included","李女士":"Ms. Li","林顾问":"Advisor Lin","汇总表":"Summary table","演示版":"Demo","版可用":"version only","王先生":"Mr. Wang","生成于":"generated at","生成人":"generated by","确认中":"Confirming","科目表":"Chart of accounts","稳定币":"Stablecoin","笔凭证":"vouchers","笔成交":"trades","管理员":"Administrator","结算单":"Statements","美元的":"USD","订单数":"Orders","请使用":"please use","请输入":"Please enter","赵先生":"Mr. Zhao","转数快":"","运行中":"Running","进行中":"In progress","陈经纪":"Broker Chen","限价单":"Limit order","项通过":"passed","黄顾问":"Advisor Huang","一键分配":"Bulk-assigned","三方对账":"Three-way reconciliation","上次回复":"Previous reply","不含当天":"excluding today","不得低于":"must not fall below","个工作日":"business days","主管说明":"Head note needed","交易历史":"Trade history","交易记录":"Transactions","交易账户":"Trading account","付款方式":"Payment method","付款金额":"Payment amount","代币余额":"Token balances","余额方向":"Normal balance","你将收到":"You will receive","佣金收入":"Commission income","佣金比例":"Commission rate","佣金金额":"Commission amount","保存配置":"Save settings","修改权限":"Permission changed","修改配置":"Settings changed","借方合计":"total debits","借方科目":"Debit account","偏离阈值":"deviation threshold","入职日期":"Hire date","入金币种":"Deposit currency","入金方式":"Deposit method","入金编号":"Deposit ID","入金金额":"Deposit amount","全部客户":"All customers","全部币种":"All currencies","全部类型":"All types","再做一笔":"New trade","出款确认":"Payout confirmation","分级规则":"Tier rules","分组明细":"Grouped details","分配客户":"Assigned customer","加权滑点":"Weighted slippage","包括入金":"Includes fiat deposits","升级处理":"Escalate","单笔上限":"per-order cap","卖出数量":"Sell quantity","即时扣款":"charged instantly","即时扣除":"deducted instantly","历史记录":"History","发送回复":"Send reply","取消订单":"Cancel order","可以先到":"You can first go to","可用余额":"Available balance","否则等待":"otherwise it waits","员工代码":"staff code","员工姓名":"Staff name","员工登录":"Staff login","回复客户":"Replied to customer","外部余额":"External balance","外部转账":"External transfer","实时交易":"Live trading","审计日志":"Audit log","客户一览":"Customer overview","客户充币":"Customer crypto deposit","客户入金":"Customer fiat deposit","客户姓名":"Customer name","客户开户":"Open a customer account","客户提交":"Customer submitted","客户收款":"customer receipt","客户汇入":"from customer","客户登录":"Customer login","客户经理":"Account Manager","客户订单":"Customer order","客户资金":"Client money","客户转入":"from customer","客户钱包":"customer wallet","客服回复":"Support reply","对冲成交":"Hedge filled","对冲进度":"Hedge progress","对账差异":"Reconciliation breaks","对账规则":"Reconciliation rules","对账通过":"reconciliation passed","导出报表":"Export reports","平台佣金":"Platform commission","开户成功":"Account opened","开户日期":"Opened","张结算单":"statements","成交均价":"Avg fill price","成本分析":"Cost analysis","我方账本":"Our ledger","我的客户":"My customers","我的订单":"My orders","我的记录":"My records","我的资产":"My assets","托管账户":"Custody","执行完成":"completed","执行策略":"Execution strategy","批准关闭":"Approve close","折合美元":"USD equivalent","折算美元":"converted to USD","报价还剩":"Quote valid for","按客户前":"By each customer's prior","按推荐人":"By referrer","接受报价":"Accept quote","提交订单":"Submit order","提交说明":"Submit note","提交财务":"Submit to finance","撤销订单":"Cancel orders","收到汇款":"Transfer received","收款钱包":"Receiving wallet","收款银行":"Bank","无推荐人":"No referrer","日交易量":"days volume","日终对账":"Daily reconciliation","时间加权":"time-weighted","智能订单":"Smart orders","智能路由":"Smart routing","暂无订单":"No orders yet","期初余额":"Opening balance","本地转账":"Local transfer","本月至今":"month to date","检查次数":"Checks","模拟数据":"Simulated data","汇款指引":"Transfer instructions","汇款金额":"Transfer amount","法币付款":"Fiat payment","法币余额":"Fiat balances","法币入金":"Fiat deposit","法币出款":"Fiat payout","法币到账":"Fiat received","法币币种":"Fiat currency","渠道行情":"Venue prices","演示代码":"Demo codes","演示完成":"Demo complete","演示规则":"demo rule","演示设定":"demo setting","生成待办":"created a to-do","生成时间":"Generated","生成记录":"History","生成账本":"Generate ledger","登录处理":"to handle it","确认入账":"Confirm & post","确认出款":"Confirm payout","确认后点":"after checking, click","确认执行":"Confirm execution","示例姓名":"Sample name","科目名称":"Account name","科目编码":"Account code","稳定币按":"stablecoins at","稳定币起":"stablecoin minimum","系统启动":"System started","系统配置":"System settings","累计检查":"Total checks","结算金额":"Settlement amount","美元出款":"USD payout","美元清算":"USD clearing","美元等值":"USD equivalent","自动关闭":"closed automatically","自动执行":"Auto-execute","自动通过":"Auto-passed","自动风控":"Automated risk control","获取报价":"Get quote","规则触发":"Rule hits","角色代码":"Role code","角色权限":"Role permissions","触发次数":"Hits","订单确认":"Order confirmed","订单进度":"Order progress","试算平衡":"trial balance","请勿转账":"do not send funds","财务主管":"Finance Head","账户余额":"Account balance","贷方合计":"total credits","贷方科目":"Credit account","资金来源":"Funding source","资金流水":"Cash movements","资金账户":"Fund account","超过阈值":"exceeds threshold","距下一档":"To next tier","路由分配":"Route allocation","路由详情":"Route details","转账网络":"Network","转账金额":"Transfer amount","载入对冲":"Load to hedge","运营账户":"Operating account","退出登录":"Log out","退回差异":"Returned break","适合急单":"suits urgent orders","选择类型":"Choose type","避免锁死":"to avoid lockout","重新询价":"Re-quote","项需处理":"need action","预计均价":"Expected avg","预计滑点":"Expected slippage","风控主管":"Risk Head","风险事件":"Risk events","香港银行":"HK bank","显示语言":"Display language","简体中文":"Simplified Chinese","繁體中文":"Traditional Chinese","下载佣金表":"Downloaded commission report","不生成文件":"no file generated","交易员订单":"trader orders","付款人姓名":"Payer name","付款金额为":"payment amount is","作废结算单":"Voided statement","佣金结算单":"Commission statements","借方发生额":"Debits","入金或充币":"to deposit fiat or crypto","公司净佣金":"Net company commission","出款通道费":"Payout fee","创建入金单":"created fiat deposit","勾选即授权":"Tick to grant","卖出数量为":"sell quantity is","卖出稳定币":"Sell stablecoin","参考号匹配":"reference matched","后台管理员":"Back-office Admin","咨询与投诉":"Inquiries & complaints","填写推荐人":"Enter a referrer","实时最优价":"Live best price","客户与交易":"Customers & trades","客户应付款":"Client liabilities","对账已通过":"Reconciliation passed","已分析订单":"Orders analyzed","已成交均价":"Avg fill price","应付推荐人":"Payable to referrer","待处理事件":"Open events","待手动确认":"pending manual confirmation","待财务确认":"Pending finance","待财务说明":"Pending finance note","待风控审核":"Pending risk review","待风控确认":"Pending risk confirmation","待风险审核":"Pending risk review","所有者权益":"Owner's equity","手续费收入":"Fee income","投诉与咨询":"Complaints & inquiries","报价已过期":"Quote expired","按客户等级":"By customer tier","按客户经理":"By account manager","推荐人佣金":"Referrer commission","推荐人姓名":"Referrer name","推荐人比例":"Referrer rate","提交即执行":"executes on submit","提交结算单":"Submitted statement","提交订单后":"After you submit an order","收款人姓名":"Payee name","新增推荐人":"Add referrer","方式或网络":"Method or network","无下单权限":"no order permission","日总成交量":"days total volume","暂无结算单":"No statements yet","最优市场价":"Best market price","标记已支付":"Mark paid","款项已退回":"funds returned","深度与分配":"depth & allocation","演示中快进":"fast-forwarded in the demo","演示设定为":"demo setting is","生成佣金表":"Generate report","生成结算单":"Generate statements","相对到达价":"vs arrival price","确认入账后":"After posting","确认数达标":"Confirmations reached","确认结算单":"Confirmed statement","稳定币入账":"Stablecoin received","稳定币库存":"Stablecoin inventory","稳定币收款":"Stablecoin delivery","稳定币转出":"Stablecoin sent","第三方付款":"third-party payment","管理员批准":"admin approval","给客户经理":"to account manager","至财务主管":"to Finance Head","营业时段内":"within business hours","试算平衡表":"Trial balance","请汇入法币":"Please send fiat","请输入内容":"Please enter content","请输入数量":"Please enter a quantity","请输入限价":"Please enter a limit price","请重新询价":"please re-quote","负责客户数":"Customers","贷方发生额":"Credits","资产与充值":"Assets & deposits","超过复核线":"exceeds the review threshold","转为待出款":"moved to pending payout","转人工审核":"sent to manual review","进行中订单":"Open orders","退回结算单":"Returned statement","银行手续费":"Bank fees","链上手续费":"Network fee","风控审核中":"Under risk review","默认佣金率":"Default commission rate","今日客户订单":"Today's customer orders","价格保护拦截":"Price protection block","价格偏离保护":"Price deviation guard","佣金比例需在":"Commission rate must be within","保存分级规则":"Save tier rules","出款通道费用":"payout channel fees","分组明细查询":"Grouped detail query","加权平均滑点":"Weighted avg slippage","单笔大额复核":"Large single order review","单笔数量上限":"per-order quantity cap","同行内部转账":"Same-bank transfer","员工登录失败":"Staff login failed","处理风险事件":"Handle risk events","外部余额差异":"external balance difference","大额对账差异":"large reconciliation break","存入账户余额":"Credit to account balance","实时三档深度":"Live 3-level depth","实时交易执行":"Live execution","客户分级规则":"Customer tier rules","客户当前档位":"Current customer tiers","客户经理佣金":"AM commission","客户经理比例":"AM rate","客户资金账户":"Client money account","客户资金隔离":"client money segregation","对冲滑点成本":"Hedge slippage cost","对应客户经理":"Account manager","对账差异升级":"Escalated reconciliation breaks","对账差异处理":"Reconciliation break handling","对账差异调整":"Reconciliation adjustment","导出历史记录":"Export history","尚未生成账本":"No ledger yet","已新增推荐人":"Added referrer","市场对冲成交":"Hedged in the market","应付客户经理":"Payable to AM","当前客户经理":"Current AM","当前执行权限":"Current execution permission","当前角色没有":"Your role lacks","待管理员批准":"Pending admin approval","成交后再补量":"refilling after each fill","手动确认执行":"Manually confirmed","扣除后净佣金":"Net commission after payouts","执行日终对账":"Run daily reconciliation","提交差异说明":"Submitted break note","收到法币入账":"Fiat received","收款钱包地址":"Receiving wallet address","数据均为模拟":"all data simulated","新增员工代码":"Added staff code","日交易量门槛":"days volume threshold","暂无对账差异":"No reconciliation breaks","暂无风险事件":"No risk events","最小充值数量":"Minimum deposit","未填写推荐人":"No referrer given","查看历史记录":"View history","查看实时交易":"View live trading","查看审计日志":"View audit log","查看成本分析":"View cost analysis","查看渠道比价":"View venue comparison","查看资金流水":"View cash movements","模拟我已付款":"Simulate payment sent","模拟我已汇款":"Simulate transfer sent","模拟我已转入":"Simulate crypto sent","模拟我已转账":"Simulate crypto sent","模拟转入数量":"Simulated amount","正数表示成本":"positive means cost","没有成交记录":"No fills","法币付款方式":"Fiat payment method","法币出款方式":"Fiat payout method","生成入金指引":"Get deposit instructions","疑似重复订单":"Possible duplicate order","登记调整凭证":"Record adjustment","监控自动风控":"Monitor automated risk","秒内相同订单":"s, same order","管理角色权限":"Manage role permissions","累计完成订单":"Completed orders","累计滑点成本":"Total slippage cost","美元自动通过":"USD pass automatically","自动风控系统":"Automated risk system","获取充币地址":"Get deposit address","订单价格保护":"Order price protection","请先生成账本":"Generate the ledger first","请联系管理员":"please contact an administrator","请转入稳定币":"Please send stablecoin","账户余额不足":"Insufficient balance","超过单笔上限":"exceeds the per-order cap","转管理员批准":"sent for admin approval","这是历史订单":"This is a historical order","选择演示客户":"Choose a demo customer","逐档吃单计算":"level by level","部署的网页版":"deployed web version","隐藏真实规模":"hiding the true size","须与实名一致":"must match the registered name","风控主管确认":"Risk Head confirmation","风控确认差异":"Risk confirmed break","风险筛查通过":"Risk screening passed","下单权限分两种":"Order permission has two modes","不涉及真实资金":"no real funds involved","之间的佣金比例":"commission rate between","从账户余额扣除":"Deducted from balance","以实现职责分离":"for segregation of duties","任一环节可退回":"any step can send it back","充币和兑换订单":"crypto deposits and exchange orders","再执行日终对账":"then run daily reconciliation again","出款确认与对账":"Payout confirmation & reconciliation","到账所需确认数":"Confirmations required","员工与角色代码":"Staff & role codes","外部转账或汇款":"External transfer","客户关系部经理":"Customer Relations Manager","客户咨询与投诉":"Customer inquiries & complaints","客户居住地准入":"Customer residency check","客户资金覆盖率":"Client money coverage","对冲与出款成本":"Hedge & payout costs","对应关系与比例":"Mapping & rates","对象和期间后点":"subject and period, then click","已分配角色代码":"Assigned role code","已登记调整凭证":"Adjustments recorded","已记录导出请求":"Export request logged","已转入你的钱包":"sent to your wallet","已载入客户订单":"Loaded customer order","已退回付款账户":"Returned to payer","市场买入稳定币":"Bought stablecoin in the market","应付推荐人佣金":"Referrer commission payable","应付推荐人金额":"Amount payable to referrer","张已存在而跳过":"already existed and were skipped","成交量按稳定币":"Volume converts stablecoins","手动确认后执行":"Manual confirmation","执行日终对账后":"After daily reconciliation","推荐人佣金比例":"Referrer commission rate","推荐人佣金费用":"Referrer commission expense","推荐人分成比例":"Referrer share","提交说明时使用":"used when submitting a note","收款账户与附言":"Receiving account & reference","智能订单成交额":"Smart order turnover","最优价自动选中":"best price auto-selected","最小充值数量为":"Minimum deposit is","最小入金金额为":"Minimum deposit amount is","查看客户与交易":"View customers & trades","查看月度结算单":"View monthly statements","检测到链上转账":"On-chain transfer detected","模拟第三方付款":"Simulate third-party payment","法币出款已发起":"Fiat payout initiated","深度和路由分配":"depth and route allocation","演示可随意填写":"anything works in the demo","生成与查看账本":"Generate & view ledger","确认后才会执行":"and it only executes after confirmation","角色代码不存在":"Role code not found","订单成本与利润":"Order cost & profit","请填写客户姓名":"Please enter the customer name","请输入员工姓名":"Please enter a staff name","请重新生成账本":"regenerate the ledger","路由分配和成交":"route allocation and fills","转风控主管确认":"sent to the Risk Head","运行中智能订单":"Running smart orders","银行手续费入账":"bank fee posted","银行扣收手续费":"Bank charge","限价偏离公允价":"Limit price deviates from fair price by","需财务主管说明":"needs a Finance Head note","下拉框默认选中他":"They are preselected in the dropdown","不接受第三方付款":"third-party payments are not accepted","付款人姓名不一致":"payer name mismatch","价格保护偏离阈值":"price protection deviation threshold","你的专属充币地址":"Your deposit address","佣金划转运营账户":"commission moved to operating account","修改客户分级规则":"Changed customer tier rules","减小对价格的冲击":"reducing market impact","分配新的角色代码":"Assign a new role code","只能向此地址转入":"Only send","同时询价多个渠道":"Requests quotes from several venues at once","地址风险筛查通过":"Address screening passed","填写差异原因说明":"Explain the break","定义客户分级规则":"Define customer tier rules","客户经理仅限本人":"account managers: own only","客户经理佣金比例":"AM commission rate","客户经理佣金费用":"AM commission expense","客户资金账户资产":"client money assets","已按调整凭证入账":"posted per adjustment","应付客户经理佣金":"AM commission payable","待对冲的客户订单":"Customer orders to hedge","按最优价拆单成交":"splits the order across the best prices","推荐人与客户经理":"Referrers & account managers","智能路由实时详情":"Smart routing live details","最近的入金与充币":"Recent deposits","模拟一笔大额差异":"Simulate a large break","没有推荐人可留空":"leave blank if none","用法币买入稳定币":"Buy stablecoin with fiat","疑似转入尚未确认":"likely an unconfirmed incoming transfer","登记对账调整凭证":"Recorded reconciliation adjustments","等待风控主管处理":"awaiting the Risk Head","管理员工角色代码":"Manage staff role codes","管理员批准后关闭":"and admin approval before closing","自动风控拦截订单":"Automated risk held order","自动风控放行订单":"Automated risk released order","至客户关系部经理":"to the Customer Relations Manager","订单价格保护拦截":"Blocked by order price protection","该角色代码已停用":"This role code is disabled","请填写完整的数字":"Please fill in all numbers","请填写推荐人姓名":"Please enter the referrer name","请联系管理员分配":"please ask an administrator to assign one","资产可能无法找回":"may result in permanent loss","链上地址风险筛查":"On-chain address screening","门槛必须逐档升高":"Thresholds must increase tier by tier","非投资或金融服务":"not an investment or financial service","付款人与实名不一致":"payer name does not match","付款人姓名核对一致":"Payer name verified","佣金按当前费率估算":"commission estimated at current rates","修改佣金与保护参数":"Change commission & protection settings","分配按价格从优到劣":"allocation goes from best to worst price","分配给所选客户经理":"Assign to selected AM","只露出一小部分数量":"Shows only a small part of the size","可以用风控主管代码":"Log in as the Risk Head with code","回复客户咨询与投诉":"Reply to customer inquiries & complaints","处理中的入金与充币":"Deposits in progress","审核通过后才会入账":"it is credited only after approval","居住地疑似受限地区":"Residence may be in a restricted region","已存入你的账户余额":"credited to your account balance","已比价的流动性渠道":"Venues compared","已自动对应客户经理":"auto-assigned to account manager","并再次执行日终对账":"and run daily reconciliation again","当前环境不支持下载":"Downloads are not supported here","推荐人佣金比例需在":"Referrer commission rate must be within","提交订单时的最优价":"best price at order submission","无推荐人客户的分配":"Assigning customers without a referrer","最小卖出金额是多少":"What is the minimum sell amount","最新入职的客户经理":"Newest account manager","本订单专用充值地址":"Deposit address for this order","没有无推荐人的客户":"No customers without a referrer","没有符合条件的成交":"No matching trades","没有符合条件的记录":"No matching records","法币已存入账户余额":"Fiat credited to balance","深度和报价每秒刷新":"Depth and quotes refresh every second","生成并启用角色代码":"Generate & enable role code","确认与批准对账差异":"Confirm & approve reconciliation breaks","管理员批准关闭差异":"Admin approved closing break","请填写收款钱包地址":"Please enter a receiving wallet address","请重新执行日终对账":"Please rerun daily reconciliation","财务主管确认并入账":"Finance Head confirms & posts","账本与外部余额差异":"Ledger vs external balance difference","转账大概多久能确认":"About how long does a transfer take to confirm","还没有生成过佣金表":"No reports generated yet","交易员默认为自动执行":"traders default to auto-execute","会得到汇总表和明细表":"to get the summary and detail tables","双因素验证和操作审批":"two-factor authentication and approvals","只显示最终的成交分布":"so only the final fill distribution is shown","同一岗位用同一个字母":"each position uses one letter","客户开户时填写推荐人":"Customers enter a referrer when opening an account","客户经理仅限本人客户":"account managers: own customers only","客户经理佣金比例需在":"AM commission rate must be within","已完成交易量自动分档":"completed volume sets the tier automatically","当前角色没有账本权限":"Your role has no ledger permission","把订单按时间均匀切片":"Slices the order evenly over time","授权人员查看渠道比价":"Authorized staff: view venue comparison","暂无处理中的客户订单":"No customer orders in progress","暂无已完成的客户订单":"No completed customer orders","暂无进行中的客户订单":"No open customer orders","来源地址命中风险标签":"Source address flagged","来源地址风险筛查通过":"Source address screening passed","生成佣金明细与汇总表":"generate commission details & summaries","生成并提交月度结算单":"Generate & submit monthly statements","真实系统需要账号认证":"a real system needs account authentication","稳定币已存入账户余额":"Stablecoin credited to balance","请先填写差异原因说明":"Please explain the break first","请在附言里填写参考号":"put the reference number in the payment note","请核对下面的路由方案":"review the routing plan below","还没有入金或充币记录":"No deposits yet","这笔充币需要风控审核":"This deposit needs a risk review","银行扣收的在途手续费":"In-transit bank charge","链上到账与账本不一致":"On-chain receipt does not match the ledger","链上手续费由客户承担":"network fees are paid by the customer","也可以改选其他客户经理":"you can also pick another account manager","仅在客户没有分档时使用":"used only when the customer has no tier","付款人姓名与实名不一致":"payer name does not match the registered name","保存对应关系与佣金比例":"Save mapping & rates","地址和到账过程均为模拟":"addresses and settlement are simulated","客户关系部经理提交财务":"Customer Relations Manager submits to finance","客户等级按当前档位显示":"Tier shows the customer's current tier","客户资金覆盖率不得低于":"Client money coverage must not fall below","当前没有在职的客户经理":"No active account managers","当前角色没有结算单权限":"Your role has no statement permission","数字是该岗位的员工编号":"the number is the staff number within that position","演示版仅展示界面和流程":"Demo of screens and workflows only","稳定币已转出到你的钱包":"Stablecoin sent to your wallet","美元依次经财务主管说明":"USD go through a Finance Head note","你只能查看自己管理的客户":"You can only see the customers you manage","充币来源地址命中风险标签":"Deposit source address flagged","只在价格不劣于限价时成交":"Fills only at the limit price or better","并在入账前做链上风险筛查":"and screens it on-chain before crediting","当前角色没有成本分析权限":"Your role has no cost analysis permission","当前角色没有此页面的权限":"Your role has no permission for this page","模拟来源地址命中风险标签":"Simulate a flagged source address","管理角色权限本身不可取消":"the administrator's own permission-management rights cannot be removed","美元由财务主管说明后关闭":"USD close after a Finance Head note","输入管理员分配的角色代码":"Enter the role code assigned by an administrator","运营账户补足客户资金账户":"Operating account tops up client money account","不能停用自己正在使用的代码":"You cannot disable the code you are using","修改立即生效并写入审计日志":"Changes take effect immediately and are audit-logged","可查看全部客户经理和推荐人":"All account managers and referrers are visible","推荐人与客户经理月度结算单":"Monthly statements for referrers & account managers","新提交的订单会实时显示报价":"New orders show live quotes","生成或支付后请重新生成账本":"Regenerate the ledger after posting or paying","真实到账时间取决于入金方式":"Actual arrival depends on the deposit method","真实到账时间取决于出款通道":"Actual arrival time depends on the payout channel","美元升级给风控主管和管理员":"USD escalate to the Risk Head and administrator","需交易员核对路由方案后确认":"requires the trader to check the routing plan first","不同客户的档位和佣金比例不同":"tiers and commission rates differ by customer","付款人姓名必须与开户实名一致":"The payer name must match the account holder's registered name","以及这些客户对应的推荐人佣金":"plus the referrer commissions for those customers","兑换订单显示付出和收到的金额":"Exchange orders show the amounts paid and received","客户经理只能看到本人的结算单":"Account managers see only their own statements","并由运营账户补足客户资金账户":"and the operating account tops up the client money account","新的分级规则将用于之后的报价":"new tier rules apply to future quotes","昨天的出款比预计晚了两个小时":"Yesterday's payout arrived two hours later than expected","确认佣金结算单入账与标记支付":"Post commission statements & mark paid","管理员默认不含下单和出款权限":"Administrators have no order or payout permission by default","系统会计提佣金费用和应付佣金":"the system accrues commission expense and commission payable","表示用余额支付或收款存入余额":"means paid from or credited to the balance","角色代码是一个字母加两位数字":"A role code is one letter plus two digits","这里会实时显示所有渠道的报价":"this panel shows every venue's quotes live","当前角色没有下达智能订单的权限":"Your role cannot place smart orders","等待客户关系部经理分配客户经理":"waiting for the Customer Relations Manager to assign an account manager","系统自动对应该推荐人的客户经理":"the system assigns that referrer's account manager","超出容差的项目会在这里生成待办":"items outside tolerance create to-dos here","转入其他代币或通过其他网络转账":"Sending other tokens or using another network","个待分配客户给最新入职的客户经理":"unassigned customers to the newest account manager","佣金比例是下单当时报价使用的比例":"Commission rate is the rate quoted when the order was placed","充值地址与高风险标签存在间接关联":"Deposit address indirectly linked to a high-risk label","真实系统会为每个订单生成唯一地址":"A real system generates a unique address per order","真实系统会通知客户并记录合规留痕":"A real system notifies the customer and keeps a compliance record","真实系统要求付款人姓名与实名一致":"A real system requires the payer name to match the registered name","美元需财务主管说明并登记调整凭证":"USD need a Finance Head note and an adjustment entry","超出各档深度的部分追加到最优渠道":"any excess beyond the depth goes to the best venue","与其对应客户经理的佣金比例合计超过":"and its account manager's commission rates together exceed","佣金比例均为占我方佣金收入的百分比":"All rates are a percentage of our commission income","定义推荐人与客户经理对应及佣金比例":"Define referrer–account manager mapping & rates","推荐人与客户经理对应关系及佣金比例":"Referrer–account manager mapping & commission rates","滑点为成交均价相对到达价的不利偏离":"Slippage is the adverse deviation of the avg fill price from the arrival price","客户下单并通过风控审核后会出现在这里":"Customer orders appear here after passing risk review","并自动把对应佣金比例加入该客户的报价":"and that tier's commission rate is added to the customer's quotes automatically","修改推荐人与客户经理对应关系及佣金比例":"Changed referrer–account manager mapping & rates","系统没有保存当时各渠道的报价和深度快照":"no snapshot of venue quotes and depth was saved","系统自动把客户对应到该推荐人的客户经理":"the system maps the customer to that referrer's account manager","一键分配所有待分配客户给最新入职的客户经理":"Assign all unassigned customers to the newest account manager","把账本余额与托管方和银行的外部余额逐项核对":"to compare ledger balances item by item with custodian and bank balances","标记已支付时冲减应付佣金并减少运营账户银行存款":"marking paid reverses the payable and reduces the operating bank balance","管理员和后台界面借鉴机构交易平台的通用功能布局":"admin and back-office screens follow common institutional trading-platform layouts","按当前资金流水生成带科目编码的复式记账凭证和试算平衡表":"to generate coded double-entry vouchers and a trial balance from current cash movements","已模拟一笔":"Simulated a","已取消一笔":"Removed the simulated","各角色默认显示语言":"Default display language per role","跟随用户或首页选择":"Follow the user's or home page choice","保存语言设置":"Save language settings","修改各角色默认显示语言":"Changed default display language per role","切换显示语言":"Switched display language","用户自己的选择优先于角色默认语言":"a user's own choice overrides the role default","每个用户可以在页面右上角自己选择显示语言":"Each user can choose a display language at the top right","都没有设置时跟随首页的选择":"if neither is set, the home page choice applies","生成月度结算单":"Generated monthly statements","语言":"Language","默认显示语言":"Default display language","关联单号":"Ref. ID","风险等级":"Severity","一":"one","下一步":"Next","不能修改自己正在使用的账号":"You cannot change the account you are using","与证件一致":"as on your ID","两次输入的密码不一致":"The passwords do not match","两步验证":"Two-step verification","员工在首页":"the employee enters it under","中使用":"on the home page","中使用激活码激活":"and use the activation code","中国大陆":"Mainland China","以后用角色代码":"From now on, log in with the role code","位":"characters","位动态码":"digit code","位验证码":"digit code","你的推荐人是":"Your referrer is","你的账户尚未完成身份认证":"Your account has not completed identity verification","你的身份认证正在审核":"Your identity verification is under review","修改了密码":"changed their password","修改密码":"Change password","其他国家或地区":"Other countries or regions","其他国家或地区的身份证":"National ID (other countries or regions)","再输入应用显示的":"then enter the","有效期":"valid for","制裁名单未命中":"no sanctions match","动态码":"Code","动态验证码":"Authenticator code","勾选即视为通过":"ticking counts as passed","去登录":"Go to login","去认证":"Verify now","发送邮箱验证码":"Send email code","发送验证码":"Send code","员工":"Staff","员工用它重新设置密码和身份验证器":"the employee uses it to reset the password and authenticator","员工角色代码":"Staff role codes","如果该邮箱已注册":"If this email is registered","安全设置":"Security","完成活体检测":"Complete liveness check","完成激活":"Finish activation","完成身份认证":"to complete identity verification","审核客户身份认证":"Review customer KYC","客户经理会在分配后与你联系":"An account manager will contact you once assigned","密码":"Password","密码和身份验证器动态码登录":"password and authenticator code","密码均为":"password for all is","密码已修改":"Password changed","密码已重置":"Password reset","密码至少":"Password needs at least","密码连续输错":"Wrong password entered","对应的客户经理会跟进":"and their account manager will follow up","小写字母和数字":"lowercase letters and digits","居住国家或地区":"Country or region of residence","居住地":"Residence","已开启":"On","已激活":"Activated","已激活账号并绑定身份验证器":"activated the account and bound an authenticator","已解锁":"Unlocked","已认证":"Verified","已通过":"Approved","已锁定":"Locked","当前密码":"Current password","当前密码不正确":"Current password is incorrect","待审核":"Pending review","待激活":"Pending activation","忘记密码":"Forgot password","我已阅读并同意用户协议":"I have read and agree to the Terms of Use","隐私政策和风险披露":"Privacy Policy and Risk Disclosure","我是员工":"I'm staff","我是客户":"I'm a customer","或用":"or use","或由身份验证器应用生成":"or generated by an authenticator app","或该账号已激活":"or the account is already activated","所以不会收到验证码":"so no code is sent","手机文件预览":"Phone file previews","找回":"to recover it","护照":"Passport","按钮暂时无法使用":"so buttons will not work","推荐码":"Referral code","推荐码不存在":"Referral code not found","提交认证":"Submit for verification","提交身份认证":"submitted identity verification","新加坡":"Singapore","新员工使用管理员发放的角色代码和一次性激活码激活账号":"New staff activate their account with the role code and one-time activation code issued by an administrator","新员工用激活码在首页激活账号":"New staff activate their accounts on the home page with an activation code","新客户注册":"New customer registered","新密码":"New password","新密码至少":"New password needs at least","暂不向中国大陆居民提供服务":"we do not currently serve residents of Mainland China","暂无待审核的身份认证":"No pending identity verifications","暂时不能使用资金和交易功能":"funding and trading are not available yet","认证通过后才能使用资金和交易功能":"funding and trading become available after verification","通过后即可使用资金和交易功能":"funding and trading become available once approved","最近登录":"Recent logins","未认证":"Not verified","根据本平台的合规政策":"Under our compliance policy","次":"times","次锁定":"failed attempts","连续输错":"locks after","欧盟国家":"EU countries","注册":"Sign up","注册用推荐码":"Referral codes for sign-up","注册邮箱":"Registered email","活体通过":"liveness passed","浏览器直接打开这个文件":"","请用":"Please open this file directly in","演示不会上传":"not uploaded in the demo","演示动态码":"Demo code","演示环境不会上传或保存证件文件":"The demo does not upload or store ID files","演示环境说明":"About this demo","演示验证码":"Demo code","激活码":"activation code","激活账号":"Activate account","然后设置密码并绑定身份验证器":"then set a password and bind an authenticator","用":"In","等应用添加下面的密钥":"or a similar app, add the key below","等":"etc.","电脑上的快速预览通常不会运行脚本":"and quick previews on computers usually do not run scripts","登录后请在":"After logging in, please go to","登录失败锁定":"Login lockout","的激活码":"activation code","通过客户":"Approved customer","拒绝客户":"Rejected customer","的身份认证":"identity verification","真实系统会发到邮箱":"a real system sends them by email","真实系统会通过邮件发给员工":"a real system emails it to the employee","确认密码":"Confirm password","确认新密码":"Confirm new password","等待风控审核":"awaiting risk review","绑定身份验证器":"Bind authenticator","聊天软件或邮件里的附件预览":"attachment previews in chat apps or email","自动检查":"Automated checks","至少":"At least","英国":"United Kingdom","角色代码或密码不正确":"Incorrect role code or password","角色代码或激活码不正确":"Incorrect role code or activation code","解锁":"Unlock","解锁员工账号":"Unlocked staff account","认证状态":"KYC status","设置密码":"Set password","证件":"ID","证件信息不清晰":"ID details are unclear","证件号码":"ID number","证件有效":"ID valid","证件照片":"ID photo","证件类型":"ID type","该账号尚未激活":"This account is not activated yet","该邮箱已注册":"This email is already registered","请先在":"Please first go to","请先完成活体检测":"Please complete the liveness check first","请先阅读并同意用户协议":"Please read and accept the Terms of Use","请在":"Please go to","请填写姓名和证件号码":"Please enter your name and ID number","请打开绑定的身份验证器":"Open your authenticator app","请核对":"please check it","请用新密码登录":"please log in with your new password","请直接登录":"please log in","请联系管理员解锁":"please ask an administrator to unlock it","请输入有效的邮箱地址":"Please enter a valid email address","请输入邮箱和密码":"Please enter your email and password","请选择":"Select","请选择居住国家或地区":"Please select your country or region of residence","请选择证件照片":"Please choose an ID photo","请通过":"Please use","请重新发送":"please resend","请重新发送验证码":"please resend the code","请重新提交":"please resubmit","账号已激活":"Account activated","账号已锁定":"Account locked","账户与认证":"Account & verification","账户信息":"Account details","账户已创建":"Account created","账户已锁定":"account locked","身份认证":"Identity verification","身份认证审核":"Identity verification review","身份认证未通过":"Identity verification failed","身份验证器上的":"From your authenticator:","输入当前的":"and enter the current","返回修改":"Back to edit","这个邮箱没有注册":"this email is not registered","选填":"optional","通过":"Approve","邮箱":"Email","邮箱或密码不正确":"Incorrect email or password","邮箱验证码":"Email code","重新发送验证码":"Resend code","重新生成激活码":"New activation code","重置了密码":"reset their password","重置后再登录":"to reset it, then log in","重置员工密码":"Reset staff password","重置密码":"Reset password","错误次数过多":"Too many wrong attempts","阿联酋":"UAE","阿联酋身份证":"UAE ID","需包含大写字母":"including uppercase letters","需同时包含字母和数字":"including letters and digits","页面脚本没有运行":"The page script is not running","风控合规人员审核后会通知你":"you will be notified after compliance review","香港特别行政区":"Hong Kong SAR","验证并创建账户":"Verify & create account","验证并登录":"Verify & log in","验证码":"Code","验证码不正确":"Incorrect code","验证码和动态码会直接显示在页面上":"Codes are shown directly on the page","验证码已发送":"a code has been sent","验证码已发送至":"Code sent to","验证码已失效":"The code has expired"},TWM={"与":"與","专":"專","业":"業","两":"兩","个":"個","为":"為","义":"義","买":"買","于":"於","产":"產","仅":"僅","从":"從","价":"價","优":"優","会":"會","伟":"偉","余":"餘","债":"債","兑":"兌","关":"關","内":"內","写":"寫","冲":"沖","决":"決","冻":"凍","净":"淨","减":"減","几":"幾","凭":"憑","击":"擊","划":"劃","刘":"劉","则":"則","刚":"剛","创":"創","别":"別","办":"辦","务":"務","动":"動","匀":"勻","区":"區","单":"單","卖":"賣","占":"佔","历":"歷","参":"參","双":"雙","发":"發","号":"號","后":"後","启":"啟","吴":"吳","员":"員","咨":"諮","场":"場","块":"塊","处":"處","复":"複","头":"頭","孙":"孫","实":"實","审":"審","对":"對","导":"導","将":"將","属":"屬","岗":"崗","币":"幣","带":"帶","并":"並","库":"庫","应":"應","废":"廢","开":"開","异":"異","张":"張","当":"當","录":"錄","志":"誌","态":"態","总":"總","户":"戶","托":"託","执":"執","护":"護","报":"報","担":"擔","拟":"擬","拦":"攔","择":"擇","换":"換","据":"據","数":"數","无":"無","时":"時","显":"顯","暂":"暫","机":"機","权":"權","条":"條","来":"來","杨":"楊","构":"構","标":"標","档":"檔","检":"檢","槛":"檻","汇":"匯","没":"沒","测":"測","润":"潤","点":"點","状":"狀","环":"環","现":"現","电":"電","监":"監","盖":"蓋","码":"碼","确":"確","离":"離","种":"種","称":"稱","稳":"穩","笔":"筆","筛":"篩","签":"簽","类":"類","级":"級","纪":"紀","线":"線","组":"組","细":"細","终":"終","经":"經","结":"結","给":"給","络":"絡","绝":"絕","统":"統","续":"續","编":"編","网":"網","职":"職","联":"聯","节":"節","荐":"薦","获":"獲","营":"營","补":"補","规":"規","览":"覽","触":"觸","计":"計","订":"訂","认":"認","记":"記","设":"設","证":"證","诉":"訴","试":"試","询":"詢","该":"該","详":"詳","说":"說","请":"請","调":"調","负":"負","财":"財","责":"責","败":"敗","账":"帳","贷":"貸","费":"費","资":"資","赎":"贖","赵":"趙","转":"轉","载":"載","输":"輸","达":"達","过":"過","运":"運","还":"還","这":"這","进":"進","迟":"遲","适":"適","选":"選","里":"裡","鉴":"鑑","钟":"鐘","钱":"錢","钻":"鑽","银":"銀","链":"鏈","销":"銷","锁":"鎖","键":"鍵","长":"長","门":"門","闭":"閉","问":"問","间":"間","阈":"閾","陈":"陳","险":"險","随":"隨","隐":"隱","页":"頁","项":"項","须":"須","顾":"顧","预":"預","额":"額","风":"風","验":"驗","黄":"黃","简":"簡","体":"體","语":"語","传":"傳","册":"冊","协":"協","国":"國","欧":"歐","浏":"瀏","绑":"綁","脑":"腦","脚":"腳","视":"視","议":"議","误":"誤","读":"讀","软":"軟","连":"連","邮":"郵","钥":"鑰","钮":"鈕","错":"錯","阅":"閱","陆":"陸"},TWP={"回复":"回覆","汇总":"彙總","网络":"網路","登录":"登入","退出登录":"登出","导出":"匯出","支持":"支援","界面":"介面","默认":"預設","文件":"檔案","信息":"資訊","下拉框":"下拉選單","批准":"批准","准入":"准入","余额":"餘額","注册":"註冊","激活":"啟用","设置":"設定","密钥":"金鑰","软件":"軟體","邮箱":"電子郵件","脚本":"指令碼","系统":"系統","占比":"佔比","演示":"示範","视频":"影片"};
+var LNAME={"zh-CN":"简体中文","zh-TW":"繁體中文","en":"English"};
+var LANG="zh-CN",LPREF={},RLANG={},TITLE0=document.title,ENMAX=0,TWPMAX=0;
+Object.keys(EN).forEach(function(k){if(k.length>ENMAX)ENMAX=k.length});
+Object.keys(TWP).forEach(function(k){if(k.length>TWPMAX)TWPMAX=k.length});
+try{var sv=JSON.parse(localStorage.getItem("demo-lang")||"{}");LPREF=sv.p||{};RLANG=sv.r||{}}catch(e){}
+function saveL(){try{localStorage.setItem("demo-lang",JSON.stringify({p:LPREF,r:RLANG}))}catch(e){}}
+function ukey(){return USER?(USER==="客户"?"C:"+CURC:"S:"+UCODE):"home"}
+function pickLang(){var l=LPREF[ukey()]||(USER&&RLANG[USER])||LPREF.home||"zh-CN";return LNAME[l]?l:"zh-CN"}
+function toTW(s){
+  var o="",i=0;
+  while(i<s.length){
+    var hit=false;
+    for(var L=Math.min(TWPMAX,s.length-i);L>=2;L--){var w=s.substr(i,L);if(TWP[w]!==undefined){o+=TWP[w];i+=L;hit=true;break}}
+    if(!hit){var c=s.charAt(i);o+=TWM[c]||c;i++}
+  }
+  return o;
+}
+function segEN(run){
+  if(EN[run]!==undefined)return EN[run];
+  var n=run.length,best=[[]];
+  for(var i=0;i<n;i++){
+    if(!best[i])continue;
+    for(var j=Math.min(n,i+ENMAX);j>i;j--){
+      var w=run.slice(i,j);
+      if(EN[w]!==undefined){var c=best[i].concat([EN[w]]);if(!best[j]||c.length<best[j].length)best[j]=c}
+    }
+  }
+  return best[n]?best[n].filter(function(x){return x}).join(" "):null;
+}
+function toEN(s){
+  var out=s.replace(/[一-鿿]+/g,function(m,off,str){
+    var t=segEN(m);if(t===null)return m;
+    var pre=off>0&&/[A-Za-z0-9%)\]]/.test(str.charAt(off-1))?" ":"";
+    var post=/[A-Za-z0-9(\[$]/.test(str.charAt(off+m.length))?" ":"";
+    return pre+t+post;
+  });
+  out=out.replace(/（/g," (").replace(/）/g,") ").replace(/，/g,", ").replace(/。/g,". ").replace(/：/g,": ").replace(/；/g,"; ").replace(/、/g,", ").replace(/？/g,"? ").replace(/！/g,"! ").replace(/[“「]/g,' "').replace(/[”」]/g,'" ').replace(/" ([,.;:!?)])/g,'"$1');
+  out=out.replace(/ {2,}/g," ").replace(/ ([,.;:!?)])/g,"$1").replace(/\( /g,"(").replace(/\n /g,"\n").replace(/\.\./g,".");
+  if(!/^\s/.test(s))out=out.replace(/^ +/,"");
+  if(!/\s$/.test(s)&&!/[：，；。、]$/.test(s))out=out.replace(/ +$/,"");
+  if(out.length&&/[a-z]/.test(out.charAt(0))&&/^[一-鿿]/.test(s))out=out.charAt(0).toUpperCase()+out.slice(1);
+  return out;
+}
+function trText(s){return LANG==="en"?toEN(s):LANG==="zh-TW"?toTW(s):s}
+var TMAP=typeof WeakMap!=="undefined"?new WeakMap():null;
+function skipEl(el){return !el||(el.closest&&el.closest("script,style,textarea,[data-nt]"))}
+function trNode(n){
+  if(!TMAP)return;
+  var p=n.parentNode;if(!p||skipEl(p))return;
+  var rec=TMAP.get(n),o=(rec&&rec.t===n.nodeValue)?rec.o:n.nodeValue;
+  if(!/[一-鿿]/.test(o)){if(rec)TMAP.delete(n);return}
+  if(LANG==="zh-CN"&&!rec)return;
+  if(p.nodeName==="OPTION"&&!p.hasAttribute("value"))p.setAttribute("value",o.replace(/\s+/g," ").trim());
+  var t=trText(o);TMAP.set(n,{o:o,t:t});if(n.nodeValue!==t)n.nodeValue=t;
+}
+function trEl(el){
+  if(!el)return;
+  if(el.nodeType===3){trNode(el);return}
+  if(el.nodeType!==1||skipEl(el))return;
+  var ph=[el].concat([].slice.call(el.querySelectorAll("[placeholder]")));
+  ph.forEach(function(x){
+    if(!x.hasAttribute||!x.hasAttribute("placeholder"))return;
+    var o=x.getAttribute("data-ph0");
+    if(o===null){o=x.getAttribute("placeholder");if(!/[一-鿿]/.test(o))return;x.setAttribute("data-ph0",o)}
+    x.setAttribute("placeholder",trText(o));
+  });
+  var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),n,list=[];
+  while((n=w.nextNode()))list.push(n);
+  list.forEach(trNode);
+}
+function setLang(l){
+  if(!LNAME[l])l="zh-CN";
+  LANG=l;$("lang").value=l;
+  document.documentElement.lang=l==="en"?"en":l;
+  document.title=trText(TITLE0);
+  trEl(document.body);
+}
+$("lang").onchange=function(){
+  var v=this.value;LPREF[ukey()]=v;saveL();setLang(v);
+  if(USER)log("切换显示语言："+LNAME[v]);
+};
+if(typeof MutationObserver!=="undefined"){
+  new MutationObserver(function(rs){
+    if(LANG==="zh-CN")return;
+    rs.forEach(function(r){if(r.type==="characterData")trNode(r.target);else r.addedNodes.forEach(trEl)});
+  }).observe(document.body,{childList:true,subtree:true,characterData:true});
+}
+function rLangCfg(){
+  var h='<table><tr><th>角色</th><th>默认显示语言</th></tr>';
+  ROLES.forEach(function(r,i){
+    h+="<tr><td>"+r+'</td><td><select id="rl_'+i+'"><option value="">跟随用户或首页选择</option>'+Object.keys(LNAME).map(function(k){return'<option data-nt value="'+k+'">'+LNAME[k]+"</option>"}).join("")+"</select></td></tr>";
+  });
+  $("rlang").innerHTML=h+"</table>";
+  ROLES.forEach(function(r,i){$("rl_"+i).value=RLANG[r]||""});
+}
+$("lsave").onclick=function(){
+  if(!can("cfg"))return;
+  ROLES.forEach(function(r,i){var v=$("rl_"+i).value;if(v)RLANG[r]=v;else delete RLANG[r]});
+  saveL();$("lsm").textContent="已保存。用户自己的选择优先于角色默认语言。";log("修改各角色默认显示语言");
+};
+setLang(pickLang());
+
+try{document.getElementById("nojs").style.display="none"}catch(e){}
+</script>
+</body>
+</html>
